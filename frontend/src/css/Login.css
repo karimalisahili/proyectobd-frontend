@@ -1,0 +1,19 @@
+:root{
+    box-sizing: border-box;
+    background: url(../assets/Fondoinicio.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+h1{
+    color: white;
+    text-align: center;
+    margin-top: 20px;
+}
+
+p{
+    color: #000000;
+    font-size: 30px;
+    font-style: oblique;
+    font-weight: bolder;
+}
