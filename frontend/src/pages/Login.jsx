@@ -46,7 +46,7 @@ export default function Login() {
                         margin: '10px 0',
                         borderRadius: '10px'}} />
         
-                    <Link to="/inicio" style={{textDecoration: 'none'}}>
+                    <Link to="/Home" style={{textDecoration: 'none'}}>
                         <Button variant="contained" sx={{
                             margin: '10px 0',
                             color: '#000000',
