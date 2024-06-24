@@ -32,7 +32,7 @@ function SearchBar() {
                         mt:2,
                     }}
                 />
-                <Button type="submit" variant="contained" sx={{ ml: 2, mt: 2, bgcolor: 'transparent' }}>Buscar</Button>
+                <Button type="submit" variant="contained" sx={{ml: 2, mt: 2, backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => { }}>Buscar</Button>
             </form>
         </Box>
     );

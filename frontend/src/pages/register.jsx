@@ -50,6 +50,15 @@ export default function Register() {
                             <TextField label="CEDULA-ENCARGADO" sx={{bgcolor: '#FFFFFF', width: '30%',margin: '10px',borderRadius: '10px'}} />
                             <TextField label="TELEFONO-ENCARGADO" sx={{bgcolor: '#FFFFFF', width: '30%', margin: '10px',borderRadius: '10px'}} />
                         </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                            <TextField label="DIRECCION-ENCARGADO" sx={{bgcolor: '#FFFFFF', width: '30%',margin: '10px',borderRadius: '10px'}} />
+                            <TextField label="SUELDO-ENCARGADO" type="number"
+                                InputProps={{
+                                    inputProps: {
+                                        min: 1}
+                                } } sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
+                        </Box>
                     </Box>
                     <Link to="/" style={{textDecoration: 'none'}}>
                         <Button variant="contained" sx={{
