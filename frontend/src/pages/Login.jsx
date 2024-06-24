@@ -40,7 +40,7 @@ export default function Login() {
                         margin: '10px 0',
                         borderRadius: '10px'}}/>
         
-                    <TextField  label="CEDULA DEL ENCARGADO" sx={{
+                    <TextField  label="Contraseña" sx={{
                         bgcolor: '#FFFFFF',
                         width: '100%',
                         margin: '10px 0',
@@ -55,6 +55,18 @@ export default function Login() {
                                 bgcolor: '#41B06E',
                                 color: '#FFFFFF'}}}>
                             Ingresar
+                        </Button>
+                    </Link>
+
+                    <Link to="/Register" style={{ textDecoration: 'none' }}>
+                        <Button variant="contained" sx={{
+                            margin: '10px 0',
+                            color: '#000000',
+                            bgcolor: '#FFFFFF',
+                            '&:hover': {
+                                bgcolor: '#41B06E',
+                                color: '#FFFFFF'}}}>
+                            Registrarse
                         </Button>
                     </Link>
                 </Box>

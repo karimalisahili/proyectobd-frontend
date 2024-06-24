@@ -1,0 +1,24 @@
+.vertical_line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 100%;
+    background-color: #000;
+    z-index: -1;
+}
+
+.circle {
+    width: 150px;
+    /* Tamaño del círculo */
+    height: 150px;
+    /* Tamaño del círculo */
+    background-color: transparent;
+    /* Color del círculo */
+    border-radius: 50%;
+    border: #000 solid 1px;
+    /* Hace el div completamente redondo */
+    /* Distancia desde el borde inferior de la ventana, ajusta según necesites */
+}
+
