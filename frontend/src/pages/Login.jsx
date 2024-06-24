@@ -5,6 +5,9 @@ import Fondo from '../assets/Fondoinicio.png';
 import '../css/Login.css';
 
 export default function Login() {
+
+
+
     return (
         <div>
             <img src={Fondo} alt="Fondo" className='fondo' />
@@ -40,7 +43,7 @@ export default function Login() {
                         margin: '10px 0',
                         borderRadius: '10px'}}/>
         
-                    <TextField  label="Contraseña" sx={{
+                    <TextField  label="RIF-Encargado" sx={{
                         bgcolor: '#FFFFFF',
                         width: '100%',
                         margin: '10px 0',
