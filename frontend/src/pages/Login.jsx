@@ -9,14 +9,6 @@ import Navbar from '../components/Navbar';
 
 export default function Login() {
 
-    const [navbarProps, setnavbarProps] = useState({ nombreEncargado:''});
-    const [showNavbar, setShowNavbar] = useState(false);
-
-    const handleNavbar = (nombre) => {
-    setnavbarProps({ nombreEncargado: nombre }); // Asegúrese de que esta línea se ejecuta correctamente.
-    setShowNavbar(true);
-};
-
     const navigate = useNavigate(); // Step 2
 
     const [formData, setFormData] = useState({
@@ -44,7 +36,6 @@ export default function Login() {
 
             const nombreEncargado = match.nombre_encargado;
             console.log("Nombre del Encargado:", nombreEncargado);
-            handleNavbar(nombreEncargado);
             navigate('/Home');
         } else {
             alert("Los datos ingresados no coinciden con nuestros registros.");
@@ -121,7 +112,6 @@ export default function Login() {
                     </Link>
                 </Box>
             </Container>
-        {showNavbar && <Navbar {...navbarProps} />} 
         </div>    
     )
 }

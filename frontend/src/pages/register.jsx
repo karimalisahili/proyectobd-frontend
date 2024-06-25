@@ -2,7 +2,7 @@ import { Button, Container, Box, TextField } from '@mui/material';
 import Fondo from '../assets/Fondoinicio.png';
 import Logo from '../assets/Logo.png';
 import '../css/Register.css';
-import React, { useState, useEffect } from 'react';
+import { useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Register() {
@@ -32,6 +32,12 @@ const [formData, setFormData] = useState({
         e.preventDefault();
         const existingData = JSON.parse(localStorage.getItem('formDatabase') || '[]');
         const index = existingData.findIndex(item => item.rif_sucursal === formData.rif_sucursal);
+
+        const isAnyFieldEmpty = Object.values(formData).some(value => value === '' || value === 0);
+        if (isAnyFieldEmpty) {
+            alert("Todos los campos son obligatorios. Por favor, complete todos los campos.");
+            return; // Detiene la ejecución si algún campo está vacío
+        }
 
         // Verificación de RIF existente
         if (index !== -1) {

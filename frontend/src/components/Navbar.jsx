@@ -6,14 +6,8 @@ import Logo from '../assets/Logo.png';
 import '../css/Navbar.css';
 import PropTypes from 'prop-types';
 
-function Navbar(props) {
-
-    const { nombreEncargado } = props;
-
-     useEffect(() => {
-        console.log('Nombre del Encargado actualizado:', nombreEncargado);
-    }, [nombreEncargado]);
-    
+function Navbar() {
+ 
     const [nbLateralProps, setNbLateralProps] = useState({ title1: '', title2: '', title3: '', title4: '', padre:''});
     const [shownbLateral, setShownbLateral] = useState(false);
 
@@ -26,7 +20,7 @@ function Navbar(props) {
         <Box>
             <Box sx={{ bgcolor: '#41B06E', flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                 <Link to='/Home' style={{ textDecoration: 'none' }}><img src={Logo} alt="Logo" className="logo" /></Link>
-                <h1 className='navh1'>WELCOME { nombreEncargado }</h1>
+                <h1 className='navh1'>WELCOME</h1>
             </Box>
             <AppBar position="static" sx={{
                 bgcolor: '#8DECB4',
@@ -64,9 +58,5 @@ function Navbar(props) {
         </Box>
     );
 }
-
-Navbar.propTypes = {
-    nombreEncargado: PropTypes.string.isRequired,
-};
 
 export default Navbar;
