@@ -37,12 +37,13 @@ export default function Login() {
             if (!response.ok) {
                 throw new Error('Error en la solicitud de inicio de sesión');
             }
-
             const data = await response.json();
             console.log('Inicio de sesión exitoso:', data);
+            alert('Inicio de sesión exitoso');
             // Aquí puedes redirigir al usuario o hacer algo con los datos de la sesión
         } catch (error) {
             console.error('Error al iniciar sesión:', error);
+            alert('Error al iniciar sesión', error);
         }
     };
 
@@ -93,7 +94,8 @@ export default function Login() {
                         onChange={handlerifEncargadoChange}
                          />
         
-                    <Link to="" style={{textDecoration: 'none'}}>
+                    <Link style={{textDecoration: 'none'}}
+                        onClick={handleLogin}>
                         <Button variant="contained" sx={{
                             margin: '10px 0',
                             color: '#000000',
