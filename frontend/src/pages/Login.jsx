@@ -1,12 +1,50 @@
+import React, { useState } from 'react';
 import { Button, Container, Box, TextField } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Logo from '../assets/Logo.png';
 import Fondo from '../assets/Fondoinicio.png';
 import '../css/Login.css';
 
+const SERVERNAME = import.meta.env.VITE_SERVERNAME;
+
 export default function Login() {
 
+    const [rifSuc, setRifSuc] = useState('');
+    const [rifEncargado, setrifEncargado] = useState('');
+  
+    const handleRifSucChange = (event) => {
+      setRifSuc(event.target.value);
+    };
+  
+    const handlerifEncargadoChange = (event) => {
+      setrifEncargado(event.target.value);
+    };
+    
+    const handleLogin = async (event) => {
+        event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+        try {
+            const response = await fetch(`${SERVERNAME}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rifSuc,
+                    rifEncargado,
+                }),
+            });
 
+            if (!response.ok) {
+                throw new Error('Error en la solicitud de inicio de sesión');
+            }
+
+            const data = await response.json();
+            console.log('Inicio de sesión exitoso:', data);
+            // Aquí puedes redirigir al usuario o hacer algo con los datos de la sesión
+        } catch (error) {
+            console.error('Error al iniciar sesión:', error);
+        }
+    };
 
     return (
         <div>
@@ -41,15 +79,21 @@ export default function Login() {
                         bgcolor: '#FFFFFF',
                         width: '100%',
                         margin: '10px 0',
-                        borderRadius: '10px'}}/>
+                        borderRadius: '10px'}}
+                            value = {rifSuc}
+                            onChange = {handleRifSucChange}
+                        />
         
                     <TextField  label="RIF-Encargado" sx={{
                         bgcolor: '#FFFFFF',
                         width: '100%',
                         margin: '10px 0',
-                        borderRadius: '10px'}} />
+                        borderRadius: '10px'}}
+                        value={rifEncargado}
+                        onChange={handlerifEncargadoChange}
+                         />
         
-                    <Link to="/Home" style={{textDecoration: 'none'}}>
+                    <Link to="" style={{textDecoration: 'none'}}>
                         <Button variant="contained" sx={{
                             margin: '10px 0',
                             color: '#000000',
