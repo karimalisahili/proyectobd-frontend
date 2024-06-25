@@ -20,32 +20,35 @@ export default function Login() {
       setrifEncargado(event.target.value);
     };
     
-    const handleLogin = async (event) => {
-        event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-        try {
-            const response = await fetch(`${SERVERNAME}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    rifSuc,
-                    rifEncargado,
-                }),
-            });
+const handleLogin = async (event) => {
+    event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+    try {
+        const response = await fetch(`${SERVERNAME}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                rifSuc,
+                rifEncargado,
+            }),
+        });
 
-            if (!response.ok) {
-                throw new Error('Error en la solicitud de inicio de sesión');
-            }
-            const data = await response.json();
-            console.log('Inicio de sesión exitoso:', data);
-            alert('Inicio de sesión exitoso');
-            // Aquí puedes redirigir al usuario o hacer algo con los datos de la sesión
-        } catch (error) {
-            console.error('Error al iniciar sesión:', error);
-            alert('Error al iniciar sesión', error);
+        const data = await response.json(); // Parsea la respuesta como JSON
+        if (!response.ok) {
+            throw new Error(data.message || 'Error en la solicitud de inicio de sesión');
         }
-    };
+        
+        console.log('Inicio de sesión exitoso:', data);
+        alert(data.message); // Muestra el mensaje de éxito
+        // Aquí puedes redirigir al usuario o hacer algo con los datos de la sesión
+        // Por ejemplo, guardar el usuario en el almacenamiento local
+        localStorage.setItem('user', JSON.stringify(data.user));
+    } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        alert(error.message || 'Error al iniciar sesión');
+    }
+};
 
     return (
         <div>
