@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import Logo from '../assets/Logo.png';
 import Fondo from '../assets/Fondoinicio.png';
 import '../css/Login.css';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+import { useAuth } from '../router/AuthContext';
 
 export default function Login() {
+
+    const { setEncargado } = useAuth();
 
     const navigate = useNavigate(); // Step 2
 
@@ -36,6 +38,7 @@ export default function Login() {
 
             const nombreEncargado = match.nombre_encargado;
             console.log("Nombre del Encargado:", nombreEncargado);
+            setEncargado(nombreEncargado);
             navigate('/Home');
         } else {
             alert("Los datos ingresados no coinciden con nuestros registros.");

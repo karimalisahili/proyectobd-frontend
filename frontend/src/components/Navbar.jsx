@@ -1,12 +1,14 @@
 import { AppBar, Box, Toolbar, Container, Button } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import NbLateral from './NbLateral';
 import Logo from '../assets/Logo.png';
 import '../css/Navbar.css';
-import PropTypes from 'prop-types';
+import { useAuth } from '../router/AuthContext';
 
 function Navbar() {
+
+    const { encargado } = useAuth();
  
     const [nbLateralProps, setNbLateralProps] = useState({ title1: '', title2: '', title3: '', title4: '', padre:''});
     const [shownbLateral, setShownbLateral] = useState(false);
@@ -20,7 +22,7 @@ function Navbar() {
         <Box>
             <Box sx={{ bgcolor: '#41B06E', flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                 <Link to='/Home' style={{ textDecoration: 'none' }}><img src={Logo} alt="Logo" className="logo" /></Link>
-                <h1 className='navh1'>WELCOME</h1>
+                <h1 className='navh1'>WELCOME { encargado }</h1>
             </Box>
             <AppBar position="static" sx={{
                 bgcolor: '#8DECB4',
