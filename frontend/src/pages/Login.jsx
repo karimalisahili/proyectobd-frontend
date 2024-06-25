@@ -7,6 +7,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
+const SERVERNAME = import.meta.env.VITE_SERVERNAME;
+
 export default function Login() {
 
     const navigate = useNavigate(); // Step 2
@@ -24,25 +26,58 @@ export default function Login() {
     }));
     };
     
-    const handleSubmit = (e) => {
-    e.preventDefault();
-    // Acceder a los datos almacenados en localStorage
-        const datosAlmacenados = JSON.parse(localStorage.getItem('formDatabase'));
+    // const handleSubmit = (e) => {
+    // e.preventDefault();
+    // // Acceder a los datos almacenados en localStorage
+    //     const datosAlmacenados = JSON.parse(localStorage.getItem('formDatabase'));
 
-    if (datosAlmacenados) {
-        const match = datosAlmacenados.find(item => item.rif_sucursal === formData.rif_sucursal && item.cedula_encargado === formData.cedula_encargado);
-        if (match) {
-            console.log("Los datos ingresados coinciden con los datos almacenados.");
+    // if (datosAlmacenados) {
+    //     const match = datosAlmacenados.find(item => item.rif_sucursal === formData.rif_sucursal && item.cedula_encargado === formData.cedula_encargado);
+    //     if (match) {
+    //         console.log("Los datos ingresados coinciden con los datos almacenados.");
 
-            const nombreEncargado = match.nombre_encargado;
-            console.log("Nombre del Encargado:", nombreEncargado);
-            navigate('/Home');
-        } else {
-            alert("Los datos ingresados no coinciden con nuestros registros.");
+    //         const nombreEncargado = match.nombre_encargado;
+    //         console.log("Nombre del Encargado:", nombreEncargado);
+    //         navigate('/Home');
+    //     } else {
+    //         alert("Los datos ingresados no coinciden con nuestros registros.");
+    //     }
+    // }};
+
+
+    const handleLogin = async (event) => {
+    event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+    // Desestructurar formData para obtener rif_sucursal y cedula_encargado
+    const { rif_sucursal, cedula_encargado } = formData;
+
+    try {
+        const response = await fetch(`${SERVERNAME}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                rif_sucursal,
+                cedula_encargado,
+            }),
+        });
+
+        const data = await response.json(); // Parsea la respuesta como JSON
+        if (!response.ok) {
+            throw new Error(data.message || 'Error en la solicitud de inicio de sesión');
         }
-    }
         
-    };
+        // Aquí puedes redirigir al usuario o hacer algo con los datos de la sesión
+        // Por ejemplo, guardar el usuario en el almacenamiento local
+        localStorage.setItem('user', JSON.stringify(data.user));
+        navigate('/Home');
+    } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        alert(error.message || 'Error al iniciar sesión');
+    }
+};
+        
     return (
         <div>
             <img src={Fondo} alt="Fondo" className='fondo' />
@@ -69,7 +104,7 @@ export default function Login() {
                     margin: 'auto'}}
                     noValidate
                     autoComplete="off"
-                    onSubmit={handleSubmit}
+                    onSubmit={handleLogin}
                 >
         
                     <h1>WELCOME</h1>
