@@ -33,16 +33,23 @@ const [formData, setFormData] = useState({
         const existingData = JSON.parse(localStorage.getItem('formDatabase') || '[]');
         const index = existingData.findIndex(item => item.rif_sucursal === formData.rif_sucursal);
 
-        if (index === -1) {
-            // Nuevo registro
-            existingData.push(formData);
-        } else {
-            // Actualizar registro existente
-            existingData[index] = { ...existingData[index], ...formData };
+        // Verificación de RIF existente
+        if (index !== -1) {
+            alert("El RIF ingresado ya está registrado. Por favor, ingrese un RIF diferente.");
+            return; // Detiene la ejecución si el RIF ya existe
         }
 
+        const cedulaIndex = existingData.findIndex(item => item.cedula_encargado === formData.cedula_encargado);
+        if (cedulaIndex !== -1) {
+            alert("La cédula del encargado ingresada ya está registrada. Por favor, ingrese una cédula diferente.");
+        return; // Detiene la ejecución si la cédula ya existe
+    }
+
+        // Nuevo registro
+        existingData.push(formData);
         localStorage.setItem('formDatabase', JSON.stringify(existingData));
         console.log('Registro guardado:', formData);
+
         // Resetear formulario
         setFormData({
             rif_sucursal: '',
@@ -54,7 +61,6 @@ const [formData, setFormData] = useState({
             direccion_encargado: '',
             sueldo_encargado: 0,
         });
-
         alert("Registro completado correctamente.");
         
         navigate('/');
