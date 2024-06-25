@@ -3,8 +3,55 @@ import { Link } from 'react-router-dom';
 import Logo from '../assets/Logo.png';
 import Fondo from '../assets/Fondoinicio.png';
 import '../css/Login.css';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 export default function Login() {
+
+    const [navbarProps, setnavbarProps] = useState({ nombreEncargado:''});
+    const [showNavbar, setShowNavbar] = useState(false);
+
+    const handleNavbar = (nombre) => {
+    setnavbarProps({ nombreEncargado: nombre }); // Asegúrese de que esta línea se ejecuta correctamente.
+    setShowNavbar(true);
+};
+
+    const navigate = useNavigate(); // Step 2
+
+    const [formData, setFormData] = useState({
+        rif_sucursal: '',
+        cedula_encargado: ''
+    });
+
+    const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+    };
+    
+    const handleSubmit = (e) => {
+    e.preventDefault();
+    // Acceder a los datos almacenados en localStorage
+        const datosAlmacenados = JSON.parse(localStorage.getItem('formDatabase'));
+
+    if (datosAlmacenados) {
+        const match = datosAlmacenados.find(item => item.rif_sucursal === formData.rif_sucursal && item.cedula_encargado === formData.cedula_encargado);
+        if (match) {
+            console.log("Los datos ingresados coinciden con los datos almacenados.");
+
+            const nombreEncargado = match.nombre_encargado;
+            console.log("Nombre del Encargado:", nombreEncargado);
+            handleNavbar(nombreEncargado);
+            navigate('/Home');
+        } else {
+            alert("Los datos ingresados no coinciden con nuestros registros.");
+        }
+    }
+        
+    };
     return (
         <div>
             <img src={Fondo} alt="Fondo" className='fondo' />
@@ -30,33 +77,36 @@ export default function Login() {
                     justifyContent:'center',
                     margin: 'auto'}}
                     noValidate
-                    autoComplete="off">
+                    autoComplete="off"
+                    onSubmit={handleSubmit}
+                >
         
                     <h1>WELCOME</h1>
 
-                    <TextField  label="RIF-SUCURSAL" sx={{
-                        bgcolor: '#FFFFFF',
-                        width: '100%',
-                        margin: '10px 0',
-                        borderRadius: '10px'}}/>
+                    <TextField label="RIF-SUCURSAL" sx={{ bgcolor: '#FFFFFF', width: '100%', margin: '10px 0', borderRadius: '10px' }}
+                        name="rif_sucursal"
+                        value={formData.rif_sucursal}
+                        onChange={handleChange}
+                    />
         
-                    <TextField  label="Contraseña" sx={{
-                        bgcolor: '#FFFFFF',
-                        width: '100%',
-                        margin: '10px 0',
-                        borderRadius: '10px'}} />
-        
-                    <Link to="/Home" style={{textDecoration: 'none'}}>
+                    <TextField label="CEDULA-ENCARGADO" sx={{ bgcolor: '#FFFFFF', width: '100%', margin: '10px 0', borderRadius: '10px' }}
+                        name="cedula_encargado"
+                        value={formData.cedula_encargado}
+                        onChange={handleChange}
+                    />
                         <Button variant="contained" sx={{
                             margin: '10px 0',
                             color: '#000000',
                             bgcolor: '#FFFFFF',
                             '&:hover': {
                                 bgcolor: '#41B06E',
-                                color: '#FFFFFF'}}}>
+                                color: '#FFFFFF'
+                            }
+                        }}
+                            type="submit"
+                        >
                             Ingresar
                         </Button>
-                    </Link>
 
                     <Link to="/Register" style={{ textDecoration: 'none' }}>
                         <Button variant="contained" sx={{
@@ -71,6 +121,7 @@ export default function Login() {
                     </Link>
                 </Box>
             </Container>
+        {showNavbar && <Navbar {...navbarProps} />} 
         </div>    
     )
 }

@@ -1,4 +1,5 @@
 import { Box, Button, List, ListItem, ListItemText, Divider } from '@mui/material';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 const style = {
@@ -9,30 +10,60 @@ const style = {
   color: 'black',
 };
 
+
 const datosDePrueba = [
-  { primary: "Elemento 1", secondary: "Detalle 1", cedula:"30293326", telefono:"123456", sueldo:"1000$" },
-    { primary: "Elemento 2", secondary: "Detalle 2", cedula: "15778991", telefono: "654321", sueldo: "2000$" },
-    { primary: "Elemento 3", secondary: "Detalle 3", cedula: "12345678", telefono: "987654", sueldo: "3000$" },
-    { primary: "Elemento 4", secondary: "Detalle 4", cedula: "87654321", telefono: "456789", sueldo: "4000$" },
-    { primary: "Elemento 5", secondary: "Detalle 5", cedula: "98765432", telefono: "789456", sueldo: "5000$" },
-    { primary: "Elemento 6", secondary: "Detalle 6", cedula: "23456789", telefono: "654987", sueldo: "6000$" },
-    { primary: "Elemento 7", secondary: "Detalle 7", cedula: "34567890", telefono: "987654", sueldo: "7000$" },
-    { primary: "Elemento 8", secondary: "Detalle 8", cedula: "45678901", telefono: "654987", sueldo: "8000$" },
-    { primary: "Elemento 9", secondary: "Detalle 9", cedula: "56789012", telefono: "987654", sueldo: "9000$" },
-    { primary: "Elemento 10", secondary: "Detalle 10", cedula: "67890123", telefono: "654987", sueldo: "10000$" },
-    { primary: "Elemento 11", secondary: "Detalle 11", cedula: "78901234", telefono: "987654", sueldo: "11000$" },
-    { primary: "Elemento 12", secondary: "Detalle 12", cedula: "89012345", telefono: "654987", sueldo: "12000$" },
-    { primary: "Elemento 13", secondary: "Detalle 13", cedula: "90123456", telefono: "987654", sueldo: "13000$" },
-    { primary: "Elemento 14", secondary: "Detalle 14", cedula: "01234567", telefono: "654987", sueldo: "14000$" },
-    { primary: "Elemento 15", secondary: "Detalle 15", cedula: "12345678", telefono: "987654", sueldo: "15000$" },
+    {
+        nombrePadre: 'Libreta',
+        hijos: [
+            { 
+                nombreHijo: 'Personal',
+                datos: [
+                    { primary: 'Juan Perez', secondary: 'Gerente', cedula: '123456789', telefono: '1234567890', sueldo: '1000' },
+                    { primary: 'Maria Lopez', secondary: 'Secretaria', cedula: '987654321', telefono: '0987654321', sueldo: '800' },
+                    { primary: 'Pedro Ramirez', secondary: 'Chofer', cedula: '456789123', telefono: '4567891230', sueldo: '700' },
+                    { primary: 'Ana Rodriguez', secondary: 'Cajera', cedula: '789123456', telefono: '7891234560', sueldo: '900' },
+                ]
+            },
+            { 
+                nombreHijo: 'Cliente',
+                datos: [
+                    { primary: 'Jose Perez', secondary: 'Cliente', cedula: '123456789', telefono: '1234567890', sueldo: '1000' },
+                    { primary: 'Luis Lopez', secondary: 'Cliente', cedula: '987654321', telefono: '0987654321', sueldo: '800' },
+                    { primary: 'Carlos Ramirez', secondary: 'Cliente', cedula: '456789123', telefono: '4567891230', sueldo: '700' },
+                    { primary: 'Ana Rodriguez', secondary: 'Cliente', cedula: '789123456', telefono: '7891234560', sueldo: '900' },
+                ]
+            },
+            { 
+                nombreHijo: 'Vehiculo',
+                datos: [
+                    { primary: 'Toyota', secondary: 'Carro', cedula: '123456789', telefono: '1234567890', sueldo: '1000' },
+                    { primary: 'Mazda', secondary: 'Carro', cedula: '987654321', telefono: '0987654321', sueldo: '800' },
+                    { primary: 'Ford', secondary: 'Carro', cedula: '456789123', telefono: '4567891230', sueldo: '700' },
+                    { primary: 'Chevrolet', secondary: 'Carro', cedula: '789123456', telefono: '7891234560', sueldo: '900' },
+                ]
+            },
+        ]
+    }
 ];
 
-function Lists() {
+
+function Lists({opcion, raiz}) {
     const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState({});
 
     const manejarClicEnEmpleado = (dato) => {
         setEmpleadoSeleccionado(dato);
     };
+
+console.log("Raíz buscada:", raiz);
+console.log("Datos de prueba:", datosDePrueba);
+const padreRaiz = datosDePrueba.find(padre => padre.nombrePadre === raiz);
+    console.log("Padre encontrado:", padreRaiz);
+    
+    console.log('Hijo buscado:', opcion);
+    const hijoOpcion = padreRaiz ? padreRaiz.hijos.find(hijo => hijo.nombreHijo === opcion) : null;
+
+    console.log("Hijo encontrado:", hijoOpcion);
+    
 
     return (
         <Box>
@@ -40,14 +71,11 @@ function Lists() {
         <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
                 <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
                     <List sx={{ ...style, maxHeight: '250px', overflowY: 'auto' }}>
-                        {datosDePrueba.map((dato, index) => (
-                            <React.Fragment key={index}>
-                                <ListItem onClick={() => manejarClicEnEmpleado(dato)}>
-                                    <ListItemText primary={dato.primary} secondary={dato.secondary} />
-                                    {dato.cedula}
-                                </ListItem>
-                                <Divider component="li" />
-                            </React.Fragment>
+                        {hijoOpcion && hijoOpcion.datos.map((dato, index) => (
+                            <ListItem key={index} onClick={() => manejarClicEnEmpleado(dato)}>
+                                <ListItemText primary={dato.primary} secondary={dato.secondary} />
+                                {dato.cedula}
+                            </ListItem>
                         ))}
                     </List>
                     <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, mt:3 }} onClick={() => { }}>
@@ -86,5 +114,10 @@ function Lists() {
             </Box>
     )
 }
+
+Lists.propTypes = {
+    opcion: PropTypes.string,
+    raiz: PropTypes.string,
+};
 
 export default Lists;

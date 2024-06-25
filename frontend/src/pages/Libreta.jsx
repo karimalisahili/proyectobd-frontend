@@ -15,7 +15,6 @@ function Libreta() {
             <NbLateral />
             <Navbar />
             <SearchBar />
-            <Lists />
         </Box>
     )
 }
