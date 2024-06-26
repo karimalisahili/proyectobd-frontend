@@ -40,7 +40,7 @@ export default function Login() {
 
     //         const nombreEncargado = match.nombre_encargado;
     //         console.log("Nombre del Encargado:", nombreEncargado);
-            setEncargado(nombreEncargado);
+           // setEncargado(nombreEncargado);
     //         navigate('/Home');
     //     } else {
     //         alert("Los datos ingresados no coinciden con nuestros registros.");
@@ -70,7 +70,7 @@ export default function Login() {
         if (!response.ok) {
             throw new Error(data.message || 'Error en la solicitud de inicio de sesión');
         }
-        
+
         // Aquí puedes redirigir al usuario o hacer algo con los datos de la sesión
         // Por ejemplo, guardar el usuario en el almacenamiento local
         localStorage.setItem('user', JSON.stringify(data.user));

@@ -5,6 +5,8 @@ import '../css/Register.css';
 import { useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const SERVERNAME = import.meta.env.VITE_SERVERNAME;
+
 export default function Register() {
 
      const navigate = useNavigate(); // Step 2
@@ -28,49 +30,128 @@ const [formData, setFormData] = useState({
         }));
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const existingData = JSON.parse(localStorage.getItem('formDatabase') || '[]');
-        const index = existingData.findIndex(item => item.rif_sucursal === formData.rif_sucursal);
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     const existingData = JSON.parse(localStorage.getItem('formDatabase') || '[]');
+    //     const index = existingData.findIndex(item => item.rif_sucursal === formData.rif_sucursal);
 
-        const isAnyFieldEmpty = Object.values(formData).some(value => value === '' || value === 0);
-        if (isAnyFieldEmpty) {
-            alert("Todos los campos son obligatorios. Por favor, complete todos los campos.");
-            return; // Detiene la ejecución si algún campo está vacío
-        }
+    //     const isAnyFieldEmpty = Object.values(formData).some(value => value === '' || value === 0);
+    //     if (isAnyFieldEmpty) {
+    //         alert("Todos los campos son obligatorios. Por favor, complete todos los campos.");
+    //         return; // Detiene la ejecución si algún campo está vacío
+    //     }
 
-        // Verificación de RIF existente
-        if (index !== -1) {
-            alert("El RIF ingresado ya está registrado. Por favor, ingrese un RIF diferente.");
-            return; // Detiene la ejecución si el RIF ya existe
-        }
+    //     // Verificación de RIF existente
+    //     if (index !== -1) {
+    //         alert("El RIF ingresado ya está registrado. Por favor, ingrese un RIF diferente.");
+    //         return; // Detiene la ejecución si el RIF ya existe
+    //     }
 
-        const cedulaIndex = existingData.findIndex(item => item.cedula_encargado === formData.cedula_encargado);
-        if (cedulaIndex !== -1) {
-            alert("La cédula del encargado ingresada ya está registrada. Por favor, ingrese una cédula diferente.");
-        return; // Detiene la ejecución si la cédula ya existe
-    }
+    //     const cedulaIndex = existingData.findIndex(item => item.cedula_encargado === formData.cedula_encargado);
+    //     if (cedulaIndex !== -1) {
+    //         alert("La cédula del encargado ingresada ya está registrada. Por favor, ingrese una cédula diferente.");
+    //     return; // Detiene la ejecución si la cédula ya existe
+    // }
 
-        // Nuevo registro
-        existingData.push(formData);
-        localStorage.setItem('formDatabase', JSON.stringify(existingData));
-        console.log('Registro guardado:', formData);
+    //     // Nuevo registro
+    //     existingData.push(formData);
+    //     localStorage.setItem('formDatabase', JSON.stringify(existingData));
+    //     console.log('Registro guardado:', formData);
 
-        // Resetear formulario
-        setFormData({
-            rif_sucursal: '',
-            nombre_sucursal: '',
-            ciudad_sucursal: '',
-            nombre_encargado: '',
-            cedula_encargado: '',
-            telefono_encargado: '',
-            direccion_encargado: '',
-            sueldo_encargado: 0,
-        });
-        alert("Registro completado correctamente.");
+    //     // Resetear formulario
+    //     setFormData({
+    //         rif_sucursal: '',
+    //         nombre_sucursal: '',
+    //         ciudad_sucursal: '',
+    //         nombre_encargado: '',
+    //         cedula_encargado: '',
+    //         telefono_encargado: '',
+    //         direccion_encargado: '',
+    //         sueldo_encargado: 0,
+    //     });
+    //     alert("Registro completado correctamente.");
         
-        navigate('/');
-    };
+    //     navigate('/');
+    // };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+        // Desestructurar formData para obtener los datos del formulario
+        const {
+            rif_sucursal: RIFSuc,
+            nombre_sucursal: NombreSuc,
+            ciudad_sucursal: Ciudad,
+            nombre_encargado: Nombre,
+            cedula_encargado: Cedula,
+            telefono_encargado: Telefono,
+            direccion_encargado: Direccion,
+            sueldo_encargado: Salario
+          } = formData;
+        
+        
+        try {
+            const response = await fetch(`${SERVERNAME}/sucursal`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    RIFSuc,
+                    NombreSuc,
+                    Ciudad
+                }),
+            });
+
+            const data = await response.json(); // Parsea la respuesta como JSON
+            if (!response.ok) {
+                throw new Error(data.message || 'Error en la solicitud de registro');
+            }
+
+                    // Si llegamos aquí, la primera solicitud fue exitosa
+        console.log("Respuesta de sucursal:", data); // Paso 1
+        
+            const responseEncargado = await fetch(`${SERVERNAME}/trabajadores`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    Cedula,
+                    Nombre,
+                    Direccion,
+                    Salario,
+                    Telefono,
+                    RIFSuc
+                }),
+            });
+
+            const dataEncargado = await responseEncargado.json(); // Parsea la respuesta como JSON
+            if (!responseEncargado.ok) {
+                throw new Error(dataEncargado.message || 'Error en la solicitud de registro');
+            }
+
+            const responsePutSucursal = await fetch(`${SERVERNAME}/sucursal`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    RIFSuc,
+                    NombreSuc,
+                    Ciudad,
+                    Encargado: Cedula
+                }),
+            });
+
+            const dataPutSucursal = await responsePutSucursal.json(); // Parsea la respuesta como JSON
+            alert('registrado correctamente');
+            navigate('/');
+        } catch (error) {
+            console.error('Error al registrar la sucursal', error);
+            alert('Error al registrar la sucursal. Por favor, intente nuevamente.');
+        }
+    }
     
     return (
         <div>
