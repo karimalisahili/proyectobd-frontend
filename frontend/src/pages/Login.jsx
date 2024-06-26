@@ -25,6 +25,26 @@ export default function Login() {
       [name]: value
     }));
     };
+    
+    // const handleSubmit = (e) => {
+    // e.preventDefault();
+    // // Acceder a los datos almacenados en localStorage
+    //     const datosAlmacenados = JSON.parse(localStorage.getItem('formDatabase'));
+
+    // if (datosAlmacenados) {
+    //     const match = datosAlmacenados.find(item => item.rif_sucursal === formData.rif_sucursal && item.cedula_encargado === formData.cedula_encargado);
+    //     if (match) {
+    //         console.log("Los datos ingresados coinciden con los datos almacenados.");
+
+    //         const nombreEncargado = match.nombre_encargado;
+    //         console.log("Nombre del Encargado:", nombreEncargado);
+           // setEncargado(nombreEncargado);
+    //         navigate('/Home');
+    //     } else {
+    //         alert("Los datos ingresados no coinciden con nuestros registros.");
+    //     }
+    // }};
+
 
     const handleLogin = async (event) => {
     event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
@@ -48,7 +68,7 @@ export default function Login() {
         if (!response.ok) {
             throw new Error(data.message || 'Error en la solicitud de inicio de sesión');
         }
-        
+
         // Aquí puedes redirigir al usuario o hacer algo con los datos de la sesión
         // Por ejemplo, guardar el usuario en el almacenamiento local
         localStorage.setItem('user', JSON.stringify(data.user));
