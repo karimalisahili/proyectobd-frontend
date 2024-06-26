@@ -1,12 +1,12 @@
 import Navbar from '../components/Navbar';
 
-function Descuentos() {
+function Configuracion() {
     return (
         <div>
             <Navbar />
-            <h1>Descuentos</h1>
+            <h1>Configuracion</h1>
         </div>
     )
 }
 
-export default Descuentos;
+export default Configuracion;
