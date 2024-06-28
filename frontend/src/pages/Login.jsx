@@ -11,6 +11,8 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 export default function Login() {
 
+    const { setEncargado } = useAuth();
+
     const navigate = useNavigate(); // Step 2
 
     const [formData, setFormData] = useState({
