@@ -30,50 +30,6 @@ const [formData, setFormData] = useState({
         }));
     };
 
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     const existingData = JSON.parse(localStorage.getItem('formDatabase') || '[]');
-    //     const index = existingData.findIndex(item => item.rif_sucursal === formData.rif_sucursal);
-
-    //     const isAnyFieldEmpty = Object.values(formData).some(value => value === '' || value === 0);
-    //     if (isAnyFieldEmpty) {
-    //         alert("Todos los campos son obligatorios. Por favor, complete todos los campos.");
-    //         return; // Detiene la ejecución si algún campo está vacío
-    //     }
-
-    //     // Verificación de RIF existente
-    //     if (index !== -1) {
-    //         alert("El RIF ingresado ya está registrado. Por favor, ingrese un RIF diferente.");
-    //         return; // Detiene la ejecución si el RIF ya existe
-    //     }
-
-    //     const cedulaIndex = existingData.findIndex(item => item.cedula_encargado === formData.cedula_encargado);
-    //     if (cedulaIndex !== -1) {
-    //         alert("La cédula del encargado ingresada ya está registrada. Por favor, ingrese una cédula diferente.");
-    //     return; // Detiene la ejecución si la cédula ya existe
-    // }
-
-    //     // Nuevo registro
-    //     existingData.push(formData);
-    //     localStorage.setItem('formDatabase', JSON.stringify(existingData));
-    //     console.log('Registro guardado:', formData);
-
-    //     // Resetear formulario
-    //     setFormData({
-    //         rif_sucursal: '',
-    //         nombre_sucursal: '',
-    //         ciudad_sucursal: '',
-    //         nombre_encargado: '',
-    //         cedula_encargado: '',
-    //         telefono_encargado: '',
-    //         direccion_encargado: '',
-    //         sueldo_encargado: 0,
-    //     });
-    //     alert("Registro completado correctamente.");
-        
-    //     navigate('/');
-    // };
-
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
