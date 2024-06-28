@@ -9,7 +9,7 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 export default function Register() {
 
-     const navigate = useNavigate(); // Step 2
+     const navigate = useNavigate(); 
 
 const [formData, setFormData] = useState({
         rif_sucursal: '',
@@ -110,7 +110,7 @@ const [formData, setFormData] = useState({
 
                     // Si llegamos aquí, la primera solicitud fue exitosa
         console.log("Respuesta de sucursal:", data); // Paso 1
-        
+
             const responseEncargado = await fetch(`${SERVERNAME}/trabajadores`, {
                 method: 'POST',
                 headers: {
