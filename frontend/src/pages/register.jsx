@@ -100,8 +100,7 @@ const [formData, setFormData] = useState({
                 }),
             });
 
-            const dataPutSucursal = await responsePutSucursal.json(); // Parsea la respuesta como JSON
-            navigate('/');
+            
         } catch (error) {
             console.error('Error al registrar la sucursal', error);
             alert('Error al registrar la sucursal. Por favor, intente nuevamente.');
