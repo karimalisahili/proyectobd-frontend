@@ -1,10 +1,11 @@
 import Navbar from '../components/Navbar';
+import NbLateral from '../components/NbLateral'
 
 function Servicios() {
     return (
         <div>
+            <NbLateral />
             <Navbar />
-            <h1>Servicios</h1>
         </div>
     )
 }
