@@ -2,9 +2,14 @@ import { Button, Box} from '@mui/material';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Lists from './Lists';
+import ListService from './listService';
 import '../css/NbLateral.css';
+import { useAuth } from '../router/AuthContext';
 
-function NbLateral({ title1, title2, title3, title4, padre}) {
+function NbLateral({ title1, title2, title3, title4, padre, listType}) {
+
+    const [showLists, setShowLists] = useState(false);
+    const { authData } = useAuth(); // Accede a los datos de autenticación
 
     const buttons = [
         { title: title1, raiz: padre },
@@ -14,7 +19,6 @@ function NbLateral({ title1, title2, title3, title4, padre}) {
     ];
 
     const [listsProps, setlistsProps] = useState({ opcion: '', raiz: '' });
-    const [showLists, setShowLists] = useState(false);
 
     const handlelists = (option) => {
         setlistsProps(option);
@@ -35,7 +39,10 @@ function NbLateral({ title1, title2, title3, title4, padre}) {
                     </Button>
                 ))}
             </div>
-            {showLists && <Lists {...listsProps} />} {/* Renderización condicional basada en showLists */}      
+            {showLists && (listType === 'list' ? <Lists {...listsProps} authData={authData} /> :
+                listType === 'listService' ? <ListService {...listsProps} authData={authData} /> :
+  null
+)}        
         </Box>
     );
 }
@@ -46,6 +53,7 @@ NbLateral.propTypes = {
     title3: PropTypes.string,
     title4: PropTypes.string,
     padre: PropTypes.string,
+    listType: PropTypes.string,
 };
 
 export default NbLateral;
