@@ -50,7 +50,7 @@ function Navbar() {
                                 <Link to="/Inventario" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'>Inventario</p> </Link>
                             </Button>
                             <Button sx={{ my: 2, mx: 5, color: 'white', display: 'block' }}>
-                                <Link to="/Descuentos" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'>Descuentos</p> </Link>
+                                <Link to="/Configuracion" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'>Configuracion</p> </Link>
                             </Button>
                         </Box>
                     </Toolbar>

@@ -7,7 +7,7 @@ import Servicios from '../pages/Servicios'
 import Tienda from '../pages/Tienda'
 import Proveedores from '../pages/Proveedores'
 import Inventario from '../pages/Inventario'
-import Descuentos from '../pages/Descuentos'
+import Configuracion from '../pages/Configuracion'
 import Register from '../pages/register'
 
 export default function AppRouter() {
@@ -20,7 +20,7 @@ export default function AppRouter() {
                 <Route path="/Tienda" element={<Tienda />} />
                 <Route path="/Proveedores" element={<Proveedores />} />
                 <Route path="/Inventario" element={<Inventario />} />
-                <Route path="/Descuentos" element={<Descuentos />} />
+                <Route path="/Configuracion" element={<Configuracion />} />
                 <Route path="/Register" element={<Register />} />
         </Routes>
     )
