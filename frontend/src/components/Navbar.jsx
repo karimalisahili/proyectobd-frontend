@@ -6,7 +6,10 @@ import Logo from '../assets/Logo.png';
 import '../css/Navbar.css';
 import { useAuth } from '../router/AuthContext';
 
+
 function Navbar() {
+    const userJson = localStorage.getItem('user');
+    const user = JSON.parse(userJson);
 
     const { encargado } = useAuth();
  
@@ -22,7 +25,7 @@ function Navbar() {
         <Box>
             <Box sx={{ bgcolor: '#41B06E', flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                 <Link to='/Home' style={{ textDecoration: 'none' }}><img src={Logo} alt="Logo" className="logo" /></Link>
-                <h1 className='navh1'>WELCOME { encargado }</h1>
+                <h1 className='navh1'>WELCOME {user.Encargado.toUpperCase()}</h1>
             </Box>
             <AppBar position="static" sx={{
                 bgcolor: '#8DECB4',

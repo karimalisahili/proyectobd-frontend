@@ -2,6 +2,7 @@
 import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React,{ useState, useEffect } from 'react';
+import PersonIcon from '@mui/icons-material/Person';
 
 // Definición de la variable SERVERNAME que obtiene el valor de la variable de entorno VITE_SERVERNAME.
 // Este valor se utiliza para configurar el nombre del servidor en la aplicación.
@@ -42,6 +43,9 @@ const commonStyles = {
   boxShadow: 24,
   p: 4,
 };
+
+// Define un estilo base para la lista y lo extiende con propiedades específicas para controlar su altura máxima y el desbordamiento vertical
+const listStyle = { ...style, maxHeight: '320px', overflowY: 'auto' };
 
 // Hook personalizado para manejar formularios
 function useForm(initialState) {
@@ -322,8 +326,7 @@ function Vehiculo() {
   );
 }
 
-// Define un estilo base para la lista y lo extiende con propiedades específicas para controlar su altura máxima y el desbordamiento vertical
-const listStyle = { ...style, maxHeight: '250px', overflowY: 'auto' };
+
 
 // Define una función para renderizar una lista de elementos
 function renderList(items, textKey, secondaryKey, onSeleccionado) {
@@ -448,7 +451,7 @@ function Lists({ opcion }) {
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
           {mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, mt: 3 }} onClick={() => handleOpen(opcion)}>
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
             Agregar {opcion}
           </Button>
           {/* Modal que se muestra u oculta basado en el estado 'open' */}
@@ -466,7 +469,9 @@ function Lists({ opcion }) {
       <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '35%', height: 'auto' }}>
         {seleccionEnLists ? (
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-          <div className="circle"></div>
+            <div className="circle">
+                <PersonIcon sx={{ fontSize: 150 }} />
+          </div>
             <h2>{ seleccionEnLists.Nombre || '' }</h2>
             <h2>{seleccionEnLists.Cedula || ''}</h2>
             <h2>{seleccionEnLists.NombreResponsable || ''}</h2>
@@ -478,7 +483,9 @@ function Lists({ opcion }) {
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
             <List sx={style}>
-    {seleccionEnLists && Object.entries(seleccionEnLists).map(([key, value]) => (
+    {seleccionEnLists && Object.entries(seleccionEnLists)
+  .slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'NombreResponsable' || entry[0] === 'Direccion'))
+  .map(([key, value]) => (
       <React.Fragment key={key}>
         <ListItem>
           <ListItemText primary={`${key}: `} />
@@ -489,7 +496,7 @@ function Lists({ opcion }) {
     ))}
   </List>
           {/* Botón para modificar, aún no implementado completamente */}
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' } }}>
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, '&:hover': { backgroundColor: '#41B06E' } }}>
             Modificar
           </Button>
         </Box>
