@@ -1,7 +1,7 @@
 // Importación de componentes de Material UI, PropTypes y hooks de React.
-import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import React,{ useState, useEffect } from 'react';
 
 // Definición de la variable SERVERNAME que obtiene el valor de la variable de entorno VITE_SERVERNAME.
 // Este valor se utiliza para configurar el nombre del servidor en la aplicación.
@@ -326,14 +326,21 @@ function Vehiculo() {
 const listStyle = { ...style, maxHeight: '250px', overflowY: 'auto' };
 
 // Define una función para renderizar una lista de elementos
-function renderList(items, textKey, secondaryKey) {
+function renderList(items, textKey, secondaryKey, onSeleccionado) {
+
+  const [Seleccionado, setSeleccionado] = useState(null);
+
+  const manejarClicSeleccionado = (seleccion) => {
+    setSeleccionado(seleccion);
+    onSeleccionado(seleccion);
+};
   // Retorna un componente List de Material-UI con un estilo personalizado
   return (
     <List sx={listStyle}>
       {/* Mapea cada elemento del array 'items' a un componente ListItem */}
       {items.map((item, index) => (
         // Cada ListItem tiene una key única basada en su índice para optimizar el renderizado
-        <ListItem key={index}>
+        <ListItem key={index} button onClick={() => manejarClicSeleccionado(item)}>
           {/* ListItemText muestra el texto principal y secundario basado en las claves proporcionadas */}
           <ListItemText primary={item[textKey]} />
           {/* Muestra el valor secundario directamente sin un componente específico */}
@@ -345,18 +352,18 @@ function renderList(items, textKey, secondaryKey) {
 }
 
 // Define una función para mostrar una lista basada en la opción seleccionada
-function mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, vehiculosSeleccionados) {
+function mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, vehiculosSeleccionados, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
     case 'Personal':
       // Renderiza y retorna una lista de empleados seleccionados
-      return renderList(empleadosSeleccionados, 'Nombre', 'Cedula');
+      return renderList(empleadosSeleccionados, 'Nombre', 'Cedula', onSeleccionado);
     case 'Cliente':
       // Renderiza y retorna una lista de clientes seleccionados
-      return renderList(clientesSeleccionados, 'NombreResponsable', 'CIResponsable');
+      return renderList(clientesSeleccionados, 'NombreResponsable', 'CIResponsable', onSeleccionado);
     case 'Vehiculo':
       // Renderiza y retorna una lista de vehículos seleccionados
-      return renderList(vehiculosSeleccionados, 'Placa', 'CodVehiculo');
+      return renderList(vehiculosSeleccionados, 'Placa', 'CodVehiculo', onSeleccionado);
     default:
       // Retorna un párrafo indicando que se debe seleccionar una opción si ninguna coincide
       return <p>Seleccione una opción</p>;
@@ -406,6 +413,9 @@ function Lists({ opcion }) {
     setOpen(true);
   };
 
+  const closeModal = () => {
+  setOpen(false);
+};
   // Función para renderizar el formulario correspondiente en el modal
   const renderForm = () => {
     switch (formType) {
@@ -420,6 +430,15 @@ function Lists({ opcion }) {
     }
   };
 
+  const [seleccionEnLists, setSeleccionEnLists] = useState(null);
+
+  // Función para manejar la selección desde renderList
+  const manejarSeleccionEnLists = (seleccion) => {
+    setSeleccionEnLists(seleccion);
+    // Aquí puedes hacer algo más con la selección en el componente Lists
+  };
+
+  
   // Renderiza el componente
   return (
     <Box>
@@ -427,7 +446,7 @@ function Lists({ opcion }) {
       <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
-          {mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, vehiculosSeleccionados)}
+          {mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, mt: 3 }} onClick={() => handleOpen(opcion)}>
             Agregar {opcion}
@@ -435,7 +454,7 @@ function Lists({ opcion }) {
           {/* Modal que se muestra u oculta basado en el estado 'open' */}
           <Modal
             open={open}
-            onClose={() => setOpen(false)}
+            onClose={closeModal}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
@@ -444,27 +463,31 @@ function Lists({ opcion }) {
           </Modal>
         </Box>
       </Box>
-      <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '34%', height: 'auto' }}>
+      <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '35%', height: 'auto' }}>
+        {seleccionEnLists ? (
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           <div className="circle"></div>
-          <h2></h2>
-          <h2></h2>
+            <h2>{ seleccionEnLists.Nombre || '' }</h2>
+            <h2>{seleccionEnLists.Cedula || ''}</h2>
+            <h2>{seleccionEnLists.NombreResponsable || ''}</h2>
+            <h2>{seleccionEnLists.CIResponsable || ''}</h2>
         </Box>
+                      ) : (
+      <Typography>No se ha seleccionado ningún empleado</Typography>
+    )}
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
-          <List sx={style}>
-            <ListItem>
-              <ListItemText />
-            </ListItem>
-            <Divider component="li" />
-            <ListItem>
-              <ListItemText />
-            </ListItem>
-            <Divider component="li" />
-            <ListItem>
-              <ListItemText/>
-            </ListItem>
-          </List>
+            <List sx={style}>
+    {seleccionEnLists && Object.entries(seleccionEnLists).map(([key, value]) => (
+      <React.Fragment key={key}>
+        <ListItem>
+          <ListItemText primary={`${key}: `} />
+            {value || 'No disponible'}
+        </ListItem>
+        <Divider component="li" />
+      </React.Fragment>
+    ))}
+  </List>
           {/* Botón para modificar, aún no implementado completamente */}
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' } }}>
             Modificar

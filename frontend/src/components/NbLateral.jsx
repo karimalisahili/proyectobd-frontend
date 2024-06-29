@@ -26,14 +26,15 @@ function NbLateral({ title1, title2, title3, title4, padre, listType}) {
     };
 
     return (
-        <Box>
+        <Box >
             <div className="navbarlat">
+
                 {buttons.map((button, index) => (
                     <Button
                         key={index}
                         onClick={() => handlelists({ opcion: button.title, raiz: button.raiz })}
                         className="btnlat"
-                        sx={{ color: 'white', display: 'block', zIndex:'1000' }}
+                        sx={{ color: 'white', display: 'block', zIndex:'1000'}}
                     >
                         {button.title}
                     </Button>
