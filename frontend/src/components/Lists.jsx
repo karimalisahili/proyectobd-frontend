@@ -14,10 +14,57 @@ const style = {
 
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
-function Lists({ opcion, raiz }) {
+function Lists({ opcion}) {
 
   const [open, setOpen] = useState(false);
   const [formType, setFormType] = useState('');
+
+  const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
+  const [clientesSeleccionados, setClientesSeleccionados] = useState([]);
+   const [vehiculosSeleccionados, setVehiculosSeleccionados] = useState([]);
+
+  useEffect(() => {
+  const obtenerDatosEmpleados = async () => {
+    try {
+      const respuesta = await fetch(`${SERVERNAME}/TRABAJADORES`);
+      const datosEmpleados = await respuesta.json();
+       setEmpleadosSeleccionados(datosEmpleados);
+    } catch (error) {
+      console.error('Error al obtener datos de empleados:', error);
+    }
+  };
+  
+  obtenerDatosEmpleados();
+}, []);
+
+  useEffect(() => {
+  const obtenerDatosClientes = async () => {
+    try {
+      const respuesta = await fetch(`${SERVERNAME}/RESPONSABLES`);
+      const datosClientes = await respuesta.json();
+       setClientesSeleccionados(datosClientes);
+    } catch (error) {
+      console.error('Error al obtener datos de empleados:', error);
+    }
+  };
+  
+  obtenerDatosClientes();
+  }, []);
+  
+    useEffect(() => {
+  const obtenerDatosVehiculos = async () => {
+    try {
+      const respuesta = await fetch(`${SERVERNAME}/VEHICULOS`);
+      const datosVehiculos = await respuesta.json();
+       setVehiculosSeleccionados(datosVehiculos);
+    } catch (error) {
+      console.error('Error al obtener datos de empleados:', error);
+    }
+  };
+  
+  obtenerDatosVehiculos();
+}, []);
+
 
   function Personal() {
     return (
@@ -252,16 +299,52 @@ function Lists({ opcion, raiz }) {
     }
   };
 
+function mostrarLista() {
+    switch (opcion) {
+      case 'Personal':
+        return (
+          <List sx={{ ...style, maxHeight: '250px', overflowY: 'auto' }} >
+            {empleadosSeleccionados.map((empleado, index) => (
+            <ListItem key={index}>
+                <ListItemText primary={empleado.Nombre} />
+                {empleado.Cedula}
+            </ListItem>
+            ))}
+          </List>
+        );
+      case 'Cliente':
+        return (
+          <List sx={{ ...style, maxHeight: '250px', overflowY: 'auto' }} >
+            {clientesSeleccionados.map((cliente, index) => (
+            <ListItem key={index}>
+                <ListItemText primary={cliente.NombreResponsable} />
+                {cliente.CIResponsable}
+            </ListItem>
+            ))}
+          </List>
+        );
+      case 'Vehiculo':
+        return (
+          <List sx={{ ...style, maxHeight: '250px', overflowY: 'auto' }} >
+            {vehiculosSeleccionados.map((vehiculo, index) => (
+            <ListItem key={index}>
+                <ListItemText primary={vehiculo.Placa} />
+                {vehiculo.CodVehiculo}
+            </ListItem>
+            ))}
+          </List>
+        );
+      default:
+        return <p>Seleccione una opción</p>;
+    }
+  }
+
   return (
     <Box>
       <div className="vertical_line"></div>
       <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-          <List sx={{ ...style, maxHeight: '250px', overflowY: 'auto' }}>
-            <ListItem>
-              <ListItemText />
-            </ListItem>
-          </List>
+          {mostrarLista()}
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, mt: 3 }} onClick={() => handleOpen(opcion)}>
             Agregar {opcion}
           </Button>
