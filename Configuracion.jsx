@@ -1,15 +1,15 @@
-import { Button, Typography, Grid, Divider, Modal, TextField, Box } from '@mui/material';
+import { Button, Typography, Grid, Divider, Container, TextField, Box } from '@mui/material';
 import '../css/Register.css';
 import { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Tabla from '../components/TablaDescuento';
+import ReactVirtualizedTable from './frontend/src/components/Tabla';
+
+
 
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 
-function createData(nroDesc, limiteInfe, limiteSup, porcentajeDesc) {
-    return { nroDesc, limiteInfe, limiteSup, porcentajeDesc };
-}
+
+
 
 function Configuracion() {
 
@@ -26,14 +26,6 @@ function Configuracion() {
         ciudad_sucursal: user.Ciudad || '',
         cedula_encargado: user.Encargado || '',
     });
-
-        // Inicializar rows como un estado
-        const [rows, setRows] = useState([
-            createData(1, 100, 200, 0.05),
-            createData(2, 201, 300, 0.10),
-            createData(3, 301, 400, 0.15),
-            // Agrega más filas según sea necesario
-        ]);
 
 
     const handleChange = (e) => {
@@ -100,7 +92,7 @@ function Configuracion() {
 
     };
 
-
+    
     return (
         <div>
             <Navbar />
@@ -174,25 +166,15 @@ function Configuracion() {
                             Guardar
                         </Button>
                     </Box>
+                    
                 </Grid>
                 <Grid item style={{ width: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Divider orientation="vertical" flexItem style={{ backgroundColor: 'black', height: '100%' }} />
                 </Grid>
-<Grid item xs style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', marginTop: '0px', marginRight: '20px' }}>
-    <Typography variant="h4" style={{ color: 'black', textAlign:'center' }}>Descuentos</Typography>
-<Box sx={{ display: 'flex', flexDirection: 'row', mt: 3, mb: 3 }}>
-    <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' } }}>
-        Agregar
-    </Button>
-    <Button variant="contained" sx={{ backgroundColor: '#FF0000', '&:hover': { backgroundColor: '#CC0000' }, ml: 1 }}>
-        Eliminar
-    </Button>
-    <Button variant="contained" sx={{ ml: 1 }}>
-        Modificar
-    </Button>
-</Box>
-    <Tabla rows={rows} />
-</Grid>
+                <Grid item xs style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'column', marginTop: '0px' }}>
+                    <Typography variant="h4" style={{ color: 'black' }}>Descuentos</Typography>
+                    <ReactVirtualizedTable />
+                </Grid>
             </Grid>
 
         </div>
