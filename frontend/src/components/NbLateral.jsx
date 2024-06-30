@@ -2,7 +2,7 @@ import { Button, Box} from '@mui/material';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Lists from './Lists';
-import ListService from './listService';
+import ListService from '../components/ListServicios';
 import '../css/NbLateral.css';
 import { useAuth } from '../router/AuthContext';
 
