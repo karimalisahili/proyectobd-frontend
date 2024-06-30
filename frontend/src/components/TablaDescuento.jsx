@@ -7,16 +7,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-function createData(nroDesc, limiteInfe, limiteSup, porcentajeDesc) {
-  return { nroDesc, limiteInfe, limiteSup, porcentajeDesc };
-}
-
-const rows2 = [
-  createData(1, 100, 200, 0.05),
-  createData(2, 201, 300, 0.10),
-  createData(3, 301, 400, 0.15),
-  // Agrega más filas según sea necesario
-];
 
 export default function Tabla(rows) {
   return (
