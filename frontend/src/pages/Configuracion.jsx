@@ -30,6 +30,12 @@ function Configuracion() {
         cedula_encargado: user.Encargado || '',
     });
 
+    const [discountFormData, setDiscountFormData] = useState({
+        limiteInferior: 0, // Inicializado como entero
+        limiteSuperior: 0, // Inicializado como entero
+        porcentajeDescuento: 0.0 // Inicializado como real
+    });
+
     // Inicializar rows como un estado
     const [rows, setRows] = useState([]);
 
@@ -37,11 +43,30 @@ function Configuracion() {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    const [discountFormData, setDiscountFormData] = useState({
-        limiteInferior: 0, // Inicializado como entero
-        limiteSuperior: 0, // Inicializado como entero
-        porcentajeDescuento: 0.0 // Inicializado como real
-    });
+    const [openModif, setOpenModif] = useState(false);
+    const handleOpenModif = () => {
+        if (selectedDescuento !== 0) {
+
+            // Encontrar el descuento seleccionado en rows
+            const descuentoSeleccionado = rows.find(row => row.nroDesc === selectedDescuento);
+            console.log("Descuento seleccionado:", descuentoSeleccionado);
+
+            // Actualizar discountFormData con los valores del descuento seleccionado
+            setDiscountFormData({
+                limiteInferior: descuentoSeleccionado.limiteInfe,
+                limiteSuperior: descuentoSeleccionado.limiteSup,
+                porcentajeDescuento: descuentoSeleccionado.porcentajeDesc
+            });
+            // Código para abrir el modal
+            setOpenModif(true);
+        } else {
+            // Mostrar mensaje de error o realizar otra acción
+            alert("Por favor, seleccione una fila antes de modificar.");
+        }
+    };
+    const handleCloseModif = () => setOpenModif(false);
+
+
 
     const handleDiscountChange = (e) => {
         const { name, value } = e.target;
@@ -237,6 +262,47 @@ function Configuracion() {
         }
     };
 
+
+    const updateDiscount = async (e) => {
+        e.preventDefault();
+        const RIFSuc = user.RIFSuc; // Asumiendo que user contiene RIFSuc
+        const NroDesc = selectedDescuento;
+
+        const { limiteInferior, limiteSuperior, porcentajeDescuento } = discountFormData;
+
+        try {
+            const response = await fetch(`${SERVERNAME}/descuentos`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    RIFSuc,
+                    NroDesc,
+                    LimiteInfe: limiteInferior,
+                    LimiteSup: limiteSuperior,
+                    PorcentajeDesc: porcentajeDescuento,
+                }),
+            });
+
+            if (response.status === 500) {
+                throw new Error('Error interno del servidor');
+            } else if (response.status === 200) {
+                const result = await response.json();
+                window.location.reload();
+
+            } else {
+                // Manejo de otros códigos de estado
+                throw new Error('Algo salió mal al actualizar el descuento');
+            }
+        } catch (error) {
+            console.error('Error al actualizar el descuento', error);
+            alert('Error al actualizar el descuento');
+        }
+    };
+
+    // Asegúrate de vincular esta función al evento onClick del botón de guardar
+
     return (
         <div>
             <Navbar />
@@ -323,7 +389,7 @@ function Configuracion() {
                         <Button onClick={deleteDiscount} variant="contained" sx={{ backgroundColor: '#FF0000', '&:hover': { backgroundColor: '#CC0000' }, ml: 1 }}>
                             Eliminar
                         </Button>
-                        <Button variant="contained" sx={{ ml: 1 }}>
+                        <Button onClick={handleOpenModif} variant="contained" sx={{ ml: 1 }}>
                             Modificar
                         </Button>
                     </Box>
@@ -404,6 +470,82 @@ function Configuracion() {
                             }
                         }}>
                         Agregar
+                    </Button>
+                </Box>
+            </Modal>
+
+            <Modal
+                open={openModif}
+                onClose={handleCloseModif}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box component="form" sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    bgcolor: '#41B06E',
+                    borderRadius: '10px',
+                    width: '700px',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: 'auto',
+                    border: '2px solid #ffffff',
+                    boxShadow: 24,
+                    p: 4,
+                }}
+                    noValidate
+                    autoComplete="off"
+                >
+
+                    <h3>Modifique los siguientes datos</h3>
+
+                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                            <TextField label="Limite Inferior" sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}
+                                type='number'
+                                name='limiteInferior'
+                                onChange={handleDiscountChange}
+                                value={discountFormData.limiteInferior}
+                            />
+
+                            <TextField label="Limite Superior" sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}
+                                type='number'
+                                name='limiteSuperior'
+                                onChange={handleDiscountChange}
+                                value={discountFormData.limiteSuperior}
+                            />
+
+                        </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                            <TextField label="Porcentaje de Descuento" sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}
+                                type='number'
+                                name='porcentajeDescuento'
+                                onChange={handleDiscountChange}
+                                inputProps={{ step: "0.01" }}
+                                value={discountFormData.porcentajeDescuento}
+                            />
+
+                        </Box>
+
+
+                    </Box>
+                    <Button type='submit' variant="contained"
+                        onClick={updateDiscount}
+                        sx={{
+                            margin: '5px 0',
+                            color: '#000000',
+                            bgcolor: '#FFFFFF',
+                            '&:hover': {
+                                bgcolor: '#41B06E',
+                                color: '#FFFFFF'
+                            }
+                        }}>
+                        Guardar
                     </Button>
                 </Box>
             </Modal>
