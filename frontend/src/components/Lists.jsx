@@ -128,7 +128,11 @@ function Personal({ data = null, isEditing = false }) {
   const [formData, handleChange] = useForm(initialValues);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+  const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
   const endpoint = `${SERVERNAME}/trabajadores`;
   const method = isEditing ? 'PUT' : 'POST';
 
@@ -142,6 +146,22 @@ function Personal({ data = null, isEditing = false }) {
     } else {
       alert('Error en la operación. Por favor, intente nuevamente.');
     }
+  }
+  };
+  
+  const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/trabajadores`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.Cedula, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
   }
 };
 
@@ -174,16 +194,23 @@ function Personal({ data = null, isEditing = false }) {
             valor={formData.Direccion} cambio={handleChange}/>
         </Box>
       </Box>
-      {/* Botón para enviar el formulario con estilos personalizados */}
-      <Button type='submit' variant="contained" sx={{
-        margin: '5px 0',
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+      <Button type='submit'  variant="contained" sx={{
+        margin: '5px 20px',
         color: '#000000',
         bgcolor: '#FFFFFF',
         '&:hover': {
             bgcolor: '#41B06E',
-            color: '#FFFFFF'}}}>
+            color: '#FFFFFF'
+          }
+        }}
+        >
         {isEditing ? 'Actualizar Personal' : 'Agregar Personal'}
       </Button>
+      <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+        Eliminar
+      </Button>
+      </Box>
     </FormBox>
   );
 }
@@ -502,7 +529,7 @@ function Lists({ opcion }) {
             ))}
           </List>
           {/* Botón para modificar, aún no implementado completamente */}
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
             Modificar
           </Button>
           <Modal open={open2} onClose={closeModal}aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
