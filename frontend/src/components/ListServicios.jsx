@@ -12,6 +12,24 @@ const style = {
     color: 'black',
   };
 
+  const commonStyles = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  display: 'flex',
+  flexDirection: 'column',
+  bgcolor: '#41B06E',
+  borderRadius: '10px',
+  width: '700px',
+  alignItems: 'center',
+  justifyContent: 'center',
+  margin: 'auto',
+  border: '2px solid #ffffff',
+  boxShadow: 24,
+  p: 4,
+};
+
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
