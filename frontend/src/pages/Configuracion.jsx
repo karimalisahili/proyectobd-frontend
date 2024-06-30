@@ -13,13 +13,15 @@ function createData(nroDesc, limiteInfe, limiteSup, porcentajeDesc) {
 
 function Configuracion() {
 
-    // Recuperar la cadena JSON almacenada en localStorage con la clave 'user'
+    // Recuperar la cadena JSON almacenada en localStorage con la clave 'RIFSuc:user'
     const userJson = localStorage.getItem('user');
 
     // Parsear la cadena JSON para convertirla en un objeto JavaScript
     const user = JSON.parse(userJson);
 
 
+    // Dentro de tu componente, después de la declaración de estados existentes
+    const [selectedDescuento, setSelectedDescuento] = useState(0);
 
     const [formData, setFormData] = useState({
         rif_sucursal: user.RIFSuc || '',
@@ -153,11 +155,10 @@ function Configuracion() {
             console.log(response);
             // Asegúrate de esperar a que la respuesta esté completamente procesada
             if (response.status === 201) {
-                const newDiscount = createData(rows.length+2, limiteInferior, limiteSuperior, porcentajeDescuento);
-                setRows(currentRows => [...currentRows, newDiscount]);
 
                 handleClose(); // Cierra el modal o formulario de creación
-                alert('Descuento creado con éxito');
+                //reiniciar pagina
+                window.location.reload();
             } else if (response.status === 500) {
                 // Manejo específico de errores para el código de estado 500
                 alert('Error interno del servidor al crear el descuento');
@@ -187,6 +188,54 @@ function Configuracion() {
             })
             .catch(error => console.error('Error al obtener los descuentos:', error));
     }, []);
+
+    useEffect(() => {
+        console.log("Descuento seleccionado:", selectedDescuento);
+        // Aquí puedes realizar acciones que dependan del valor actualizado de selectedDescuento
+    }, [selectedDescuento]); // Este efecto se ejecutará cada vez que selectedDescuento cambie
+
+    const handleDescuentoSelect = (nroDesc) => {
+        console.log("Número de descuento seleccionado:", nroDesc);
+        setSelectedDescuento(nroDesc);
+    };
+
+
+    const deleteDiscount = async (e) => {
+        e.preventDefault();
+        // Mostrar el cuadro de diálogo de confirmación
+        const isConfirmed = window.confirm('¿Estás seguro de que quieres eliminar este descuento?');
+
+        // Si el usuario hace clic en "Cancelar", detener la ejecución de la función
+        if (!isConfirmed) {
+            return;
+        }
+
+        // Si el usuario hace clic en "Aceptar", continuar con la eliminación
+        try {
+            const response = await fetch(`${SERVERNAME}/descuentos`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    RIFSuc: user.RIFSuc,
+                    NroDesc: selectedDescuento
+                }),
+            });
+
+            if (response.status === 200) {
+                // Eliminar el descuento del estado local
+                console.log(rows)
+                setRows(currentRows => currentRows.filter(row => row.nroDesc !== selectedDescuento));
+            } else {
+                // Manejar otros códigos de estado según sea necesario
+                alert('Error al eliminar el descuento');
+            }
+        } catch (error) {
+            console.error('Error al eliminar el descuento:', error);
+            alert('Error al eliminar el descuento');
+        }
+    };
 
     return (
         <div>
@@ -271,14 +320,14 @@ function Configuracion() {
                         <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' } }} onClick={handleOpen}>
                             Agregar
                         </Button>
-                        <Button variant="contained" sx={{ backgroundColor: '#FF0000', '&:hover': { backgroundColor: '#CC0000' }, ml: 1 }}>
+                        <Button onClick={deleteDiscount} variant="contained" sx={{ backgroundColor: '#FF0000', '&:hover': { backgroundColor: '#CC0000' }, ml: 1 }}>
                             Eliminar
                         </Button>
                         <Button variant="contained" sx={{ ml: 1 }}>
                             Modificar
                         </Button>
                     </Box>
-                    <Tabla rows={rows} />
+                    <Tabla rows={rows} onSelect={handleDescuentoSelect} />
                 </Grid>
             </Grid>
 
