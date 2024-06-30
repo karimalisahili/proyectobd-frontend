@@ -178,7 +178,7 @@ function ListServicios({opcion}){
         };
 
         return(
-            
+            <FormBox onSubmit={handleSubmit}>
                 <Box component="form" sx={{
                 position: 'absolute',
                 top: '50%',
@@ -221,8 +221,7 @@ function ListServicios({opcion}){
                                   Agregar {opcion}
                 </Button>
             </Box>
-            
-            
+            </FormBox>
         )
     }
 
