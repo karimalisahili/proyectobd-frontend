@@ -2,6 +2,7 @@
 import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React,{ useState, useEffect } from 'react';
+import PersonIcon from '@mui/icons-material/Person';
 
 // Definición de la variable SERVERNAME que obtiene el valor de la variable de entorno VITE_SERVERNAME.
 // Este valor se utiliza para configurar el nombre del servidor en la aplicación.
@@ -43,6 +44,9 @@ const commonStyles = {
   p: 4,
 };
 
+// Define un estilo base para la lista y lo extiende con propiedades específicas para controlar su altura máxima y el desbordamiento vertical
+const listStyle = { ...style, maxHeight: '320px', overflowY: 'auto' };
+
 // Hook personalizado para manejar formularios
 function useForm(initialState) {
   // Inicializa el estado del formulario con el estado inicial proporcionado
@@ -64,23 +68,25 @@ function useForm(initialState) {
 }
 
 // Define una función asíncrona llamada sendData
-async function sendData(url, data) {
-  // Realiza una solicitud HTTP POST usando fetch
-  const response = await fetch(url, {
-    method: 'POST', // Especifica el método HTTP POST
+async function sendData(endpoint, formData, method) {
+  console.log(formData, method, endpoint)
+  const response = await fetch(endpoint, {
+    method: method,
     headers: {
-      'Content-Type': 'application/json', // Establece el tipo de contenido de la solicitud a JSON
+      'Content-Type': 'application/json',
+      // Add any other headers your request needs
     },
-    body: JSON.stringify(data), // Convierte el objeto de datos a una cadena JSON para el cuerpo de la solicitud
+    body: JSON.stringify(formData), // Convert the data to JSON format
   });
-  // Verifica si el estado de la respuesta no es exitoso (ok)
-  if (!response.ok) {
-    const errorData = await response.json(); // Intenta obtener los detalles del error de la respuesta JSON
-    // Lanza un error con el mensaje obtenido de la respuesta o un mensaje de error predeterminado
-    throw new Error(errorData.message || 'Error en la solicitud de registro');
+
+  // Check if the response is OK and the content type is JSON
+  if (response.ok && response.headers.get('Content-Type')?.includes('application/json')) {
+    return response.json();
+  } else {
+    // Handle non-JSON responses or errors
+    const text = await response.text(); // Read response as text to avoid JSON parse error
+    throw new Error(`Failed to fetch JSON. Status: ${response.status}, Body: ${text}`);
   }
-  // Si la respuesta es exitosa, devuelve el cuerpo de la respuesta como JSON
-  return response.json();
 }
 
 // Define un componente funcional FormBox que acepta props, incluyendo children y onSubmit
@@ -109,31 +115,55 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 );
 
 // Define un componente funcional llamado Personal
-function Personal() {
-  // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados
-  const [formData, handleChange] = useForm({
-    Nombre: '',
-    Salario: '',
-    Cedula: '',
-    Telefono: '',
-    Direccion: '',
-    RIFSuc: user.RIFSuc, // RIFSuc se inicializa con un valor proveniente de un objeto user, presumiblemente del contexto del usuario
-  });
-
-  // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Previene el comportamiento por defecto del formulario (recargar la página)
-    // Desestructura formData para obtener los valores de los campos del formulario
-    const { Nombre, Salario, Cedula, Telefono, Direccion, RIFSuc } = formData;
-    try {
-      // Intenta enviar los datos del formulario al servidor utilizando una función sendData y espera por la respuesta
-      const data = await sendData(`${SERVERNAME}/trabajadores`, formData);
-      alert('Agregado correctamente'); // Muestra una alerta indicando que el empleado fue agregado correctamente
-    } catch (error) {
-      console.error('Error al agregar el empleado', error); // Registra en consola el error si la solicitud falla
-      alert('Error al agregar el empleado. Por favor, intente nuevamente.'); // Muestra una alerta de error
-    }
+function Personal({ data = null, isEditing = false }) {
+  const initialValues = {
+    Cedula: data?.Cedula || '',
+    Nombre: data?.Nombre || '',
+    Direccion: data?.Direccion || '',
+    Salario: data?.Salario || '',
+    Telefono: data?.Telefono || '',
+    RIFSuc: user.RIFSuc, // Asumiendo que user está disponible en el contexto
   };
+
+  const [formData, handleChange] = useForm(initialValues);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/trabajadores`;
+  const method = isEditing ? 'PUT' : 'POST';
+
+  try {
+    await sendData(endpoint, formData, method);
+    alert('Operación realizada correctamente');
+  } catch (error) {
+    console.error('Error en la operación', error);
+    if (error.message.includes('404')) {
+      alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+    } else {
+      alert('Error en la operación. Por favor, intente nuevamente.');
+    }
+  }
+  };
+  
+  const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/trabajadores`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
@@ -144,68 +174,93 @@ function Personal() {
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           {/* InputField para el nombre del empleado */}
           <InputField label="NOMBRE-EMPLEADO" type='text' name='Nombre'
-            valor={formData.Nombre} cambio={handleChange}
-          />
+            valor={formData.Nombre} cambio={handleChange}/>
           {/* InputField para el salario del empleado */}
-          <InputField label="SUELDO-EMPLEADO" type='number' name='Salario' min={1}
-            valor={formData.Salario} cambio={handleChange}
-          />
+          <InputField label="SUELDO-EMPLEADO" type='number' name='Salario' min={1} valor={formData.Salario} cambio={handleChange}/>
         </Box>
       </Box>
       {/* Repite la estructura anterior para otros campos del formulario */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="CEDULA-EMPLEADO" type='text' name='Cedula'
-            valor={formData.Cedula} cambio={handleChange}
-          />
+            valor={formData.Cedula} cambio={handleChange}/>
           <InputField label="TELEFONO-EMPLEADO" type='text' name='Telefono'
-            valor={formData.Telefono} cambio={handleChange}
-          />
+            valor={formData.Telefono} cambio={handleChange}/>
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="DIRECCION-EMPLEADO" type='text' name='Direccion'
-            valor={formData.Direccion} cambio={handleChange}
-          />
+            valor={formData.Direccion} cambio={handleChange}/>
         </Box>
       </Box>
-      {/* Botón para enviar el formulario con estilos personalizados */}
-      <Button type='submit' variant="contained" sx={{
-        margin: '5px 0',
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+      <Button type='submit'  variant="contained" sx={{
+        margin: '5px 20px',
         color: '#000000',
         bgcolor: '#FFFFFF',
         '&:hover': {
             bgcolor: '#41B06E',
-            color: '#FFFFFF'}}}>
-        Agregar Personal
+            color: '#FFFFFF'
+          }
+        }}
+        >
+        {isEditing ? 'Actualizar Personal' : 'Agregar Personal'}
       </Button>
+      {isEditing && (
+  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+    Eliminar
+  </Button>
+)}
+      </Box>
     </FormBox>
   );
 }
 
 // Define un componente funcional llamado Cliente
-function Cliente() {
+function Cliente({ data = null, isEditing = false }) {
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para CIResponsable y NombreResponsable
-  const [formData, handleChange] = useForm({
-    CIResponsable: '',
-    NombreResponsable: '',
-  });
+  const initialValues = {
+    CIResponsable: data?.CIResponsable || '',
+    NombreResponsable: data?.NombreResponsable || '',
+  };
+
+  const [formData, handleChange] = useForm(initialValues);
 
   // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Previene el comportamiento por defecto del formulario (recargar la página)
-    // Desestructura formData para obtener los valores de los campos del formulario
-    const { CIResponsable, NombreResponsable } = formData;
-    try {
-      // Intenta enviar los datos del formulario al servidor utilizando una función sendData y espera por la respuesta
-      const data = await sendData(`${SERVERNAME}/responsables`, formData);
-      alert('Agregado correctamente'); // Muestra una alerta indicando que el cliente fue agregado correctamente
-    } catch (error) {
-      console.error('Error al agregar el cliente', error); // Registra en consola el error si la solicitud falla
-      alert('Error al agregar el cliente. Por favor, intente nuevamente.'); // Muestra una alerta de error
+  e.preventDefault();
+  const endpoint = `${SERVERNAME}/responsables`;
+  const method = isEditing ? 'PUT' : 'POST';
+
+  try {
+    await sendData(endpoint, formData, method);
+    alert('Operación realizada correctamente');
+  } catch (error) {
+    console.error('Error en la operación', error);
+    if (error.message.includes('404')) {
+      alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+    } else {
+      alert('Error en la operación. Por favor, intente nuevamente.');
     }
+  }
   };
+  
+    const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/responsables`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
@@ -216,15 +271,12 @@ function Cliente() {
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           {/* InputField para la cédula del cliente */}
           <InputField label="CEDULA-CLIENTE" type='text' name='CIResponsable'
-            valor={formData.CIResponsable} cambio={handleChange}
-          />
+            valor={formData.CIResponsable} cambio={handleChange}/>
           {/* InputField para el nombre del cliente */}
-          <InputField label="NOMBRE-CLIENTE" type='text' name='NombreResponsable'
-            valor={formData.NombreResponsable} cambio={handleChange}
-          />
+          <InputField label="NOMBRE-CLIENTE" type='text' name='NombreResponsable' valor={formData.NombreResponsable} cambio={handleChange}/>
         </Box>
       </Box>
-      {/* Botón para enviar el formulario con estilos personalizados */}
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
       <Button type='submit' variant="contained" sx={{
         margin: '5px 0',
         color: '#000000',
@@ -234,39 +286,69 @@ function Cliente() {
           color: '#FFFFFF'
         }
       }}>
-        Agregar Cliente
+        {isEditing ? 'Actualizar Cliente' : 'Agregar Cliente'}
       </Button>
+      {isEditing && (
+  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+    Eliminar
+  </Button>
+)}
+      </Box>
     </FormBox>
   );
 }
 
 // Define un componente funcional llamado Vehiculo
-function Vehiculo() {
-  // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados
-  const [formData, handleChange] = useForm({
-    ciResp: '', // Cédula de identidad del responsable
-    CodVehiculo: '', // Código del vehículo
-    Placa: '', // Placa del vehículo
-    TipoAceite: '', // Tipo de aceite del vehículo
-    FechaAdq: new Date().toISOString(), // Fecha de adquisición del vehículo, inicializada al momento actual
-    CodMarca: '', // Código de la marca del vehículo
-    NumModelo: '', // Número de modelo del vehículo
-  });
+function Vehiculo({ data = null, isEditing = false }) {
+
+  // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
+  const initialValues = {
+    Placa: data?.Placa || '',
+    TipoAceite: data?.TipoAceite || '',
+    FechaAdq:  new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
+    ciResp: data?.ciResp || '',
+    NumModelo: data?.NumModelo || '',
+    CodMarca: data?.CodMarca || '',
+  };
+
+  const [formData, handleChange] = useForm(initialValues);
 
   // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
+
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Previene el comportamiento por defecto del formulario (recargar la página)
-    // Desestructura formData para obtener los valores de los campos del formulario
-    const { ciResp, CodVehiculo, Placa, TipoAceite, FechaAdq, CodMarca, NumModelo } = formData;
+    e.preventDefault();
+    
+    const endpoint = `${SERVERNAME}/vehiculos`;
+    const method = isEditing ? 'PUT' : 'POST';
+
     try {
-      // Intenta enviar los datos del formulario al servidor utilizando una función sendData y espera por la respuesta
-      const data = await sendData(`${SERVERNAME}/vehiculos`, formData);
-      alert('Agregado correctamente'); // Muestra una alerta indicando que el vehículo fue agregado correctamente
+      await sendData(endpoint, formData, method);
+      alert('Operación realizada correctamente');
     } catch (error) {
-      console.error('Error al agregar el vehiculo', error); // Registra en consola el error si la solicitud falla
-      alert('Error al agregar el vehiculo. Por favor, intente nuevamente.'); // Muestra una alerta de error
+      console.error('Error en la operación', error);
+      if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
+      }
     }
+  };
+
+  const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
   }
+  const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
@@ -277,36 +359,27 @@ function Vehiculo() {
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           {/* InputField para la cédula del responsable */}
           <InputField label="CEDULA-CLIENTE" type='text' name='ciResp' 
-            valor={formData.ciResp} cambio={handleChange}
-          />
-          {/* InputField para el código del vehículo */}
-          <InputField label="COD-VEHICULO" type='text' name='CodVehiculo'
-            valor={formData.CodVehiculo} cambio={handleChange}
-          />
+            valor={formData.ciResp} cambio={handleChange}/>
+          <InputField label="No-MODELO" type='text' name='NumModelo'
+            valor={formData.NumModelo} cambio={handleChange}/>
         </Box>
       </Box>
       {/* Repite la estructura anterior para otros campos del formulario */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="PLACA-VEHICULO" type='text' name='Placa'
-            valor={formData.Placa} cambio={handleChange}
-          />
+            valor={formData.Placa} cambio={handleChange}/>
           <InputField label="TIPO-ACEITE" type='text' name='TipoAceite'
-            valor={formData.TipoAceite} cambio={handleChange}
-          />
+            valor={formData.TipoAceite} cambio={handleChange}/>
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="COD-MARCA" type='text' name='CodMarca'
-            valor={formData.CodMarca} cambio={handleChange}
-          />
-          <InputField label="No-MODELO" type='text' name='NumModelo'
-            valor={formData.NumModelo} cambio={handleChange}
-          />
+            valor={formData.CodMarca} cambio={handleChange}/>
         </Box>
       </Box>
-      {/* Botón para enviar el formulario con estilos personalizados */}
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
       <Button type='submit' variant="contained" sx={{
         margin: '5px 0',
         color: '#000000',
@@ -316,14 +389,19 @@ function Vehiculo() {
           color: '#FFFFFF'
         }
       }}>
-        Agregar Vehiculo
-      </Button>
+        {isEditing ? 'Actualizar Vehiculo' : 'Agregar Vehiculo'}
+        </Button>
+        {isEditing && (
+  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+    Eliminar
+  </Button>
+)}
+      </Box>
     </FormBox>
   );
 }
 
-// Define un estilo base para la lista y lo extiende con propiedades específicas para controlar su altura máxima y el desbordamiento vertical
-const listStyle = { ...style, maxHeight: '250px', overflowY: 'auto' };
+
 
 // Define una función para renderizar una lista de elementos
 function renderList(items, textKey, secondaryKey, onSeleccionado) {
@@ -343,8 +421,8 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
         <ListItem key={index} button onClick={() => manejarClicSeleccionado(item)}>
           {/* ListItemText muestra el texto principal y secundario basado en las claves proporcionadas */}
           <ListItemText primary={item[textKey]} />
-          {/* Muestra el valor secundario directamente sin un componente específico */}
-          {item[secondaryKey]}
+            {/* Muestra el valor secundario directamente sin un componente específico */}
+            {item[secondaryKey]}
         </ListItem>
       ))}
     </List>
@@ -374,10 +452,13 @@ function mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, veh
 
 // Define el componente Lists que recibe una prop 'opcion'
 function Lists({ opcion }) {
+
+  console.log(opcion)
   // Estado para controlar la visibilidad del modal
   const [open, setOpen] = useState(false);
   // Estado para determinar el tipo de formulario a mostrar en el modal
   const [formType, setFormType] = useState('');
+  const [open2, setOpen2] = useState(false);
 
   // Estados para almacenar los datos seleccionados de empleados, clientes y vehículos
   const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
@@ -413,18 +494,24 @@ function Lists({ opcion }) {
     setOpen(true);
   };
 
+  const handleOpen2 = (type) => {
+    setFormType(type);
+    setOpen2(true);
+  };
+
   const closeModal = () => {
-  setOpen(false);
+    setOpen(false);
+    setOpen2(false);
 };
   // Función para renderizar el formulario correspondiente en el modal
-  const renderForm = () => {
+  const renderForm = (info, editar) => {
     switch (formType) {
       case 'Personal':
-        return <Personal />;
+        return <Personal data={info} isEditing={editar}/>;
       case 'Cliente':
-        return <Cliente />;
+        return <Cliente data={info} isEditing={editar}/>;
       case 'Vehiculo':
-        return <Vehiculo />;
+        return <Vehiculo data={info} isEditing={editar}/>;
       default:
         return <div> fallo </div>;
     }
@@ -448,50 +535,51 @@ function Lists({ opcion }) {
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
           {mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, mt: 3 }} onClick={() => handleOpen(opcion)}>
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
             Agregar {opcion}
           </Button>
           {/* Modal que se muestra u oculta basado en el estado 'open' */}
-          <Modal
-            open={open}
-            onClose={closeModal}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
+          <Modal open={open} onClose={closeModal}aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
-            {renderForm()}
+            {renderForm(null, false)}
           </Modal>
         </Box>
       </Box>
       <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '35%', height: 'auto' }}>
         {seleccionEnLists ? (
-        <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-          <div className="circle"></div>
+          <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+            <div className="circle">
+                <PersonIcon sx={{ fontSize: 150 }} />
+            </div>
             <h2>{ seleccionEnLists.Nombre || '' }</h2>
             <h2>{seleccionEnLists.Cedula || ''}</h2>
             <h2>{seleccionEnLists.NombreResponsable || ''}</h2>
             <h2>{seleccionEnLists.CIResponsable || ''}</h2>
-        </Box>
-                      ) : (
-      <Typography>No se ha seleccionado ningún empleado</Typography>
-    )}
+          </Box>
+        ) : (
+          <Typography>No se ha seleccionado ningún empleado</Typography>
+        )}
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
-            <List sx={style}>
-    {seleccionEnLists && Object.entries(seleccionEnLists).map(([key, value]) => (
-      <React.Fragment key={key}>
-        <ListItem>
-          <ListItemText primary={`${key}: `} />
-            {value || 'No disponible'}
-        </ListItem>
-        <Divider component="li" />
-      </React.Fragment>
-    ))}
-  </List>
+          <List sx={style}>
+            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'NombreResponsable' || entry[0] === 'Direccion')).map(([key,value])=> (
+              <React.Fragment key={key}>
+                <ListItem>
+                  <ListItemText primary={`${key}: `} />
+                    {value || 'No disponible'}
+                </ListItem>
+                <Divider component="li" />
+              </React.Fragment>
+            ))}
+          </List>
           {/* Botón para modificar, aún no implementado completamente */}
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' } }}>
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
             Modificar
           </Button>
+          <Modal open={open2} onClose={closeModal}aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+            {/* Renderiza el formulario correspondiente dentro del modal */}
+            {renderForm(seleccionEnLists, true)}
+          </Modal>
         </Box>
       </Box>
     </Box>
@@ -519,5 +607,20 @@ InputField.propTypes = {
   cambio: PropTypes.func, // 'cambio' debe ser una función, pero no es requerida
   valor: PropTypes.string, // 'valor' debe ser una cadena de texto, pero no es requerida
 };
+
+Personal.propTypes = {
+  data: PropTypes.object,
+  isEditing: PropTypes.bool,
+}
+
+Cliente.propTypes = {
+  data: PropTypes.object,
+  isEditing: PropTypes.bool,
+}
+
+Vehiculo.propTypes = {
+  data: PropTypes.object,
+  isEditing: PropTypes.bool,
+}
 
 export default Lists;
