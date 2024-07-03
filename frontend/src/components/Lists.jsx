@@ -156,7 +156,7 @@ function Personal({ data = null, isEditing = false }) {
   }
   const endpoint = `${SERVERNAME}/trabajadores`; // Asumiendo que Cedula es el identificador único
   try {
-    await sendData(endpoint, formData.Cedula, 'DELETE');
+    await sendData(endpoint, formData, 'DELETE');
     alert('Empleado eliminado correctamente');
     // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
   } catch (error) {
@@ -207,9 +207,11 @@ function Personal({ data = null, isEditing = false }) {
         >
         {isEditing ? 'Actualizar Personal' : 'Agregar Personal'}
       </Button>
-      <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-        Eliminar
-      </Button>
+      {isEditing && (
+  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+    Eliminar
+  </Button>
+)}
       </Box>
     </FormBox>
   );
@@ -242,6 +244,22 @@ function Cliente({ data = null, isEditing = false }) {
       alert('Error en la operación. Por favor, intente nuevamente.');
     }
   }
+  };
+  
+    const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/responsables`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
 };
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
@@ -258,7 +276,7 @@ function Cliente({ data = null, isEditing = false }) {
           <InputField label="NOMBRE-CLIENTE" type='text' name='NombreResponsable' valor={formData.NombreResponsable} cambio={handleChange}/>
         </Box>
       </Box>
-      {/* Botón para enviar el formulario con estilos personalizados */}
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
       <Button type='submit' variant="contained" sx={{
         margin: '5px 0',
         color: '#000000',
@@ -270,6 +288,12 @@ function Cliente({ data = null, isEditing = false }) {
       }}>
         {isEditing ? 'Actualizar Cliente' : 'Agregar Cliente'}
       </Button>
+      {isEditing && (
+  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+    Eliminar
+  </Button>
+)}
+      </Box>
     </FormBox>
   );
 }
@@ -279,12 +303,12 @@ function Vehiculo({ data = null, isEditing = false }) {
 
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
   const initialValues = {
-    ciResp: data?.ciResp || '',
-    NumModelo: data?.NumModelo || '',
     Placa: data?.Placa || '',
     TipoAceite: data?.TipoAceite || '',
-    CodMarca: data?.CodMarca || '',
     FechaAdq:  new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
+    ciResp: data?.ciResp || '',
+    NumModelo: data?.NumModelo || '',
+    CodMarca: data?.CodMarca || '',
   };
 
   const [formData, handleChange] = useForm(initialValues);
@@ -310,7 +334,21 @@ function Vehiculo({ data = null, isEditing = false }) {
     }
   };
 
-
+  const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
@@ -341,7 +379,7 @@ function Vehiculo({ data = null, isEditing = false }) {
             valor={formData.CodMarca} cambio={handleChange}/>
         </Box>
       </Box>
-      {/* Botón para enviar el formulario con estilos personalizados */}
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
       <Button type='submit' variant="contained" sx={{
         margin: '5px 0',
         color: '#000000',
@@ -352,7 +390,13 @@ function Vehiculo({ data = null, isEditing = false }) {
         }
       }}>
         {isEditing ? 'Actualizar Vehiculo' : 'Agregar Vehiculo'}
-      </Button>
+        </Button>
+        {isEditing && (
+  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+    Eliminar
+  </Button>
+)}
+      </Box>
     </FormBox>
   );
 }
