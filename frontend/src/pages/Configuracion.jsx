@@ -301,7 +301,41 @@ function Configuracion() {
         }
     };
 
-    // Asegúrate de vincular esta función al evento onClick del botón de guardar
+const deleteSucursal = async (e) => {
+    e.preventDefault();
+    // Confirmar con el usuario
+    const isConfirmed = window.confirm('¿Estás seguro de que quieres eliminar esta sucursal?');
+    if (!isConfirmed) {
+        return; // Si el usuario no confirma, detener la ejecución
+    }
+
+    const RIFSuc = user.RIFSuc;
+
+    try {
+        // Realizar la solicitud de eliminación al servidor
+        const response = await fetch(`${SERVERNAME}/sucursal`, { // Asegúrate de reemplazar '/ruta-del-endpoint-de-eliminacion' con la ruta correcta
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ RIFSuc }),
+        });
+
+        if (response.status === 500) {
+            const errorData = await response.json(); // Asumiendo que el servidor envía el error en formato JSON
+            throw new Error(errorData.error || 'Error interno del servidor');
+        } else if (response.status === 200) {
+            alert('Sucursal eliminada con éxito');
+            window.location.reload(); // Recargar la página para reflejar los cambios
+        } else {
+            const errorData = await response.json(); // Asumiendo que el servidor envía el error en formato JSON
+            throw new Error(errorData.error || 'Algo salió mal al eliminar la sucursal');
+        }
+    } catch (error) {
+        console.error('Error al eliminar la sucursal', error);
+        alert(error.message); // Mostrar el mensaje de error recibido del servidor
+    }
+};
 
     return (
         <div>
@@ -375,7 +409,14 @@ function Configuracion() {
                         }}>
                             Guardar
                         </Button>
+
                     </Box>
+
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+                        <Button onClick={deleteSucursal} variant="contained" sx={{ backgroundColor: '#FF0000', '&:hover': { backgroundColor: '#CC0000' } }}>
+                            Eliminar Sucursal
+                        </Button>
+                    </div>
                 </Grid>
                 <Grid item style={{ width: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Divider orientation="vertical" flexItem style={{ backgroundColor: 'black', height: '100%' }} />
@@ -425,7 +466,7 @@ function Configuracion() {
                     autoComplete="off"
                 >
 
-                    <h3>Ingrese los Siguientes Datos</h3>
+                    <h3>Editar</h3>
 
                     <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
