@@ -565,7 +565,7 @@ function Lists({ opcion }) {
             <h2>{seleccionEnLists.CIResponsable || ''}</h2>
           </Box>
         ) : (
-          <Typography>No se ha seleccionado ningún empleado</Typography>
+            <Typography>No se ha seleccionado ningún {opcion}</Typography>
         )}
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
