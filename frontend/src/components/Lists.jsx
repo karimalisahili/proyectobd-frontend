@@ -471,6 +471,7 @@ function Lists({ opcion }) {
     // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
     const obtenerDatos = async (endpoint, setter) => {
       try {
+        console.log(`${SERVERNAME}/${endpoint}`)
         // Realiza la petición fetch al servidor y espera la respuesta
         const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
         // Convierte la respuesta a formato JSON
@@ -483,8 +484,9 @@ function Lists({ opcion }) {
       }
     };
 
+  
     // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos('TRABAJADORES', setEmpleadosSeleccionados);
+    obtenerDatos(`trabajadores/${user.RIFSuc}`, setEmpleadosSeleccionados);
     obtenerDatos('RESPONSABLES', setClientesSeleccionados);
     obtenerDatos('VEHICULOS', setVehiculosSeleccionados);
   }, []);
