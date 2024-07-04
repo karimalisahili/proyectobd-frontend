@@ -133,6 +133,7 @@ function Personal({ data = null, isEditing = false }) {
   if (!isConfirmed) {
     return; // Si el usuario no confirma, detiene la función aquí
   }
+
   const endpoint = `${SERVERNAME}/trabajadores`;
   const method = isEditing ? 'PUT' : 'POST';
 
@@ -511,6 +512,8 @@ function Lists({ opcion }) {
     setOpen(false);
     setOpen2(false);
 };
+
+//llevarme esto a tienda a adaptar 
   // Función para renderizar el formulario correspondiente en el modal
   const renderForm = (info, editar) => {
     switch (formType) {
