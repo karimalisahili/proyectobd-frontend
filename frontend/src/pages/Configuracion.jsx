@@ -3,6 +3,7 @@ import '../css/Register.css';
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Tabla from '../components/TablaDescuento';
+import { useNavigate } from 'react-router-dom';
 
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
@@ -12,6 +13,8 @@ function createData(nroDesc, limiteInfe, limiteSup, porcentajeDesc) {
 }
 
 function Configuracion() {
+
+    const navigate = useNavigate(); // Hook de React Router
 
     // Recuperar la cadena JSON almacenada en localStorage con la clave 'RIFSuc:user'
     const userJson = localStorage.getItem('user');
@@ -326,7 +329,7 @@ const deleteSucursal = async (e) => {
             throw new Error(errorData.error || 'Error interno del servidor');
         } else if (response.status === 200) {
             alert('Sucursal eliminada con éxito');
-            window.location.reload(); // Recargar la página para reflejar los cambios
+            navigate('/');
         } else {
             const errorData = await response.json(); // Asumiendo que el servidor envía el error en formato JSON
             throw new Error(errorData.error || 'Algo salió mal al eliminar la sucursal');
