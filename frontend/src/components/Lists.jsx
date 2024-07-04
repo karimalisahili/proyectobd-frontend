@@ -307,8 +307,9 @@ function Vehiculo({ data = null, isEditing = false }) {
     TipoAceite: data?.TipoAceite || '',
     FechaAdq:  new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
     ciResp: data?.ciResp || '',
-    NumModelo: data?.NumModelo || '',
     CodMarca: data?.CodMarca || '',
+    NumModelo: data?.NumModelo || '',
+    
   };
 
   const [formData, handleChange] = useForm(initialValues);
@@ -317,7 +318,7 @@ function Vehiculo({ data = null, isEditing = false }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+     console.log(formData)
     const endpoint = `${SERVERNAME}/vehiculos`;
     const method = isEditing ? 'PUT' : 'POST';
 

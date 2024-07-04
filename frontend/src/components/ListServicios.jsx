@@ -140,7 +140,7 @@ function ListServicios({opcion}){
     };
 
     // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos('LISTAS DE SERVICIOS', setListaServiciosSeleccionados);
+    obtenerDatos('servicios', setListaServiciosSeleccionados);
     obtenerDatos('RESERVAS', setReservasSeleccionados);
     obtenerDatos('PAGOS', setPagosSeleccionados);
     obtenerDatos('FACTURAS', setFacturasSeleccionados);
