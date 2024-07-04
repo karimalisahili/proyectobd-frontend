@@ -99,7 +99,7 @@ const [formData, setFormData] = useState({
                     Encargado: Cedula
                 }),
             });
-
+            navigate('/');
             
         } catch (error) {
             console.error('Error al registrar la sucursal', error);
