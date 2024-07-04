@@ -140,6 +140,7 @@ function Personal({ data = null, isEditing = false }) {
   try {
     await sendData(endpoint, formData, method);
     alert('Operación realizada correctamente');
+    window.location.reload()
   } catch (error) {
     console.error('Error en la operación', error);
     if (error.message.includes('404')) {
@@ -160,6 +161,7 @@ function Personal({ data = null, isEditing = false }) {
     await sendData(endpoint, formData, 'DELETE');
     alert('Empleado eliminado correctamente');
     // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    window.location.reload()
   } catch (error) {
     console.error('Error al eliminar el empleado', error);
     alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
@@ -237,6 +239,7 @@ function Cliente({ data = null, isEditing = false }) {
   try {
     await sendData(endpoint, formData, method);
     alert('Operación realizada correctamente');
+    window.location.reload()
   } catch (error) {
     console.error('Error en la operación', error);
     if (error.message.includes('404')) {
@@ -257,6 +260,7 @@ function Cliente({ data = null, isEditing = false }) {
     await sendData(endpoint, formData, 'DELETE');
     alert('Empleado eliminado correctamente');
     // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    window.location.reload()
   } catch (error) {
     console.error('Error al eliminar el empleado', error);
     alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
@@ -308,8 +312,9 @@ function Vehiculo({ data = null, isEditing = false }) {
     TipoAceite: data?.TipoAceite || '',
     FechaAdq:  new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
     ciResp: data?.ciResp || '',
-    NumModelo: data?.NumModelo || '',
     CodMarca: data?.CodMarca || '',
+    NumModelo: data?.NumModelo || '',
+    
   };
 
   const [formData, handleChange] = useForm(initialValues);
@@ -318,13 +323,14 @@ function Vehiculo({ data = null, isEditing = false }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+     console.log(formData)
     const endpoint = `${SERVERNAME}/vehiculos`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
       await sendData(endpoint, formData, method);
       alert('Operación realizada correctamente');
+      window.location.reload()
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -345,6 +351,7 @@ function Vehiculo({ data = null, isEditing = false }) {
     await sendData(endpoint, formData, 'DELETE');
     alert('Empleado eliminado correctamente');
     // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    window.location.reload()
   } catch (error) {
     console.error('Error al eliminar el empleado', error);
     alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
@@ -454,7 +461,6 @@ function mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, veh
 // Define el componente Lists que recibe una prop 'opcion'
 function Lists({ opcion }) {
 
-  console.log(opcion)
   // Estado para controlar la visibilidad del modal
   const [open, setOpen] = useState(false);
   // Estado para determinar el tipo de formulario a mostrar en el modal
@@ -471,6 +477,7 @@ function Lists({ opcion }) {
     // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
     const obtenerDatos = async (endpoint, setter) => {
       try {
+        console.log(`${SERVERNAME}/${endpoint}`)
         // Realiza la petición fetch al servidor y espera la respuesta
         const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
         // Convierte la respuesta a formato JSON
@@ -483,8 +490,9 @@ function Lists({ opcion }) {
       }
     };
 
+  
     // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos('TRABAJADORES', setEmpleadosSeleccionados);
+    obtenerDatos(`trabajadores/${user.RIFSuc}`, setEmpleadosSeleccionados);
     obtenerDatos('RESPONSABLES', setClientesSeleccionados);
     obtenerDatos('VEHICULOS', setVehiculosSeleccionados);
   }, []);
@@ -510,7 +518,7 @@ function Lists({ opcion }) {
   const renderForm = (info, editar) => {
     switch (formType) {
       case 'Personal':
-        return <Personal data={info} isEditing={editar}/>;
+        return<Personal data={info} isEditing={editar} />
       case 'Cliente':
         return <Cliente data={info} isEditing={editar}/>;
       case 'Vehiculo':
@@ -560,7 +568,7 @@ function Lists({ opcion }) {
             <h2>{seleccionEnLists.CIResponsable || ''}</h2>
           </Box>
         ) : (
-          <Typography>No se ha seleccionado ningún empleado</Typography>
+            <Typography>No se ha seleccionado ningún {opcion}</Typography>
         )}
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
@@ -575,7 +583,6 @@ function Lists({ opcion }) {
               </React.Fragment>
             ))}
           </List>
-          {/* Botón para modificar, aún no implementado completamente */}
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
             Modificar
           </Button>
