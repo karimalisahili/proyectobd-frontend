@@ -139,6 +139,7 @@ function Personal({ data = null, isEditing = false }) {
   try {
     await sendData(endpoint, formData, method);
     alert('Operación realizada correctamente');
+    window.location.reload()
   } catch (error) {
     console.error('Error en la operación', error);
     if (error.message.includes('404')) {
@@ -159,6 +160,7 @@ function Personal({ data = null, isEditing = false }) {
     await sendData(endpoint, formData, 'DELETE');
     alert('Empleado eliminado correctamente');
     // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    window.location.reload()
   } catch (error) {
     console.error('Error al eliminar el empleado', error);
     alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
@@ -236,6 +238,7 @@ function Cliente({ data = null, isEditing = false }) {
   try {
     await sendData(endpoint, formData, method);
     alert('Operación realizada correctamente');
+    window.location.reload()
   } catch (error) {
     console.error('Error en la operación', error);
     if (error.message.includes('404')) {
@@ -256,6 +259,7 @@ function Cliente({ data = null, isEditing = false }) {
     await sendData(endpoint, formData, 'DELETE');
     alert('Empleado eliminado correctamente');
     // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    window.location.reload()
   } catch (error) {
     console.error('Error al eliminar el empleado', error);
     alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
@@ -324,6 +328,7 @@ function Vehiculo({ data = null, isEditing = false }) {
     try {
       await sendData(endpoint, formData, method);
       alert('Operación realizada correctamente');
+      window.location.reload()
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -344,6 +349,7 @@ function Vehiculo({ data = null, isEditing = false }) {
     await sendData(endpoint, formData, 'DELETE');
     alert('Empleado eliminado correctamente');
     // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    window.location.reload()
   } catch (error) {
     console.error('Error al eliminar el empleado', error);
     alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
@@ -453,7 +459,6 @@ function mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, veh
 // Define el componente Lists que recibe una prop 'opcion'
 function Lists({ opcion }) {
 
-  console.log(opcion)
   // Estado para controlar la visibilidad del modal
   const [open, setOpen] = useState(false);
   // Estado para determinar el tipo de formulario a mostrar en el modal
@@ -507,7 +512,7 @@ function Lists({ opcion }) {
   const renderForm = (info, editar) => {
     switch (formType) {
       case 'Personal':
-        return <Personal data={info} isEditing={editar}/>;
+        return<Personal data={info} isEditing={editar} />
       case 'Cliente':
         return <Cliente data={info} isEditing={editar}/>;
       case 'Vehiculo':
@@ -572,7 +577,6 @@ function Lists({ opcion }) {
               </React.Fragment>
             ))}
           </List>
-          {/* Botón para modificar, aún no implementado completamente */}
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
             Modificar
           </Button>
