@@ -193,6 +193,7 @@ function ListaDeServicios({ data = null, isEditing = false }){
   );
 }
 
+<<<<<<< HEAD
 function Reservas({ data = null, isEditing = false }){
   
   const initialValues = {
@@ -200,6 +201,14 @@ function Reservas({ data = null, isEditing = false }){
     Abono: data?.Abono || '',
     CodVehiculo: data?.CodVehiculo || ''
   };
+=======
+    // Llama a obtenerDatos para cada tipo de dato necesario
+    obtenerDatos('servicios', setListaServiciosSeleccionados);
+    obtenerDatos('RESERVAS', setReservasSeleccionados);
+    obtenerDatos('PAGOS', setPagosSeleccionados);
+    obtenerDatos('FACTURAS', setFacturasSeleccionados);
+  }, []);
+>>>>>>> be1c5371765d5a70ec3d096e65139111641ee542
 
   const [formData, handleChange] = useForm(initialValues);
 
