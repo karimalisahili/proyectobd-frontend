@@ -3,6 +3,7 @@
 import Navbar from '../components/Navbar';
 import NbLateral from '../components/NbLateral';
 import { Box } from '@mui/material';
+import '../css/Tienda.css'
 
 
 
