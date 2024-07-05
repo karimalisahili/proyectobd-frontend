@@ -2,10 +2,10 @@
 import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
-import PersonIcon from '@mui/icons-material/Person';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 // Definición de la variable SERVERNAME que obtiene el valor de la variable de entorno VITE_SERVERNAME.
-// Este valor se utiliza para configurar el NombreP del servidor en la aplicación.
+// Este valor se utiliza para configurar el Nombre del servidor en la aplicación.
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
@@ -54,7 +54,7 @@ function useForm(initialState) {
 
   // Función para manejar los cambios en los campos del formulario
   const handleChange = (e) => {
-    // Extrae el NombreP y el valor del campo que disparó el evento
+    // Extrae el Nombre y el valor del campo que disparó el evento
     const { name, value } = e.target;
     // Actualiza el estado del formulario con el nuevo valor para el campo especificado
     setFormData(prevState => ({
@@ -107,7 +107,7 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
   <TextField
     label={label} // Establece la etiqueta del campo
     type={type} // Establece el tipo de input (ej. text, number)
-    name={name} // Establece el NombreP del campo, importante para identificarlo al enviar el formulario
+    name={name} // Establece el Nombre del campo, importante para identificarlo al enviar el formulario
     sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} // Estilos personalizados
     InputProps={min ? { inputProps: { min } } : {}} // Propiedad condicional para establecer el valor mínimo si se proporciona
     value={valor} // Vincula el valor del campo a la variable 'valor'
@@ -116,19 +116,14 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 );
 
 // Define un componente funcional llamado Personal
-function Productos({ data = null, isEditing = false }) {
-
+function Marcas({ data = null, isEditing = false }) {
+/*
+    CodMarcaVeh INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+    Nombre VARCHAR(50) NOT NULL UNIQUE
+*/
   const initialValues = {
-    CodProd: data?.CodProd || '',
-    NombreP: data?.NombreP || '',
-    Descripcion: data?.Descripcion || '',
-    Precio: data?.Precio || '',
-    Ecologico: data?.Ecologico || '',
-    Fabricante: data?.Fabricante || '',
-    Maximo: data?.Maximo || '',
-    Minimo: data?.Minimo || '',
-    TipoPro: data?.TipoPro || '',
-    CodLinea: data?.CodLinea || '',
+    CodMarcaVeh: data?.CodMarcaVeh || '',
+    Nombre: data?.Nombre || '',
   };
 
   const [formData, handleChange] = useForm(initialValues);
@@ -139,7 +134,7 @@ function Productos({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/productos`;
+    const endpoint = `${SERVERNAME}/marcas_vehiculos`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
@@ -160,7 +155,7 @@ function Productos({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/productos`; // Asumiendo que CodProd es el identificador único
+    const endpoint = `${SERVERNAME}/marcas_vehiculos`; // Asumiendo que CodMarcaVeh es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -178,52 +173,12 @@ function Productos({ data = null, isEditing = false }) {
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para el NombreP del empleado */}
-          <InputField label="Nombre-Producto" type='text' name='NombreP'
-            valor={formData.NombreP} cambio={handleChange} />
-          {/* InputField para el Precio del empleado */}
-          <InputField label="Precio" type='number' name='Precio' min={1} valor={formData.Precio} cambio={handleChange} />
+          {/* InputField para el Nombre del empleado */}
+          <InputField label="Nombre-Marca" type='text' name='Nombre'
+            valor={formData.Nombre} cambio={handleChange} />
         </Box>
       </Box>
-      {/* Repite la estructura anterior para otros campos del formulario */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Codigo-Producto" type='text' name='CodProd'
-            valor={formData.CodProd} cambio={handleChange} />
-          <select name="Ecologico" value={formData.Ecologico} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
-            <option value="N">¿Es Ecologico?</option>
-            <option value="S">Sí</option>
-            <option value="N">No</option>
-          </select>
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Descripcion" type='text' name='Descripcion'
-            valor={formData.Descripcion} cambio={handleChange} />
-          <InputField label="Codigo-Linea" type='number' name='CodLinea'
-            valor={formData.CodLinea} cambio={handleChange} />
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Minimo" type='number' name='Minimo'
-            valor={formData.Minimo} cambio={handleChange} />
-          <InputField label="Maximo" type='number' name='Maximo'
-            valor={formData.Maximo} cambio={handleChange} />
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Fabricante" type='text' name='Fabricante'
-            valor={formData.Fabricante} cambio={handleChange} />
-          <select name="TipoPro" value={formData.TipoPro} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
-            <option value="Tienda">Tipo Producto</option>
-            <option value="Servicio">Servicio</option>
-            <option value="Tienda">Tienda</option>
-          </select>
-        </Box>
-      </Box>
+
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         <Button type='submit' variant="contained" sx={{
           margin: '5px 20px',
@@ -284,7 +239,7 @@ function Lineas({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/lineas`; // Asumiendo que CodProd es el identificador único
+    const endpoint = `${SERVERNAME}/lineas`; // Asumiendo que CodMarcaVeh es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -303,7 +258,7 @@ function Lineas({ data = null, isEditing = false }) {
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           {/* InputField para la cédula del linea */}
-          {/* InputField para el NombreP del linea */}
+          {/* InputField para el Nombre del linea */}
           <InputField label="Descripcion-linea" type='text' name='Descripcion' valor={formData.Descripcion} cambio={handleChange} />
         </Box>
       </Box>
@@ -331,11 +286,11 @@ function Lineas({ data = null, isEditing = false }) {
 
 // Define un componente funcional llamado Vehiculo
 function Inventario({ data = null, isEditing = false }) {
-  //RIFSuc,p.CodProd, p.NombreP, i.Existencia
+  //RIFSuc,p.CodMarcaVeh, p.Nombre, i.Existencia
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
   const initialValues = {
-    CodProd: data?.CodProd || '',
-    NombreP: data?.NombreP || '',
+    CodMarcaVeh: data?.CodMarcaVeh || '',
+    Nombre: data?.Nombre || '',
     Existencia: data?.Existencia || '',
 
   };
@@ -368,7 +323,7 @@ function Inventario({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que CodProd es el identificador único
+    const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que CodMarcaVeh es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -387,7 +342,7 @@ function Inventario({ data = null, isEditing = false }) {
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           {/* InputField para la cédula del responsable */}
-          <InputField label="CodProd-linea" type='text' name='Existencia'
+          <InputField label="CodMarcaVeh-linea" type='text' name='Existencia'
             valor={formData.Existencia} cambio={handleChange} />
         </Box>
       </Box>
@@ -396,8 +351,8 @@ function Inventario({ data = null, isEditing = false }) {
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="CodProd-Inventario" type='text' name='CodProd'
             valor={formData.CodProd} cambio={handleChange} />
-          <InputField label="TIPO-ACEITE" type='text' name='NombreP'
-            valor={formData.NombreP} cambio={handleChange} />
+          <InputField label="TIPO-ACEITE" type='text' name='Nombre'
+            valor={formData.Nombre} cambio={handleChange} />
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -454,15 +409,15 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
 function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
-    case 'Productos':
+    case 'Marcas':
       // Renderiza y retorna una lista de empleados seleccionados
-      return renderList(empleadosSeleccionados, 'NombreP', 'CodProd', onSeleccionado);
+      return renderList(empleadosSeleccionados, 'CodMarcaVeh', 'Nombre', onSeleccionado);
     case 'Lineas':
       // Renderiza y retorna una lista de lineas seleccionados
       return renderList(lineasSeleccionados, 'Descripcion', 'CodLineas', onSeleccionado);
     case 'Inventario':
       // Renderiza y retorna una lista de vehículos seleccionados
-      return renderList(vehiculosSeleccionados, 'CodProd', 'NombreP', onSeleccionado);
+      return renderList(vehiculosSeleccionados, 'CodProd', 'Nombre', onSeleccionado);
     default:
       // Retorna un párrafo indicando que se debe seleccionar una opción si ninguna coincide
       return <p>Seleccione una opción</p>;
@@ -505,7 +460,7 @@ function InventarioLista({ opcion }) {
 
 
     // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos(`productos`, setEmpleadosSeleccionados);
+    obtenerDatos(`marcas_vehiculos`, setEmpleadosSeleccionados);
     obtenerDatos('lineas', setlineasSeleccionados);
     obtenerDatos(`inventario_view/${user.RIFSuc}`, setVehiculosSeleccionados);
   }, []);
@@ -528,8 +483,8 @@ function InventarioLista({ opcion }) {
   // Función para renderizar el formulario correspondiente en el modal
   const renderForm = (info, editar) => {
     switch (formType) {
-      case 'Productos':
-        return <Productos data={info} isEditing={editar} />;
+      case 'Marcas':
+        return <Marcas data={info} isEditing={editar} />;
       case 'Lineas':
         return <Lineas data={info} isEditing={editar} />;
       case 'Inventario':
@@ -573,9 +528,9 @@ function InventarioLista({ opcion }) {
         {seleccionEnLists ? (
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <div className="circle">
-              <PersonIcon sx={{ fontSize: 150 }} />
+              <DirectionsCarIcon sx={{ fontSize: 150 }} />
             </div>
-            <h2>{seleccionEnLists.NombreP || ''}</h2>
+            <h2>{seleccionEnLists.Nombre || ''}</h2>
             <h2>{seleccionEnLists.CodProd || ''}</h2>
             <h2>{seleccionEnLists.Descripcion || ''}</h2>
             <h2>{seleccionEnLists.CodLineas || ''}</h2>
@@ -636,7 +591,7 @@ InputField.propTypes = {
   valor: PropTypes.string, // 'valor' debe ser una cadena de texto, pero no es requerida
 };
 
-Productos.propTypes = {
+Marcas.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
