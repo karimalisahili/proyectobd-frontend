@@ -117,7 +117,7 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 
 // Define un componente funcional llamado Personal
 function Productos({ data = null, isEditing = false }) {
-  
+
   const initialValues = {
     CodProd: data?.CodProd || '',
     NombreP: data?.NombreP || '',
@@ -201,7 +201,7 @@ function Productos({ data = null, isEditing = false }) {
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="Descripcion" type='text' name='Descripcion'
             valor={formData.Descripcion} cambio={handleChange} />
-            <InputField label="Codigo-Linea" type='number' name='CodLinea'
+          <InputField label="Codigo-Linea" type='number' name='CodLinea'
             valor={formData.CodLinea} cambio={handleChange} />
         </Box>
       </Box>
@@ -209,7 +209,7 @@ function Productos({ data = null, isEditing = false }) {
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="Minimo" type='number' name='Minimo'
             valor={formData.Minimo} cambio={handleChange} />
-            <InputField label="Maximo" type='number' name='Maximo'
+          <InputField label="Maximo" type='number' name='Maximo'
             valor={formData.Maximo} cambio={handleChange} />
         </Box>
       </Box>
@@ -330,16 +330,13 @@ function Lineas({ data = null, isEditing = false }) {
 }
 
 // Define un componente funcional llamado Vehiculo
-function Vehiculo({ data = null, isEditing = false }) {
-
+function Inventario({ data = null, isEditing = false }) {
+  //RIFSuc,p.CodProd, p.NombreP, i.Existencia
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
   const initialValues = {
-    Placa: data?.Placa || '',
-    TipoAceite: data?.TipoAceite || '',
-    FechaAdq: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
-    ciResp: data?.ciResp || '',
-    CodMarca: data?.CodMarca || '',
-    NumModelo: data?.NumModelo || '',
+    CodProd: data?.CodProd || '',
+    NombreP: data?.NombreP || '',
+    Existencia: data?.Existencia || '',
 
   };
 
@@ -390,25 +387,17 @@ function Vehiculo({ data = null, isEditing = false }) {
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           {/* InputField para la cédula del responsable */}
-          <InputField label="CodProd-linea" type='text' name='ciResp'
-            valor={formData.ciResp} cambio={handleChange} />
-          <InputField label="No-MODELO" type='text' name='NumModelo'
-            valor={formData.NumModelo} cambio={handleChange} />
+          <InputField label="CodProd-linea" type='text' name='Existencia'
+            valor={formData.Existencia} cambio={handleChange} />
         </Box>
       </Box>
       {/* Repite la estructura anterior para otros campos del formulario */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="PLACA-VEHICULO" type='text' name='Placa'
-            valor={formData.Placa} cambio={handleChange} />
-          <InputField label="TIPO-ACEITE" type='text' name='TipoAceite'
-            valor={formData.TipoAceite} cambio={handleChange} />
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="COD-MARCA" type='text' name='CodMarca'
-            valor={formData.CodMarca} cambio={handleChange} />
+          <InputField label="CodProd-Inventario" type='text' name='CodProd'
+            valor={formData.CodProd} cambio={handleChange} />
+          <InputField label="TIPO-ACEITE" type='text' name='NombreP'
+            valor={formData.NombreP} cambio={handleChange} />
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -421,7 +410,7 @@ function Vehiculo({ data = null, isEditing = false }) {
             color: '#FFFFFF'
           }
         }}>
-          {isEditing ? 'Actualizar Vehiculo' : 'Agregar Vehiculo'}
+          {isEditing ? 'Actualizar Inventario' : 'Agregar Inventario'}
         </Button>
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
@@ -471,9 +460,9 @@ function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehic
     case 'Lineas':
       // Renderiza y retorna una lista de lineas seleccionados
       return renderList(lineasSeleccionados, 'Descripcion', 'CodLineas', onSeleccionado);
-    case 'Vehiculo':
+    case 'Inventario':
       // Renderiza y retorna una lista de vehículos seleccionados
-      return renderList(vehiculosSeleccionados, 'Placa', 'CodVehiculo', onSeleccionado);
+      return renderList(vehiculosSeleccionados, 'CodProd', 'NombreP', onSeleccionado);
     default:
       // Retorna un párrafo indicando que se debe seleccionar una opción si ninguna coincide
       return <p>Seleccione una opción</p>;
@@ -518,7 +507,7 @@ function InventarioLista({ opcion }) {
     // Llama a obtenerDatos para cada tipo de dato necesario
     obtenerDatos(`productos`, setEmpleadosSeleccionados);
     obtenerDatos('lineas', setlineasSeleccionados);
-    obtenerDatos('VEHICULOS', setVehiculosSeleccionados);
+    obtenerDatos(`inventario_view/${user.RIFSuc}`, setVehiculosSeleccionados);
   }, []);
 
   // Función para manejar la apertura del modal y establecer el tipo de formulario
@@ -543,8 +532,8 @@ function InventarioLista({ opcion }) {
         return <Productos data={info} isEditing={editar} />;
       case 'Lineas':
         return <Lineas data={info} isEditing={editar} />;
-      case 'Vehiculo':
-        return <Vehiculo data={info} isEditing={editar} />;
+      case 'Inventario':
+        return <Inventario data={info} isEditing={editar} />;
       default:
         return <div> fallo </div>;
     }
@@ -568,9 +557,11 @@ function InventarioLista({ opcion }) {
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
           {mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
-            Agregar {opcion}
-          </Button>
+          {opcion !== 'Inventario' && (
+            <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
+              Agregar {opcion}
+            </Button>
+          )}
           {/* Modal que se muestra u oculta basado en el estado 'open' */}
           <Modal open={open} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
@@ -606,9 +597,13 @@ function InventarioLista({ opcion }) {
             ))}
           </List>
           {/* Botón para modificar, aún no implementado completamente */}
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
-            Modificar
-          </Button>
+          {opcion !== 'Inventario' && (
+            <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
+              Modificar
+            </Button>
+          )
+          }
+
           <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
             {renderForm(seleccionEnLists, true)}
@@ -651,7 +646,7 @@ Lineas.propTypes = {
   isEditing: PropTypes.bool,
 }
 
-Vehiculo.propTypes = {
+Inventario.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
