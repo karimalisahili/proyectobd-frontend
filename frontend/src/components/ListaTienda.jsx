@@ -1,5 +1,5 @@
 
-import { Box, Button, List, ListItem, ListItemText, Modal, TextField, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Stepper, Step, StepLabel, MenuItem } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Modal, TextField, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Stepper, Step, StepLabel, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import PropTypes from 'prop-types';
 import React,{ useState, useEffect } from 'react';
 
@@ -38,7 +38,7 @@ const style = {
   };
   
   // Define un estilo base para la lista y lo extiende con propiedades específicas para controlar su altura máxima y el desbordamiento vertical
-  const listStyle = { ...style, maxHeight: '320px', overflowY: 'auto' };
+  const listStyle = { ...style, maxHeight: '320px', overflowY: 'auto', marginTop: '20px'};
 
 function useForm(initialState) {
   // Inicializa el estado del formulario con el estado inicial proporcionado
@@ -383,8 +383,43 @@ function ListaTienda({ opcion }) {
     NumR: null
   };
 
+  const initialValuesFacturas = {
+    Fecha: null,
+    Monto: 0,
+    Descuento: 0,
+    CodPago: null
+  };
+
   const [formData, handleChange, resetForm] = useForm(initialValues);
-  const handleSubmit = async (e) => {
+
+  const [formDataFactura, handleChange2, resetForm2] = useForm(initialValues);
+  const handleSubmitFactura = async (e) => {
+    e.preventDefault();
+  const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  
+  const endpoint = `${SERVERNAME}/facturas_tiendas`;
+  const method = 'POST';
+
+  try {
+  await sendData(endpoint, formDataFactura, method);
+  alert('Operación realizada correctamente');
+} catch (error) {
+  console.error('Error en la operación', error);
+  // Assuming error is an object with a message property
+  if (error.message.includes('500')) {
+    alert('Error interno del servidor. Por favor, intente nuevamente más tarde.');
+  } else if (error.message.includes('404')) {
+    alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+  } else {
+    alert('Error en la operación. Por favor, intente nuevamente.');
+  }
+}
+  };
+
+    const handleSubmit = async (e) => {
     e.preventDefault();
   const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
   if (!isConfirmed) {
@@ -420,6 +455,8 @@ function ListaTienda({ opcion }) {
 
   const [productosTiendaSeleccionados, setproductosTiendaSeleccionados] = useState([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState([]);
+  const [Descuento, setDescuento] = useState([]);
+  const [Pagos, setPagos] = useState([]);
 
    // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
    useEffect(() => {
@@ -440,7 +477,9 @@ function ListaTienda({ opcion }) {
 
     // Llama a obtenerDatos para cada tipo de dato necesario
     obtenerDatos('productos_tiendas', setproductosTiendaSeleccionados);
-    obtenerDatos('productos', setProductoSeleccionado);
+     obtenerDatos('productos', setProductoSeleccionado);
+     obtenerDatos(`descuentos/${user.RIFSuc}`, setDescuento);
+      obtenerDatos(`pagos`, setPagos);
   }, []);
   
   // Función para manejar la apertura del modal y establecer el tipo de formulario
@@ -509,10 +548,6 @@ function ListaTienda({ opcion }) {
     const [activeStep, setActiveStep] = React.useState(0);
     const [skipped, setSkipped] = React.useState(new Set());
 
-  const isStepOptional = (step) => {
-    return step === 1;
-  };
-
   const isStepSkipped = (step) => {
     return skipped.has(step);
   };
@@ -531,30 +566,25 @@ function ListaTienda({ opcion }) {
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
-    
-    
-    const handleReset = () => {
-    setActiveStep(0);
-    };
-      const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
 
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  };
+  const subtotal = selectedProducts.reduce((acc, product) => acc + product.total, 0);
 
+
+// Paso 2 y 3: Verificar si `descuento` tiene datos y calcular el total con descuento
+let total
+if (Descuento && Descuento.length > 0) {
+  // Asegurarse de que Descuento no es undefined y tiene al menos un elemento
+  console.log(Descuento[0].PorcentajeDesc)
+  const montoDescuento = (subtotal * Descuento[0].PorcentajeDesc) / 100;
+  total = subtotal - montoDescuento;
+} else {
+  // Si no hay descuento, el total es el subtotal
+  total = subtotal;
+  }
     return (
         <Box>
         <div className="vertical_line"></div>
-        <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
+        <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '35%', height: 'auto' }}>
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <h2>Productos Disponibles</h2>
             {/* Renderiza la lista de productos disponibles */}
@@ -600,8 +630,17 @@ function ListaTienda({ opcion }) {
         ))}
           </List>
           <ListItem sx={listStyle}>
-            <ListItemText primary="Total General" />
-             ${selectedProducts.reduce((acc, product) => acc + product.total, 0)}
+            <ListItemText primary="SubTotal" />
+            ${selectedProducts.reduce((acc, product) => acc + product.total, 0)}
+            
+          </ListItem>
+          <ListItem sx={listStyle}>
+  <ListItemText primary="Descuento" />
+  {Descuento && Descuento.length > 0 ? `${Descuento[0].PorcentajeDesc}%` : 'No disponible'}
+</ListItem>
+          <ListItem sx={listStyle}>
+            <ListItemText primary="Total" />
+            ${total}
           </ListItem>
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
             Emitir Factura
@@ -699,7 +738,42 @@ function ListaTienda({ opcion }) {
   )}
   {activeStep === 1 && (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-      <Typography variant="h4">Hola Mundo</Typography>
+                        <TableContainer component={Paper}>
+                          <h1 style={{color:'black'}}>M&M</h1>
+                          <p className='p_factura'>RIF: {user.RIFSuc}</p>
+                          <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
+
+      <Table aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Descripción</TableCell>
+            <TableCell align="right">Cantidad</TableCell>
+            <TableCell align="right">Precio</TableCell>
+            <TableCell align="right">Subtotal</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+         {selectedProducts.map((product, index) => (
+
+        
+            <TableRow key={index}>
+              <TableCell component="th" scope="row">
+{product.Descripcion}
+              </TableCell>
+              <TableCell align="right">{product.quantity}</TableCell>
+              <TableCell align="right">{product.Precio}</TableCell>
+              <TableCell align="right">{product.total}</TableCell>
+            </TableRow>
+
+          ))}
+           <TableRow>
+            <TableCell rowSpan={3} />
+            <TableCell colSpan={2}>Total</TableCell>
+                                <TableCell align="right">${total }</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
     </Box>
                     )}
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
@@ -710,14 +784,25 @@ function ListaTienda({ opcion }) {
     >
       Regresar
     </Button>
-   <Button 
-  type={activeStep === steps.length - 1 ? 'submit' : 'button'}
-  onClick={handleNext} 
-  variant="contained" 
-  sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E', mr: 1  } }} 
->
-  {activeStep === steps.length - 1 ? 'Emitir Factura' : 'Siguiente'}
-</Button>
+{activeStep === steps.length - 1 ? (
+  <Button
+    type="submit"
+    onClick={handleNext}
+    variant="contained"
+    sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E', mr: 1 } }}
+  >
+    Emitir Factura
+  </Button>
+) : (
+  <Button
+    type="button"
+    onClick={handleNext}
+    variant="contained"
+    sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF', mr: 1 } }}
+  >
+    Siguiente
+  </Button>
+)}
     
   </Box>
 </React.Fragment>

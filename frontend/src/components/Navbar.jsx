@@ -5,12 +5,14 @@ import NbLateral from './NbLateral';
 import Logo from '../assets/Logo.png';
 import '../css/Navbar.css';
 import { useAuth } from '../router/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 
 function Navbar() {
     const userJson = localStorage.getItem('user');
     const user = JSON.parse(userJson);
-
+    const navigate = useNavigate(); // Step 2
     const { encargado } = useAuth();
  
     const [nbLateralProps, setNbLateralProps] = useState({ title1: '', title2: '', title3: '', title4: '', padre:'', listType:''});
@@ -21,11 +23,20 @@ function Navbar() {
             setShownbLateral(true);
     };
 
+      const handleLogout = () => {
+        const confirmLogout = window.confirm("¿Está seguro de que quiere salir?");
+        if (confirmLogout) {
+            // Aquí puedes agregar lógica adicional para manejar el cierre de sesión, como limpiar el estado global o localStorage
+            navigate('/'); // Redirige al usuario al login
+        }
+    };
+
     return (
         <Box>
-            <Box sx={{ bgcolor: '#41B06E', flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            <Box sx={{ bgcolor: '#41B06E', flexGrow: 1, display: 'flex', justifyContent: 'space-between' }}>
                 <Link to='/Home' style={{ textDecoration: 'none' }}><img src={Logo} alt="Logo" className="logo" /></Link>
-                <h1 className='navh1'>WELCOME {user.Encargado.toUpperCase()}</h1>
+                <h1 className='navh1'>BIENVENIDO {user.Encargado.toUpperCase()}</h1>
+                <Button variant="outlined" onClick={handleLogout} sx={{ my: 7, mx: 3, p: 1, color:'#FFFFFF', borderColor:'#FFFFFF', '&:hover': { borderColor:'#FFFFFF', backgroundColor: '#8DECB4'}}} endIcon={<LogoutIcon/>}>Cerrar Sesión</Button>
             </Box>
             <AppBar position="static" sx={{
                 bgcolor: '#8DECB4',
