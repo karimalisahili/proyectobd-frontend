@@ -38,7 +38,7 @@ const style = {
   };
   
   // Define un estilo base para la lista y lo extiende con propiedades específicas para controlar su altura máxima y el desbordamiento vertical
-  const listStyle = { ...style, maxHeight: '320px', overflowY: 'auto' };
+  const listStyle = { ...style, maxHeight: '320px', overflowY: 'auto', marginTop: '20px'};
 
 function useForm(initialState) {
   // Inicializa el estado del formulario con el estado inicial proporcionado
@@ -509,10 +509,6 @@ function ListaTienda({ opcion }) {
     const [activeStep, setActiveStep] = React.useState(0);
     const [skipped, setSkipped] = React.useState(new Set());
 
-  const isStepOptional = (step) => {
-    return step === 1;
-  };
-
   const isStepSkipped = (step) => {
     return skipped.has(step);
   };
@@ -532,29 +528,10 @@ function ListaTienda({ opcion }) {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
     
-    
-    const handleReset = () => {
-    setActiveStep(0);
-    };
-      const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  };
-
     return (
         <Box>
         <div className="vertical_line"></div>
-        <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
+        <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '35%', height: 'auto' }}>
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <h2>Productos Disponibles</h2>
             {/* Renderiza la lista de productos disponibles */}
