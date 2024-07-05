@@ -1,7 +1,7 @@
 import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, MenuItem ,Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import React, { useState, useMemo, useEffect } from 'react';
-import PersonIcon from '@mui/icons-material/Person';
+import React, { useState, useEffect } from 'react';
+
 
 
 
@@ -193,7 +193,98 @@ function ListaDeServicios({ data = null, isEditing = false }){
   );
 }
 
-<<<<<<< HEAD
+function Actividades({ data = null, isEditing = false }){
+  const initialValues = {
+    CodServicio: data?.CodServicio || '',
+    Descripcion: data?.Descripcion || '',
+    Monto: data?.Monto || '',
+    AntelacionReserva: data?.AntelacionReserva || '',
+    rifSucursal: data?.rifSucursal || '',
+    capacidad: data?.capacidad || ''
+  };
+
+  const [formData, handleChange] = useForm(initialValues);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const endpoint = `${SERVERNAME}/actividades`;
+    const method = isEditing ? 'PUT' : 'POST';
+
+    try {
+      await sendData(endpoint, formData, method);
+      alert('Operación realizada correctamente');
+    } catch (error) {
+      console.error('Error en la operación', error);
+      if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
+      }
+    }
+  }
+
+  return(
+    <FormBox onSubmit={handleSubmit}> 
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="CODIGO-SERVICIO" 
+          type='text'
+          name='CodServicio'
+          valor = {formData.CodServicio}
+          cambio = {handleChange}
+          sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
+          <InputField label="DESCRIPCION" 
+          type='text'
+          name='Descripcion'
+          valor = {formData.Descripcion}
+          cambio = {handleChange}
+          sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
+        </Box>  
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="MONTO"
+          type='text'
+          name='Monto'
+          valor = {formData.Monto}
+          cambio = {handleChange}
+          sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
+          <InputField label="ANTELACION-RESERVA"
+          type='text'
+          name='AntelacionReserva'
+          valor = {formData.AntelacionReserva}
+          cambio = {handleChange}
+          sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="RIF-SUCURSAL"
+          type='text'
+          name='rifSucursal'
+          valor = {formData.rifSucursal}
+          cambio = {handleChange}
+          sx={{ bgcolor: '#FFFFFF', width : '30%', margin: '10px', borderRadius: '10px' }}/>
+          <InputField label="CAPACIDAD"
+          type='text'
+          name='capacidad'
+          valor = {formData.capacidad}
+          cambio = {handleChange}
+          sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
+        </Box>
+      </Box>
+      <Button type='submit'  variant="contained" sx={{
+        margin: '5px 20px',
+        color: '#000000',
+        bgcolor: '#FFFFFF',
+        '&:hover': {
+          bgcolor: '#41B06E',
+          color: '#FFFFFF'
+        }
+      }}>
+        {isEditing ? 'Actualizar Actividad' : 'Agregar Actividad'}
+      </Button>
+    </FormBox>
+  );
+}
+
 function Reservas({ data = null, isEditing = false }){
   
   const initialValues = {
@@ -201,14 +292,6 @@ function Reservas({ data = null, isEditing = false }){
     Abono: data?.Abono || '',
     CodVehiculo: data?.CodVehiculo || ''
   };
-=======
-    // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos('servicios', setListaServiciosSeleccionados);
-    obtenerDatos('RESERVAS', setReservasSeleccionados);
-    obtenerDatos('PAGOS', setPagosSeleccionados);
-    obtenerDatos('FACTURAS', setFacturasSeleccionados);
-  }, []);
->>>>>>> be1c5371765d5a70ec3d096e65139111641ee542
 
   const [formData, handleChange] = useForm(initialValues);
 
@@ -579,16 +662,20 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
   );
 }
 
-function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, pagosSeleccionados, facturasSeleccionados, onSeleccionado) {
+function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, pagosSeleccionados, facturasSeleccionados, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
     case 'Listas de Servicios':
       // Renderiza y retorna una lista de servicios seleccionados
-      return renderList(listaServiciosSeleccionados, 'Descripcion', 'CI_Coord', onSeleccionado);
+      return renderList(listaServiciosSeleccionados, 'Descripcion', 'CodigoServ', onSeleccionado);
 
     case 'Reservas':
       // Renderiza y retorna una lista de reservas seleccionadas
       return renderList(reservasSeleccionados, 'FechaR', 'Abono', onSeleccionado);
+
+    case 'Actividades':
+      // Renderiza y retorna una lista de actividades seleccionadas
+      return renderList(actividadesSeleccionadas, 'NroActividad', 'Descripcion', onSeleccionado);
 
     case 'Pagos':
       // Renderiza y retorna una lista de pagos seleccionados
@@ -617,12 +704,12 @@ function ListServicios({opcion}){
     const [reservasSeleccionados, setReservasSeleccionados] = useState([]);
     const [pagosSeleccionados, setPagosSeleccionados] = useState([]);
     const [facturasSeleccionados, setFacturasSeleccionados] = useState([]);
+    const [actividadesSeleccionadas, setActividadesSeleccionadas] = useState([]);
 
     // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
   useEffect(() => {
     // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
     const obtenerDatos = async (endpoint, setter) => {
-      console.log(SERVERNAME+' '+endpoint)
       try {
         // Realiza la petición fetch al servidor y espera la respuesta
         const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
@@ -638,9 +725,11 @@ function ListServicios({opcion}){
 
     // Llama a obtenerDatos para cada tipo de dato necesario
     obtenerDatos('SERVICIOS', setListaServiciosSeleccionados);
+    obtenerDatos('ACTIVIDADES', setActividadesSeleccionadas);
     obtenerDatos('RESERVAS', setReservasSeleccionados);
     obtenerDatos('PAGOS', setPagosSeleccionados);
     obtenerDatos('FACTURAS_SERVICIOS', setFacturasSeleccionados); //REVISAR: endpoint de facturaservicio no existe ES FACTURAS_SERVICIOS
+    
   }, []);
 
   const handleOpen = (type) => {
@@ -662,6 +751,8 @@ const renderForm = (info, editar) => {
   switch (formType) {
     case 'Listas de Servicios':
       return <ListaDeServicios data={info} isEditing={editar}/>;
+    case 'Actividades':
+      return <Actividades data={info} isEditing={editar}/>;
     case 'Reservas':
       return <Reservas data={info} isEditing={editar}/>;
     case 'Pagos':
@@ -688,7 +779,7 @@ const manejarSeleccionEnLists = (seleccion) => {
     <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
       <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
-        {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
+        {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas,pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
         {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
         <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
           Agregar {opcion}
@@ -757,6 +848,11 @@ InputField.propTypes = {
 };
 
 ListaDeServicios.propTypes={
+  data: PropTypes.object,
+  isEditing: PropTypes.bool,
+}
+
+Actividades.propTypes={
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
