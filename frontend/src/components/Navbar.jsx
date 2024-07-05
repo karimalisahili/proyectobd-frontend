@@ -36,7 +36,7 @@ function Navbar() {
             <Box sx={{ bgcolor: '#41B06E', flexGrow: 1, display: 'flex', justifyContent: 'space-between' }}>
                 <Link to='/Home' style={{ textDecoration: 'none' }}><img src={Logo} alt="Logo" className="logo" /></Link>
                 <h1 className='navh1'>BIENVENIDO {user.Encargado.toUpperCase()}</h1>
-                <Button variant="contained" color='error' onClick={handleLogout} sx={{ my: 7, mx: 3, p: 1 }} endIcon={<LogoutIcon/>}>Cerrar Sesión</Button>
+                <Button variant="outlined" onClick={handleLogout} sx={{ my: 7, mx: 3, p: 1, color:'#FFFFFF', borderColor:'#FFFFFF', '&:hover': { borderColor:'#FFFFFF', backgroundColor: '#8DECB4'}}} endIcon={<LogoutIcon/>}>Cerrar Sesión</Button>
             </Box>
             <AppBar position="static" sx={{
                 bgcolor: '#8DECB4',
