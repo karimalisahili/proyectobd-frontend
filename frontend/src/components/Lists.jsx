@@ -139,6 +139,7 @@ function Personal({ data = null, isEditing = false }) {
   try {
     await sendData(endpoint, formData, method);
     alert('Operación realizada correctamente');
+    window.location.reload();
   } catch (error) {
     console.error('Error en la operación', error);
     if (error.message.includes('404')) {
