@@ -772,6 +772,32 @@ const manejarSeleccionEnLists = (seleccion) => {
   // Aquí puedes hacer algo más con la selección en el componente Lists
 };
 
+const renderContenido = () => {
+  if (seleccionEnLists && opcion === 'Listas de Servicios') {
+    return (
+      <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        SERVICIOS
+      </Box>
+    );
+  } else if(seleccionEnLists && opcion === 'Actividades'){
+    return(
+      <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        ACTIVIDADES
+      </Box>
+    )
+  }else if(seleccionEnLists && opcion === 'Reservas'){
+    return(
+      <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        RESERVAS
+      </Box>
+    )
+  }else{
+    return (
+      <Typography>No se ha seleccionado ningún Servicio</Typography>
+    );
+  }
+};
+
 
   return (
     <Box>
@@ -792,13 +818,7 @@ const manejarSeleccionEnLists = (seleccion) => {
       </Box>
     </Box>
     <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '35%', height: 'auto' }}>
-        {seleccionEnLists ? (
-          <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-            SERVICIOS
-          </Box>
-        ) : (
-          <Typography>No se ha seleccionado ningún empleado</Typography>
-        )}
+      {renderContenido()}
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
           <List sx={style}>
