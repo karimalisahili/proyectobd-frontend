@@ -1,11 +1,13 @@
 import { Button, Box} from '@mui/material';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Lists from './Lists';
 import ListService from '../components/ListServicios';
 import '../css/NbLateral.css';
 import { useAuth } from '../router/AuthContext';
 import InventarioLista from './InventarioLista';
+
+import ListaTienda from './ListaTienda';
 
 function NbLateral({ title1, title2, title3, title4, padre, listType}) {
 
@@ -44,7 +46,8 @@ function NbLateral({ title1, title2, title3, title4, padre, listType}) {
             {showLists && (listType === 'list' ? <Lists {...listsProps} authData={authData} /> :
                 listType === 'listService' ? <ListService {...listsProps} authData={authData} /> :
                 listType === 'InventarioLista' ? <InventarioLista {...listsProps} authData={authData} /> :
-  null
+                listType === 'listaTienda' ? <ListaTienda {...listsProps} authData={authData} /> :
+                null
 )}        
         </Box>
     );
