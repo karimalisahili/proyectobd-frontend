@@ -1,11 +1,11 @@
 // Importación de componentes de Material UI, PropTypes y hooks de React.
 import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import React,{ useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PersonIcon from '@mui/icons-material/Person';
 
 // Definición de la variable SERVERNAME que obtiene el valor de la variable de entorno VITE_SERVERNAME.
-// Este valor se utiliza para configurar el nombre del servidor en la aplicación.
+// Este valor se utiliza para configurar el NombreP del servidor en la aplicación.
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
@@ -54,7 +54,7 @@ function useForm(initialState) {
 
   // Función para manejar los cambios en los campos del formulario
   const handleChange = (e) => {
-    // Extrae el nombre y el valor del campo que disparó el evento
+    // Extrae el NombreP y el valor del campo que disparó el evento
     const { name, value } = e.target;
     // Actualiza el estado del formulario con el nuevo valor para el campo especificado
     setFormData(prevState => ({
@@ -80,7 +80,8 @@ async function sendData(endpoint, formData, method) {
   });
 
   // Check if the response is OK and the content type is JSON
-  if (response.ok && response.headers.get('Content-Type')?.includes('application/json')) {
+  if (response.status == 200) {
+    window.location.reload();
     return response.json();
   } else {
     // Handle non-JSON responses or errors
@@ -90,13 +91,13 @@ async function sendData(endpoint, formData, method) {
 }
 
 // Define un componente funcional FormBox que acepta props, incluyendo children y onSubmit
-const FormBox = ({ children, onSubmit, ...props  }) => (
+const FormBox = ({ children, onSubmit, ...props }) => (
   // Retorna un componente Box actuando como un formulario
   <Box component="form" sx={commonStyles} noValidate autoComplete="off" onSubmit={onSubmit} {...props}>
     {/*Dentro del Box, muestra un encabezado con un mensaje*/}
     <h3>Ingrese los Siguientes Datos</h3>
     {/*Renderiza cualquier hijo pasado al FormBox (usualmente campos de formulario)*/}
-      {children}
+    {children}
   </Box>
 );
 
@@ -106,7 +107,7 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
   <TextField
     label={label} // Establece la etiqueta del campo
     type={type} // Establece el tipo de input (ej. text, number)
-    name={name} // Establece el nombre del campo, importante para identificarlo al enviar el formulario
+    name={name} // Establece el NombreP del campo, importante para identificarlo al enviar el formulario
     sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} // Estilos personalizados
     InputProps={min ? { inputProps: { min } } : {}} // Propiedad condicional para establecer el valor mínimo si se proporciona
     value={valor} // Vincula el valor del campo a la variable 'valor'
@@ -115,160 +116,60 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 );
 
 // Define un componente funcional llamado Personal
-function Personal({ data = null, isEditing = false }) {
+function Productos({ data = null, isEditing = false }) {
+  
   const initialValues = {
-    Cedula: data?.Cedula || '',
-    Nombre: data?.Nombre || '',
-    Direccion: data?.Direccion || '',
-    Salario: data?.Salario || '',
-    Telefono: data?.Telefono || '',
-    RIFSuc: user.RIFSuc, // Asumiendo que user está disponible en el contexto
+    CodProd: data?.CodProd || '',
+    NombreP: data?.NombreP || '',
+    Descripcion: data?.Descripcion || '',
+    Precio: data?.Precio || '',
+    Ecologico: data?.Ecologico || '',
+    Fabricante: data?.Fabricante || '',
+    Maximo: data?.Maximo || '',
+    Minimo: data?.Minimo || '',
+    TipoPro: data?.TipoPro || '',
+    CodLinea: data?.CodLinea || '',
   };
 
   const [formData, handleChange] = useForm(initialValues);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
-
-  const endpoint = `${SERVERNAME}/trabajadores`;
-  const method = isEditing ? 'PUT' : 'POST';
-
-  try {
-    await sendData(endpoint, formData, method);
-    alert('Operación realizada correctamente');
-
-   window.location.reload();
-
-
-  } catch (error) {
-    console.error('Error en la operación', error);
-    if (error.message.includes('404')) {
-      alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-    } else {
-      alert('Error en la operación. Por favor, intente nuevamente.');
+    const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
     }
-  }
+    const endpoint = `${SERVERNAME}/productos`;
+    const method = isEditing ? 'PUT' : 'POST';
+
+    try {
+      await sendData(endpoint, formData, method);
+      alert('Operación realizada correctamente');
+    } catch (error) {
+      console.error('Error en la operación', error);
+      if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
+      }
+    }
   };
-  
+
   const handleDelete = async () => {
-  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
-  const endpoint = `${SERVERNAME}/trabajadores`; // Asumiendo que Cedula es el identificador único
-  try {
-    await sendData(endpoint, formData, 'DELETE');
-    alert('Empleado eliminado correctamente');
-    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
-    window.location.reload()
-  } catch (error) {
-    console.error('Error al eliminar el empleado', error);
-    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
-  }
-};
-
-  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
-  return (
-    <FormBox onSubmit={handleSubmit}> 
-      {/* Box para agrupar los campos de entrada con estilo de flexbox */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        {/* Box para agrupar dos campos de entrada horizontalmente */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para el nombre del empleado */}
-          <InputField label="NOMBRE-EMPLEADO" type='text' name='Nombre'
-            valor={formData.Nombre} cambio={handleChange}/>
-          {/* InputField para el salario del empleado */}
-          <InputField label="SUELDO-EMPLEADO" type='number' name='Salario' min={1} valor={formData.Salario} cambio={handleChange}/>
-        </Box>
-      </Box>
-      {/* Repite la estructura anterior para otros campos del formulario */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="CEDULA-EMPLEADO" type='text' name='Cedula'
-            valor={formData.Cedula} cambio={handleChange}/>
-          <InputField label="TELEFONO-EMPLEADO" type='text' name='Telefono'
-            valor={formData.Telefono} cambio={handleChange}/>
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="DIRECCION-EMPLEADO" type='text' name='Direccion'
-            valor={formData.Direccion} cambio={handleChange}/>
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-      <Button type='submit'  variant="contained" sx={{
-        margin: '5px 20px',
-        color: '#000000',
-        bgcolor: '#FFFFFF',
-        '&:hover': {
-            bgcolor: '#41B06E',
-            color: '#FFFFFF'
-          }
-        }}
-        >
-        {isEditing ? 'Actualizar Personal' : 'Agregar Personal'}
-      </Button>
-      {isEditing && (
-  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-    Eliminar
-  </Button>
-)}
-      </Box>
-    </FormBox>
-  );
-}
-
-// Define un componente funcional llamado Cliente
-function Cliente({ data = null, isEditing = false }) {
-  // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para CIResponsable y NombreResponsable
-  const initialValues = {
-    CIResponsable: data?.CIResponsable || '',
-    NombreResponsable: data?.NombreResponsable || '',
-  };
-
-  const [formData, handleChange] = useForm(initialValues);
-
-  // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  const endpoint = `${SERVERNAME}/responsables`;
-  const method = isEditing ? 'PUT' : 'POST';
-
-  try {
-    await sendData(endpoint, formData, method);
-    alert('Operación realizada correctamente');
-    window.location.reload()
-  } catch (error) {
-    console.error('Error en la operación', error);
-    if (error.message.includes('404')) {
-      alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-    } else {
-      alert('Error en la operación. Por favor, intente nuevamente.');
+    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
     }
-  }
+    const endpoint = `${SERVERNAME}/productos`; // Asumiendo que CodProd es el identificador único
+    try {
+      await sendData(endpoint, formData, 'DELETE');
+      alert('Empleado eliminado correctamente');
+      // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    } catch (error) {
+      console.error('Error al eliminar el empleado', error);
+      alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+    }
   };
-  
-    const handleDelete = async () => {
-  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
-  const endpoint = `${SERVERNAME}/responsables`; // Asumiendo que Cedula es el identificador único
-  try {
-    await sendData(endpoint, formData, 'DELETE');
-    alert('Empleado eliminado correctamente');
-    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
-    window.location.reload()
-  } catch (error) {
-    console.error('Error al eliminar el empleado', error);
-    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
-  }
-};
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
@@ -277,30 +178,152 @@ function Cliente({ data = null, isEditing = false }) {
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para la cédula del cliente */}
-          <InputField label="CEDULA-CLIENTE" type='text' name='CIResponsable'
-            valor={formData.CIResponsable} cambio={handleChange}/>
-          {/* InputField para el nombre del cliente */}
-          <InputField label="NOMBRE-CLIENTE" type='text' name='NombreResponsable' valor={formData.NombreResponsable} cambio={handleChange}/>
+          {/* InputField para el NombreP del empleado */}
+          <InputField label="Nombre-Producto" type='text' name='NombreP'
+            valor={formData.NombreP} cambio={handleChange} />
+          {/* InputField para el Precio del empleado */}
+          <InputField label="Precio" type='number' name='Precio' min={1} valor={formData.Precio} cambio={handleChange} />
+        </Box>
+      </Box>
+      {/* Repite la estructura anterior para otros campos del formulario */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="Codigo-Producto" type='text' name='CodProd'
+            valor={formData.CodProd} cambio={handleChange} />
+          <select name="Ecologico" value={formData.Ecologico} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
+            <option value="N">¿Es Ecologico?</option>
+            <option value="S">Sí</option>
+            <option value="N">No</option>
+          </select>
+        </Box>
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="Descripcion" type='text' name='Descripcion'
+            valor={formData.Descripcion} cambio={handleChange} />
+            <InputField label="Codigo-Linea" type='number' name='CodLinea'
+            valor={formData.CodLinea} cambio={handleChange} />
+        </Box>
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="Minimo" type='number' name='Minimo'
+            valor={formData.Minimo} cambio={handleChange} />
+            <InputField label="Maximo" type='number' name='Maximo'
+            valor={formData.Maximo} cambio={handleChange} />
+        </Box>
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="Fabricante" type='text' name='Fabricante'
+            valor={formData.Fabricante} cambio={handleChange} />
+          <select name="TipoPro" value={formData.TipoPro} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
+            <option value="Tienda">Tipo Producto</option>
+            <option value="Servicio">Servicio</option>
+            <option value="Tienda">Tienda</option>
+          </select>
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-      <Button type='submit' variant="contained" sx={{
-        margin: '5px 0',
-        color: '#000000',
-        bgcolor: '#FFFFFF',
-        '&:hover': {
-          bgcolor: '#41B06E',
-          color: '#FFFFFF'
-        }
-      }}>
-        {isEditing ? 'Actualizar Cliente' : 'Agregar Cliente'}
-      </Button>
-      {isEditing && (
-  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-    Eliminar
-  </Button>
-)}
+        <Button type='submit' variant="contained" sx={{
+          margin: '5px 20px',
+          color: '#000000',
+          bgcolor: '#FFFFFF',
+          '&:hover': {
+            bgcolor: '#41B06E',
+            color: '#FFFFFF'
+          }
+        }}
+        >
+          {isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
+        </Button>
+        {isEditing && (
+          <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+            Eliminar
+          </Button>
+        )}
+      </Box>
+    </FormBox>
+  );
+}
+
+// Define un componente funcional llamado linea
+function Lineas({ data = null, isEditing = false }) {
+  // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para CodLineas y Descripcion
+  const initialValues = {
+    CodLineas: data?.CodLineas || '',
+    Descripcion: data?.Descripcion || '',
+  };
+
+  const [formData, handleChange] = useForm(initialValues);
+
+  // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const endpoint = `${SERVERNAME}/lineas`;
+    const method = isEditing ? 'PUT' : 'POST';
+
+    try {
+      await sendData(endpoint, formData, method);
+      alert('Operación realizada correctamente');
+    } catch (error) {
+      console.error('Error en la operación', error);
+      if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
+      }
+    }
+  };
+
+
+
+  const handleDelete = async () => {
+    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
+    }
+    const endpoint = `${SERVERNAME}/lineas`; // Asumiendo que CodProd es el identificador único
+    try {
+      await sendData(endpoint, formData, 'DELETE');
+      alert('Empleado eliminado correctamente');
+      // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    } catch (error) {
+      console.error('Error al eliminar el empleado', error);
+      alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+    }
+  };
+
+  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
+  return (
+    <FormBox onSubmit={handleSubmit}>
+      {/* Box para agrupar los campos de entrada con estilo de flexbox */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+        {/* Box para agrupar dos campos de entrada horizontalmente */}
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          {/* InputField para la cédula del linea */}
+          {/* InputField para el NombreP del linea */}
+          <InputField label="Descripcion-linea" type='text' name='Descripcion' valor={formData.Descripcion} cambio={handleChange} />
+        </Box>
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+        <Button type='submit' variant="contained" sx={{
+          margin: '5px 0',
+          color: '#000000',
+          bgcolor: '#FFFFFF',
+          '&:hover': {
+            bgcolor: '#41B06E',
+            color: '#FFFFFF'
+          }
+        }}>
+          {isEditing ? 'Actualizar linea' : 'Agregar linea'}
+        </Button>
+        {isEditing && (
+          <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+            Eliminar
+          </Button>
+        )}
       </Box>
     </FormBox>
   );
@@ -313,11 +336,11 @@ function Vehiculo({ data = null, isEditing = false }) {
   const initialValues = {
     Placa: data?.Placa || '',
     TipoAceite: data?.TipoAceite || '',
-    FechaAdq:  new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
+    FechaAdq: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
     ciResp: data?.ciResp || '',
     CodMarca: data?.CodMarca || '',
     NumModelo: data?.NumModelo || '',
-    
+
   };
 
   const [formData, handleChange] = useForm(initialValues);
@@ -326,14 +349,13 @@ function Vehiculo({ data = null, isEditing = false }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-     console.log(formData)
+    console.log(formData)
     const endpoint = `${SERVERNAME}/vehiculos`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
       await sendData(endpoint, formData, method);
       alert('Operación realizada correctamente');
-      window.location.reload()
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -345,21 +367,20 @@ function Vehiculo({ data = null, isEditing = false }) {
   };
 
   const handleDelete = async () => {
-  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
-  const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que Cedula es el identificador único
-  try {
-    await sendData(endpoint, formData, 'DELETE');
-    alert('Empleado eliminado correctamente');
-    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
-    window.location.reload()
-  } catch (error) {
-    console.error('Error al eliminar el empleado', error);
-    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
-  }
-};
+    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
+    }
+    const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que CodProd es el identificador único
+    try {
+      await sendData(endpoint, formData, 'DELETE');
+      alert('Empleado eliminado correctamente');
+      // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    } catch (error) {
+      console.error('Error al eliminar el empleado', error);
+      alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+    }
+  };
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
@@ -369,44 +390,44 @@ function Vehiculo({ data = null, isEditing = false }) {
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           {/* InputField para la cédula del responsable */}
-          <InputField label="CEDULA-CLIENTE" type='text' name='ciResp' 
-            valor={formData.ciResp} cambio={handleChange}/>
+          <InputField label="CodProd-linea" type='text' name='ciResp'
+            valor={formData.ciResp} cambio={handleChange} />
           <InputField label="No-MODELO" type='text' name='NumModelo'
-            valor={formData.NumModelo} cambio={handleChange}/>
+            valor={formData.NumModelo} cambio={handleChange} />
         </Box>
       </Box>
       {/* Repite la estructura anterior para otros campos del formulario */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="PLACA-VEHICULO" type='text' name='Placa'
-            valor={formData.Placa} cambio={handleChange}/>
+            valor={formData.Placa} cambio={handleChange} />
           <InputField label="TIPO-ACEITE" type='text' name='TipoAceite'
-            valor={formData.TipoAceite} cambio={handleChange}/>
+            valor={formData.TipoAceite} cambio={handleChange} />
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="COD-MARCA" type='text' name='CodMarca'
-            valor={formData.CodMarca} cambio={handleChange}/>
+            valor={formData.CodMarca} cambio={handleChange} />
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-      <Button type='submit' variant="contained" sx={{
-        margin: '5px 0',
-        color: '#000000',
-        bgcolor: '#FFFFFF',
-        '&:hover': {
-          bgcolor: '#41B06E',
-          color: '#FFFFFF'
-        }
-      }}>
-        {isEditing ? 'Actualizar Vehiculo' : 'Agregar Vehiculo'}
+        <Button type='submit' variant="contained" sx={{
+          margin: '5px 0',
+          color: '#000000',
+          bgcolor: '#FFFFFF',
+          '&:hover': {
+            bgcolor: '#41B06E',
+            color: '#FFFFFF'
+          }
+        }}>
+          {isEditing ? 'Actualizar Vehiculo' : 'Agregar Vehiculo'}
         </Button>
         {isEditing && (
-  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-    Eliminar
-  </Button>
-)}
+          <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+            Eliminar
+          </Button>
+        )}
       </Box>
     </FormBox>
   );
@@ -422,7 +443,7 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
   const manejarClicSeleccionado = (seleccion) => {
     setSeleccionado(seleccion);
     onSeleccionado(seleccion);
-};
+  };
   // Retorna un componente List de Material-UI con un estilo personalizado
   return (
     <List sx={listStyle}>
@@ -432,8 +453,8 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
         <ListItem key={index} button onClick={() => manejarClicSeleccionado(item)}>
           {/* ListItemText muestra el texto principal y secundario basado en las claves proporcionadas */}
           <ListItemText primary={item[textKey]} />
-            {/* Muestra el valor secundario directamente sin un componente específico */}
-            {item[secondaryKey]}
+          {/* Muestra el valor secundario directamente sin un componente específico */}
+          {item[secondaryKey]}
         </ListItem>
       ))}
     </List>
@@ -441,15 +462,15 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
 }
 
 // Define una función para mostrar una lista basada en la opción seleccionada
-function mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, vehiculosSeleccionados, onSeleccionado) {
+function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
-    case 'Personal':
+    case 'Productos':
       // Renderiza y retorna una lista de empleados seleccionados
-      return renderList(empleadosSeleccionados, 'Nombre', 'Cedula', onSeleccionado);
-    case 'Cliente':
-      // Renderiza y retorna una lista de clientes seleccionados
-      return renderList(clientesSeleccionados, 'NombreResponsable', 'CIResponsable', onSeleccionado);
+      return renderList(empleadosSeleccionados, 'NombreP', 'CodProd', onSeleccionado);
+    case 'Lineas':
+      // Renderiza y retorna una lista de lineas seleccionados
+      return renderList(lineasSeleccionados, 'Descripcion', 'CodLineas', onSeleccionado);
     case 'Vehiculo':
       // Renderiza y retorna una lista de vehículos seleccionados
       return renderList(vehiculosSeleccionados, 'Placa', 'CodVehiculo', onSeleccionado);
@@ -462,7 +483,7 @@ function mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, veh
 
 
 // Define el componente Lists que recibe una prop 'opcion'
-function Lists({ opcion }) {
+function InventarioLista({ opcion }) {
 
   // Estado para controlar la visibilidad del modal
   const [open, setOpen] = useState(false);
@@ -470,12 +491,12 @@ function Lists({ opcion }) {
   const [formType, setFormType] = useState('');
   const [open2, setOpen2] = useState(false);
 
-  // Estados para almacenar los datos seleccionados de empleados, clientes y vehículos
+  // Estados para almacenar los datos seleccionados de empleados, lineas y vehículos
   const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
-  const [clientesSeleccionados, setClientesSeleccionados] = useState([]);
+  const [lineasSeleccionados, setlineasSeleccionados] = useState([]);
   const [vehiculosSeleccionados, setVehiculosSeleccionados] = useState([]);
 
-  // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
+  // useEffect para cargar datos de empleados, lineas y vehículos al montar el componente
   useEffect(() => {
     // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
     const obtenerDatos = async (endpoint, setter) => {
@@ -493,10 +514,10 @@ function Lists({ opcion }) {
       }
     };
 
-  
+
     // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos(`trabajadores/${user.RIFSuc}`, setEmpleadosSeleccionados);
-    obtenerDatos('RESPONSABLES', setClientesSeleccionados);
+    obtenerDatos(`productos`, setEmpleadosSeleccionados);
+    obtenerDatos('lineas', setlineasSeleccionados);
     obtenerDatos('VEHICULOS', setVehiculosSeleccionados);
   }, []);
 
@@ -514,18 +535,16 @@ function Lists({ opcion }) {
   const closeModal = () => {
     setOpen(false);
     setOpen2(false);
-};
-
-//llevarme esto a tienda a adaptar 
+  };
   // Función para renderizar el formulario correspondiente en el modal
   const renderForm = (info, editar) => {
     switch (formType) {
-      case 'Personal':
-        return<Personal data={info} isEditing={editar} />
-      case 'Cliente':
-        return <Cliente data={info} isEditing={editar}/>;
+      case 'Productos':
+        return <Productos data={info} isEditing={editar} />;
+      case 'Lineas':
+        return <Lineas data={info} isEditing={editar} />;
       case 'Vehiculo':
-        return <Vehiculo data={info} isEditing={editar}/>;
+        return <Vehiculo data={info} isEditing={editar} />;
       default:
         return <div> fallo </div>;
     }
@@ -539,7 +558,7 @@ function Lists({ opcion }) {
     // Aquí puedes hacer algo más con la selección en el componente Lists
   };
 
-  
+
   // Renderiza el componente
   return (
     <Box>
@@ -547,13 +566,13 @@ function Lists({ opcion }) {
       <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
-          {mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
+          {mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
             Agregar {opcion}
           </Button>
           {/* Modal que se muestra u oculta basado en el estado 'open' */}
-          <Modal open={open} onClose={closeModal}aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+          <Modal open={open} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
             {renderForm(null, false)}
           </Modal>
@@ -561,35 +580,36 @@ function Lists({ opcion }) {
       </Box>
       <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '35%', height: 'auto' }}>
         {seleccionEnLists ? (
-          <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <div className="circle">
-                <PersonIcon sx={{ fontSize: 150 }} />
+              <PersonIcon sx={{ fontSize: 150 }} />
             </div>
-            <h2>{ seleccionEnLists.Nombre || '' }</h2>
-            <h2>{seleccionEnLists.Cedula || ''}</h2>
-            <h2>{seleccionEnLists.NombreResponsable || ''}</h2>
-            <h2>{seleccionEnLists.CIResponsable || ''}</h2>
+            <h2>{seleccionEnLists.NombreP || ''}</h2>
+            <h2>{seleccionEnLists.CodProd || ''}</h2>
+            <h2>{seleccionEnLists.Descripcion || ''}</h2>
+            <h2>{seleccionEnLists.CodLineas || ''}</h2>
           </Box>
         ) : (
-            <Typography>No se ha seleccionado ningún {opcion}</Typography>
+          <Typography>No se ha seleccionado ningún empleado</Typography>
         )}
-        <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
           <List sx={style}>
-            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'NombreResponsable' || entry[0] === 'Direccion')).map(([key,value])=> (
+            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Descripcion' || entry[0] === 'Descripcion')).map(([key, value]) => (
               <React.Fragment key={key}>
                 <ListItem>
                   <ListItemText primary={`${key}: `} />
-                    {value || 'No disponible'}
+                  {value || 'No disponible'}
                 </ListItem>
                 <Divider component="li" />
               </React.Fragment>
             ))}
           </List>
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
+          {/* Botón para modificar, aún no implementado completamente */}
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
             Modificar
           </Button>
-          <Modal open={open2} onClose={closeModal}aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+          <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
             {renderForm(seleccionEnLists, true)}
           </Modal>
@@ -600,7 +620,7 @@ function Lists({ opcion }) {
 }
 
 // Define las propiedades esperadas para el componente Lists
-Lists.propTypes = {
+InventarioLista.propTypes = {
   opcion: PropTypes.string.isRequired, // 'opcion' debe ser una cadena de texto y es requerida
   raiz: PropTypes.string.isRequired, // 'raiz' debe ser una cadena de texto y es requerida
 };
@@ -621,12 +641,12 @@ InputField.propTypes = {
   valor: PropTypes.string, // 'valor' debe ser una cadena de texto, pero no es requerida
 };
 
-Personal.propTypes = {
+Productos.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
 
-Cliente.propTypes = {
+Lineas.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
@@ -636,4 +656,4 @@ Vehiculo.propTypes = {
   isEditing: PropTypes.bool,
 }
 
-export default Lists;
+export default InventarioLista;
