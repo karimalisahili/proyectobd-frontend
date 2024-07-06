@@ -432,36 +432,30 @@ function Tipos_Vehiculos({ data = null, isEditing = false }) {
 
 
 // Define una función para renderizar una lista de elementos
-function renderList(items, textKey, secondaryKey, tercerKey, onSeleccionado) {
+function renderList(items, textKey, secondaryKey, onSeleccionado) {
 
     const [Seleccionado, setSeleccionado] = useState(null);
-
+  
     const manejarClicSeleccionado = (seleccion) => {
-        setSeleccionado(seleccion);
-        onSeleccionado(seleccion);
+      setSeleccionado(seleccion);
+      onSeleccionado(seleccion);
     };
     // Retorna un componente List de Material-UI con un estilo personalizado
     return (
-        <List sx={listStyle}>
-            <ListItem>
-                <ListItemText primary={textKey} />
-                <ListItemText primary={secondaryKey} />
-                <ListItemText primary={tercerKey} />
-            </ListItem>
-            {/* Mapea cada elemento del array 'items' a un componente ListItem */}
-            {items.map((item, index) => (
-                // Cada ListItem tiene una key única basada en su índice para optimizar el renderizado
-                <ListItem key={index} button onClick={() => manejarClicSeleccionado(item)}>
-                    {/* ListItemText muestra el texto principal y secundario basado en las claves proporcionadas */}
-                    <ListItemText primary={item[textKey]} />
-                    {/* Muestra el valor secundario directamente sin un componente específico */}
-                    <ListItemText primary={item[secondaryKey]} />
+      <List sx={listStyle}>
+        {/* Mapea cada elemento del array 'items' a un componente ListItem */}
+        {items.map((item, index) => (
+          // Cada ListItem tiene una key única basada en su índice para optimizar el renderizado
+          <ListItem key={index} button onClick={() => manejarClicSeleccionado(item)}>
+            {/* ListItemText muestra el texto principal y secundario basado en las claves proporcionadas */}
+            <ListItemText primary={item[textKey]} />
+            {/* Muestra el valor secundario directamente sin un componente específico */}
+            {item[secondaryKey]}
 
-                    <ListItemText primary={item[tercerKey]} />
 
-                </ListItem>
-            ))}
-        </List>
+          </ListItem>
+        ))}
+      </List>
     );
 }
 
@@ -474,7 +468,7 @@ function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehic
             return renderList(empleadosSeleccionados, 'CodMarcaVeh', 'Nombre', onSeleccionado);
         case 'Modelos':
             // Renderiza y retorna una lista de lineas seleccionados
-            return renderList(lineasSeleccionados, 'CodMarcaV', 'CodConsec', 'Descripcion', onSeleccionado);
+            return renderList(lineasSeleccionados, 'CodMarcaV', 'Descripcion', onSeleccionado);
         case 'Tipos Vehiculos':
             // Renderiza y retorna una lista de vehículos seleccionados
             return renderList(vehiculosSeleccionados, 'CodTipoV', 'Descripcion', onSeleccionado);
@@ -553,6 +547,8 @@ function MarcasListas({ opcion }) {
     };
 
     const [seleccionEnLists, setSeleccionEnLists] = useState(null);
+
+    
 
     // Función para manejar la selección desde renderList
     const manejarSeleccionEnLists = (seleccion) => {
