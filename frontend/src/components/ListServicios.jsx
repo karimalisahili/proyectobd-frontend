@@ -74,7 +74,8 @@ async function sendData(endpoint, formData, method) {
   });
 
   // Check if the response is OK and the content type is JSON
-  if (response.ok && response.headers.get('Content-Type')?.includes('application/json')) {
+  if (response.status == 200) {
+    window.location.reload();
     return response.json();
   } else {
     // Handle non-JSON responses or errors
@@ -111,6 +112,7 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 function ListaDeServicios({ data = null, isEditing = false }){
 
   const initialValues = {
+    CodigoServ: data?.CodigoServ || '',
     Descripcion: data?.Descripcion || '',
     CI_Coord: data?.CI_Coord || ''
   };
@@ -187,9 +189,11 @@ function ListaDeServicios({ data = null, isEditing = false }){
         >
         {isEditing ? 'Actualizar Servicio' : 'Agregar Servicio'}
       </Button>
-      <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-        Eliminar
-      </Button>
+      {isEditing && (
+        <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+          Eliminar
+        </Button>
+      )}
       </Box>
     </FormBox>
   );
@@ -198,6 +202,7 @@ function ListaDeServicios({ data = null, isEditing = false }){
 function Actividades({ data = null, isEditing = false }){
   const initialValues = {
     CodServicio: data?.CodServicio || '',
+    NroActividad: data?.NroActividad || '',
     Descripcion: data?.Descripcion || '',
     Monto: data?.Monto || '',
     AntelacionReserva: data?.AntelacionReserva || '',
@@ -227,6 +232,22 @@ function Actividades({ data = null, isEditing = false }){
     }
   }
 
+  const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/actividades`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
   return(
     <FormBox onSubmit={handleSubmit}> 
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
@@ -284,6 +305,11 @@ function Actividades({ data = null, isEditing = false }){
       }}>
         {isEditing ? 'Actualizar Actividad' : 'Agregar Actividad'}
       </Button>
+      {isEditing && (
+        <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+          Eliminar
+        </Button>
+      )}
     </FormBox>
   );
 }
@@ -291,6 +317,7 @@ function Actividades({ data = null, isEditing = false }){
 function Reservas({ data = null, isEditing = false }){
   
   const initialValues = {
+    NroR: data?.NroR || '',
     FechaR: data?.FechaR || new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
     Abono: data?.Abono || '',
     CodVehiculo: data?.CodVehiculo || ''
@@ -317,6 +344,23 @@ function Reservas({ data = null, isEditing = false }){
       }
     }
   };
+
+  const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
 
   return(
           <FormBox onSubmit={handleSubmit}> 
@@ -357,6 +401,11 @@ function Reservas({ data = null, isEditing = false }){
               }}>
                 {isEditing ? 'Actualizar Reserva' : 'Agregar Reserva'}
               </Button>
+              {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
           </FormBox>
       );
 }
@@ -364,7 +413,7 @@ function Reservas({ data = null, isEditing = false }){
 
 
 
-  function Pagos({ data = null, isEditing = false }) {
+  function Pagos({ data = null , isEditing = false}) {
       
       const [infoEspecifica, setInfoEspecifica] = useState(null);
       
@@ -484,6 +533,24 @@ function Reservas({ data = null, isEditing = false }){
           }
         };
 
+        const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
+        
+
         return (
           <FormBox onSubmit={handleSubmit}>
                 <Box component="form" sx={{
@@ -543,8 +610,13 @@ function Reservas({ data = null, isEditing = false }){
                   color: '#FFFFFF'
                 }
               }}>
-                {isEditing ? 'Actualizar Pagos' : 'Agregar Pagos'}
+                {isEditing ? '' : 'Agregar Pagos'}
               </Button>
+              {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
           </Box>
           </FormBox>
           
@@ -579,6 +651,23 @@ function Reservas({ data = null, isEditing = false }){
         }
       }
 
+      const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
+
       return(
         <FormBox onSubmit={handleSubmit}>
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
@@ -606,6 +695,11 @@ function Reservas({ data = null, isEditing = false }){
         }}>
           {isEditing ? 'Actualizar Autorizado' : 'Agregar Autorizado'}
         </Button>
+        {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
       </FormBox>
       );
 
@@ -614,6 +708,7 @@ function Reservas({ data = null, isEditing = false }){
     function OrdenesServicios({ data = null, isEditing = false}) {
 
       const initialValues = {
+        Nro: data?.Nro || '',
         FechaHoraE: data?.FechaHoraE || '',
         FechaHoraSEstimada: data?.FechaHoraS || '',
         CIAutorizado: data?.CIAutorizado || '',
@@ -642,6 +737,23 @@ function Reservas({ data = null, isEditing = false }){
           }
         }
       }
+
+      const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
 
       return(
         <FormBox onSubmit={handleSubmit}>
@@ -689,12 +801,17 @@ function Reservas({ data = null, isEditing = false }){
           }}>
             {isEditing ? 'Actualizar Orden de Servicio' : 'Agregar Orden de Servicio'}
           </Button>
+          {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
         </FormBox>
       );
 
     }
 
-    function Facturas({ data = null }) {
+    function Facturas({ data = null, isEditing = false}) {
       // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados
       const initialValues = {
           Fecha: data?.Fecha || '',
@@ -723,6 +840,23 @@ function Reservas({ data = null, isEditing = false }){
           }
         }
       };
+
+      const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
   
       return(
         <FormBox onSubmit={handleSubmit}> 
@@ -778,8 +912,13 @@ function Reservas({ data = null, isEditing = false }){
                 color: '#FFFFFF'
               }
             }}>
-              Agregar Factura
+              {isEditing ? '' : 'Agregar Factura'}
             </Button>
+            {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
             </Box>
         </FormBox>
     );
@@ -919,7 +1058,7 @@ const renderForm = (info, editar) => {
     case 'Pagos':
       return <Pagos data={info} isEditing={editar}/>;
     case 'Facturas':
-      return <Facturas data ={info} />;
+      return <Facturas data ={info} isEditing={editar}/>;
     default:
       return <div> fallo </div>;
   }
