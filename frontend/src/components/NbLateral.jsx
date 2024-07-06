@@ -6,8 +6,9 @@ import ListService from '../components/ListServicios';
 import '../css/NbLateral.css';
 import { useAuth } from '../router/AuthContext';
 import InventarioLista from './InventarioLista';
-
+import ProveedoresLista from './ProveedoresLista';
 import ListaTienda from './ListaTienda';
+import MarcasLista from './MarcasListas';
 
 function NbLateral({ title1, title2, title3, title4, padre, listType}) {
 
@@ -47,6 +48,8 @@ function NbLateral({ title1, title2, title3, title4, padre, listType}) {
                 listType === 'listService' ? <ListService {...listsProps} authData={authData} /> :
                 listType === 'InventarioLista' ? <InventarioLista {...listsProps} authData={authData} /> :
                 listType === 'listaTienda' ? <ListaTienda {...listsProps} authData={authData} /> :
+                listType === 'ProveedoreLista' ? <ProveedoresLista {...listsProps} authData={authData} /> :
+                listType === 'MarcasLista' ? <MarcasLista {...listsProps} authData={authData} /> :
                 null
 )}        
         </Box>

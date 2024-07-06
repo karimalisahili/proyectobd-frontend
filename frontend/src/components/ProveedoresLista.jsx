@@ -116,8 +116,10 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 );
 
 // Define un componente funcional llamado Personal
-function Productos({ data = null, isEditing = false }) {
+function Proveedores({ data = null, isEditing = false }) {
+/*
 
+*/
   const initialValues = {
     CodProd: data?.CodProd || '',
     NombreP: data?.NombreP || '',
@@ -529,7 +531,7 @@ function InventarioLista({ opcion }) {
   const renderForm = (info, editar) => {
     switch (formType) {
       case 'Productos':
-        return <Productos data={info} isEditing={editar} />;
+        return <Proveedores data={info} isEditing={editar} />;
       case 'Lineas':
         return <Lineas data={info} isEditing={editar} />;
       case 'Inventario':
@@ -581,7 +583,7 @@ function InventarioLista({ opcion }) {
             <h2>{seleccionEnLists.CodLineas || ''}</h2>
           </Box>
         ) : (
-          <Typography>No se ha seleccionado ningún elemento</Typography>
+          <Typography>No se ha seleccionado ningún empleado</Typography>
         )}
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
@@ -636,7 +638,7 @@ InputField.propTypes = {
   valor: PropTypes.string, // 'valor' debe ser una cadena de texto, pero no es requerida
 };
 
-Productos.propTypes = {
+Proveedores.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }

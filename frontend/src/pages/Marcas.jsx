@@ -1,7 +1,7 @@
 import Navbar from '../components/Navbar';
 import NbLateral from '../components/NbLateral';
 
-function Proveedores() {
+function Marcas() {
     return (
         <div>
         <NbLateral />
@@ -10,4 +10,4 @@ function Proveedores() {
     )
 }
 
-export default Proveedores;
+export default Marcas;
