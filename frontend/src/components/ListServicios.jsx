@@ -959,7 +959,7 @@ function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados
 
     case 'Reservas':
       // Renderiza y retorna una lista de reservas seleccionadas
-      return renderList(reservasSeleccionados, 'FechaR', 'Abono', onSeleccionado);
+      return renderList(reservasSeleccionados, 'CodVehiculo', 'Abono', onSeleccionado);
 
     case 'Actividades':
       // Renderiza y retorna una lista de actividades seleccionadas
@@ -1076,36 +1076,36 @@ const renderContenido = () => {
   if (seleccionEnLists && opcion === 'Listas de Servicios') {
     return (
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        SERVICIOS
+        <h2 className='h2Libreta'>SERVICIOS</h2>
       </Box>
     );
   } else if(seleccionEnLists && opcion === 'Actividades'){
     return(
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        ACTIVIDADES
+        <h2 className='h2Libreta'>ACTIVIDADES</h2>
       </Box>
     )
   }else if(seleccionEnLists && opcion === 'Reservas'){
     return(
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        RESERVAS
+        <h2 className='h2Libreta'>RESERVAS</h2>
       </Box>
     )
   }else if(seleccionEnLists && opcion === 'Autorizados'){
     return(
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        AUTORIZADOS
+        <h2 className='h2Libreta'>AUTORIZADOS</h2>
       </Box>
     )
   }else if(seleccionEnLists && opcion === 'Ordenes de Servicios'){
     return(
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        ORDENES DE SERVICIOS
+        <h2 className='h2Libreta'>ORDENES DE SERVICIOS</h2>
       </Box>
     )
   }else{
     return (
-      <Typography>No se ha seleccionado ningún Servicio</Typography>
+      <Typography textAlign={'center'}>No se ha seleccionado ningún {opcion}</Typography>
     );
   }
 };
@@ -1114,8 +1114,9 @@ const renderContenido = () => {
   return (
     <Box>
     <div className="vertical_line"></div>
-    <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
+    <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
       <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <h1 className='h1Libreta'>Lista de {opcion}</h1>
         {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
         {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados,pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
         {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}

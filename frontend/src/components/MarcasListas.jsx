@@ -560,8 +560,9 @@ function MarcasListas({ opcion }) {
     return (
         <Box>
             <div className="vertical_line"></div>
-            <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
+            <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <h1 className='h1Libreta'>Lista de {opcion}</h1>
                     {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
                     {mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
                     {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
@@ -589,7 +590,7 @@ function MarcasListas({ opcion }) {
                         <h2>{seleccionEnLists.CodLineas || ''}</h2>
                     </Box>
                 ) : (
-                    <Typography>No se ha seleccionado ningún elemento</Typography>
+                    <Typography textAlign={'center'}>No se ha seleccionado ningún {opcion}</Typography>
                 )}
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                     {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
