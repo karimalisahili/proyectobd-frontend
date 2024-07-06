@@ -35,9 +35,9 @@ function Navbar() {
                 <Container>
                     <Toolbar>
                         <Box sx={{ flexGrow: 2, display: { xs: 'none', md: 'flex' } }}>
-                        <Button onClick={() => { handleNbLateral({ title1: 'Marcas', title2: 'Modelos', title3: '', title4: '', padre:'Marcas', listType:'MarcasLista'});  }}sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
+                        <Button onClick={() => { handleNbLateral({ title1: 'Marcas', title2: 'Tipos Vehiculos', title3: 'Modelos', title4: '', padre:'Marcas', listType:'MarcasLista'});  }}sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
                                 <Link   to="/Marcas" style={{ textDecoration: 'none', color: 'black' }}>
-                                    <p className='PNav'> Marcas </p>
+                                    <p className='PNav'>Vehiculos </p>
                                 </Link>
                             </Button>
                             <Button onClick={() => { handleNbLateral({ title1: 'Personal', title2: 'Cliente', title3: 'Vehiculo', title4: '', padre:'Libreta', listType:'list'});  }}sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>

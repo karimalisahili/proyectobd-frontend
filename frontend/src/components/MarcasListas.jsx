@@ -203,7 +203,7 @@ function Marcas({ data = null, isEditing = false }) {
 }
 
 // Define un componente funcional llamado linea
-function Lineas({ data = null, isEditing = false }) {
+function Modelos({ data = null, isEditing = false }) {
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para CodLineas y Descripcion
   const initialValues = {
     CodLineas: data?.CodLineas || '',
@@ -285,13 +285,12 @@ function Lineas({ data = null, isEditing = false }) {
 }
 
 // Define un componente funcional llamado Vehiculo
-function Inventario({ data = null, isEditing = false }) {
-  //RIFSuc,p.CodMarcaVeh, p.Nombre, i.Existencia
+function Tipos_Vehiculos({ data = null, isEditing = false }) {
+  
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
   const initialValues = {
-    CodMarcaVeh: data?.CodMarcaVeh || '',
-    Nombre: data?.Nombre || '',
-    Existencia: data?.Existencia || '',
+    CodTipoV: data?.CodTipoV || '',
+    Descripcion: data?.Descripcion || '',
 
   };
 
@@ -302,7 +301,7 @@ function Inventario({ data = null, isEditing = false }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData)
-    const endpoint = `${SERVERNAME}/vehiculos`;
+    const endpoint = `${SERVERNAME}/tiposvehiculos`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
@@ -323,7 +322,7 @@ function Inventario({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que CodMarcaVeh es el identificador único
+    const endpoint = `${SERVERNAME}/tiposvehiculos`; // Asumiendo que CodTipoV es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -339,20 +338,12 @@ function Inventario({ data = null, isEditing = false }) {
     <FormBox onSubmit={handleSubmit}>
       {/* Box para agrupar los campos de entrada con estilo de flexbox */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        {/* Box para agrupar dos campos de entrada horizontalmente */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para la cédula del responsable */}
-          <InputField label="CodMarcaVeh-linea" type='text' name='Existencia'
-            valor={formData.Existencia} cambio={handleChange} />
-        </Box>
       </Box>
       {/* Repite la estructura anterior para otros campos del formulario */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="CodProd-Inventario" type='text' name='CodProd'
-            valor={formData.CodProd} cambio={handleChange} />
-          <InputField label="TIPO-ACEITE" type='text' name='Nombre'
-            valor={formData.Nombre} cambio={handleChange} />
+          <InputField label="Descripcion" type='text' name='Descripcion'
+            valor={formData.Descripcion} cambio={handleChange} />
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -365,7 +356,7 @@ function Inventario({ data = null, isEditing = false }) {
             color: '#FFFFFF'
           }
         }}>
-          {isEditing ? 'Actualizar Inventario' : 'Agregar Inventario'}
+          {isEditing ? 'Actualizar Tipo Vehiculo' : 'Agregar Tipo Vehiculo'}
         </Button>
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
@@ -412,22 +403,20 @@ function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehic
     case 'Marcas':
       // Renderiza y retorna una lista de empleados seleccionados
       return renderList(empleadosSeleccionados, 'CodMarcaVeh', 'Nombre', onSeleccionado);
-    case 'Lineas':
+    case 'Modelos':
       // Renderiza y retorna una lista de lineas seleccionados
       return renderList(lineasSeleccionados, 'Descripcion', 'CodLineas', onSeleccionado);
-    case 'Inventario':
+    case 'Tipos Vehiculos':
       // Renderiza y retorna una lista de vehículos seleccionados
-      return renderList(vehiculosSeleccionados, 'CodProd', 'Nombre', onSeleccionado);
+      return renderList(vehiculosSeleccionados, 'CodTipoV', 'Descripcion', onSeleccionado);
     default:
       // Retorna un párrafo indicando que se debe seleccionar una opción si ninguna coincide
       return <p>Seleccione una opción</p>;
   }
 }
 
-
-
 // Define el componente Lists que recibe una prop 'opcion'
-function InventarioLista({ opcion }) {
+function MarcasListas({ opcion }) {
 
   // Estado para controlar la visibilidad del modal
   const [open, setOpen] = useState(false);
@@ -462,7 +451,7 @@ function InventarioLista({ opcion }) {
     // Llama a obtenerDatos para cada tipo de dato necesario
     obtenerDatos(`marcas_vehiculos`, setEmpleadosSeleccionados);
     obtenerDatos('lineas', setlineasSeleccionados);
-    obtenerDatos(`inventario_view/${user.RIFSuc}`, setVehiculosSeleccionados);
+    obtenerDatos(`tiposvehiculos`, setVehiculosSeleccionados);
   }, []);
 
   // Función para manejar la apertura del modal y establecer el tipo de formulario
@@ -485,10 +474,10 @@ function InventarioLista({ opcion }) {
     switch (formType) {
       case 'Marcas':
         return <Marcas data={info} isEditing={editar} />;
-      case 'Lineas':
+      case 'Modelos':
         return <Lineas data={info} isEditing={editar} />;
-      case 'Inventario':
-        return <Inventario data={info} isEditing={editar} />;
+      case 'Tipos Vehiculos':
+        return <Tipos_Vehiculos data={info} isEditing={editar} />;
       default:
         return <div> fallo </div>;
     }
@@ -512,11 +501,11 @@ function InventarioLista({ opcion }) {
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
           {mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
-          {opcion !== 'Inventario' && (
+        
             <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
               Agregar {opcion}
             </Button>
-          )}
+         
           {/* Modal que se muestra u oculta basado en el estado 'open' */}
           <Modal open={open} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
@@ -552,12 +541,11 @@ function InventarioLista({ opcion }) {
             ))}
           </List>
           {/* Botón para modificar, aún no implementado completamente */}
-          {opcion !== 'Inventario' && (
+       
             <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
               Modificar
             </Button>
-          )
-          }
+          
 
           <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
@@ -570,7 +558,7 @@ function InventarioLista({ opcion }) {
 }
 
 // Define las propiedades esperadas para el componente Lists
-InventarioLista.propTypes = {
+MarcasListas.propTypes = {
   opcion: PropTypes.string.isRequired, // 'opcion' debe ser una cadena de texto y es requerida
   raiz: PropTypes.string.isRequired, // 'raiz' debe ser una cadena de texto y es requerida
 };
@@ -596,14 +584,14 @@ Marcas.propTypes = {
   isEditing: PropTypes.bool,
 }
 
-Lineas.propTypes = {
+Modelos.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
 
-Inventario.propTypes = {
+Tipos_Vehiculos.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
 
-export default InventarioLista;
+export default MarcasListas;
