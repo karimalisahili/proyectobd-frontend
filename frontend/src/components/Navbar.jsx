@@ -15,7 +15,7 @@ function Navbar() {
     const navigate = useNavigate(); // Step 2
     const { encargado } = useAuth();
  
-    const [nbLateralProps, setNbLateralProps] = useState({ title1: '', title2: '', title3: '', title4: '', padre:'', listType:''});
+    const [nbLateralProps, setNbLateralProps] = useState({ title1: '', title2: '', title3: '', title4: '', title5:'', title6:'', padre:'', listType:''});
     const [shownbLateral, setShownbLateral] = useState(false);
 
     const handleNbLateral = (titles) => {
@@ -56,16 +56,16 @@ function Navbar() {
                                     <p className='PNav'> Libreta </p>
                                 </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({ title1: 'Listas de Servicios', title2: 'Actividades', title3: 'Reservas', title4: 'Facturas', padre:'servicios', listType:'listService'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
+                            <Button onClick={() => { handleNbLateral({ title1: 'Listas de Servicios', title2: 'Actividades', title3: 'Reservas', title4: 'Autorizados',title5: 'Ordenes de Servicios', title6:'Facturas', padre:'servicios', listType:'listService'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
                                 <Link to="/Servicios" style={{ textDecoration: 'none', color: 'black' }}><p className='PNav'> Servicios </p> </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({ title1: 'Ventas de Productos', title2: 'Facturas', title3: '', title4: '', padre:'tienda', listType:'listaTienda'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
+                            <Button onClick={() => { handleNbLateral({ title1: 'Ventas de Productos', title2: 'Facturas', title3: '', title4: '', title5: '', title6:'', padre:'tienda', listType:'listaTienda'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
                                 <Link to="/Tienda" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'> Tienda </p> </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({ title1: 'Proveedores', title2: 'Orden de Compra', title3: 'Facturas', title4: 'Pagos', padre:'proveedores', listType:'InventarioLista'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
+                            <Button onClick={() => { handleNbLateral({ title1: 'Proveedores', title2: 'Orden de Compra', title3: 'Facturas', title4: 'Pagos', title5:'',title6:'' ,padre:'proveedores', listType:'InventarioLista'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
                                 <Link to="/Proveedores" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'> Proveedores </p></Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({ title1: 'Productos', title2: 'Lineas', title3: 'Inventario', title4: '', padre:'inventario', listType:'InventarioLista'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
+                            <Button onClick={() => { handleNbLateral({ title1: 'Productos', title2: 'Lineas', title3: 'Inventario', title4: '', title5:'', title6:'', padre:'inventario', listType:'InventarioLista'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
                                 <Link to="/Inventario" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'>Inventario</p> </Link>
                             </Button>
                             <Button sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>

@@ -74,7 +74,8 @@ async function sendData(endpoint, formData, method) {
   });
 
   // Check if the response is OK and the content type is JSON
-  if (response.ok && response.headers.get('Content-Type')?.includes('application/json')) {
+  if (response.status == 200) {
+    window.location.reload();
     return response.json();
   } else {
     // Handle non-JSON responses or errors
@@ -111,6 +112,7 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 function ListaDeServicios({ data = null, isEditing = false }){
 
   const initialValues = {
+    CodigoServ: data?.CodigoServ || '',
     Descripcion: data?.Descripcion || '',
     CI_Coord: data?.CI_Coord || ''
   };
@@ -127,6 +129,7 @@ function ListaDeServicios({ data = null, isEditing = false }){
       console.log(formData)
       await sendData(endpoint, formData, method);
       alert('Operación realizada correctamente');
+      window.location.reload();
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -146,6 +149,7 @@ function ListaDeServicios({ data = null, isEditing = false }){
   try {
     await sendData(endpoint, formData.CodigoServ, 'DELETE');
     alert('Empleado eliminado correctamente');
+    window.location.reload();
     // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
   } catch (error) {
     console.error('Error al eliminar el empleado', error);
@@ -185,9 +189,11 @@ function ListaDeServicios({ data = null, isEditing = false }){
         >
         {isEditing ? 'Actualizar Servicio' : 'Agregar Servicio'}
       </Button>
-      <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-        Eliminar
-      </Button>
+      {isEditing && (
+        <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+          Eliminar
+        </Button>
+      )}
       </Box>
     </FormBox>
   );
@@ -196,6 +202,7 @@ function ListaDeServicios({ data = null, isEditing = false }){
 function Actividades({ data = null, isEditing = false }){
   const initialValues = {
     CodServicio: data?.CodServicio || '',
+    NroActividad: data?.NroActividad || '',
     Descripcion: data?.Descripcion || '',
     Monto: data?.Monto || '',
     AntelacionReserva: data?.AntelacionReserva || '',
@@ -214,6 +221,7 @@ function Actividades({ data = null, isEditing = false }){
     try {
       await sendData(endpoint, formData, method);
       alert('Operación realizada correctamente');
+      window.location.reload();
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -224,6 +232,22 @@ function Actividades({ data = null, isEditing = false }){
     }
   }
 
+  const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/actividades`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
   return(
     <FormBox onSubmit={handleSubmit}> 
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
@@ -281,6 +305,11 @@ function Actividades({ data = null, isEditing = false }){
       }}>
         {isEditing ? 'Actualizar Actividad' : 'Agregar Actividad'}
       </Button>
+      {isEditing && (
+        <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+          Eliminar
+        </Button>
+      )}
     </FormBox>
   );
 }
@@ -288,6 +317,7 @@ function Actividades({ data = null, isEditing = false }){
 function Reservas({ data = null, isEditing = false }){
   
   const initialValues = {
+    NroR: data?.NroR || '',
     FechaR: data?.FechaR || new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
     Abono: data?.Abono || '',
     CodVehiculo: data?.CodVehiculo || ''
@@ -304,6 +334,7 @@ function Reservas({ data = null, isEditing = false }){
     try {
       await sendData(endpoint, formData, method);
       alert('Operación realizada correctamente');
+      window.location.reload();
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -313,6 +344,23 @@ function Reservas({ data = null, isEditing = false }){
       }
     }
   };
+
+  const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
 
   return(
           <FormBox onSubmit={handleSubmit}> 
@@ -353,6 +401,11 @@ function Reservas({ data = null, isEditing = false }){
               }}>
                 {isEditing ? 'Actualizar Reserva' : 'Agregar Reserva'}
               </Button>
+              {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
           </FormBox>
       );
 }
@@ -360,7 +413,7 @@ function Reservas({ data = null, isEditing = false }){
 
 
 
-  function Pagos({ data = null, isEditing = false }) {
+  function Pagos({ data = null , isEditing = false}) {
       
       const [infoEspecifica, setInfoEspecifica] = useState(null);
       
@@ -469,6 +522,7 @@ function Reservas({ data = null, isEditing = false }){
           try {
             await sendData(endpoint, formData, method);
             alert('Operación realizada correctamente');
+            window.location.reload();
           } catch (error) {
             console.error('Error en la operación', error);
             if (error.message.includes('404')) {
@@ -478,6 +532,24 @@ function Reservas({ data = null, isEditing = false }){
             }
           }
         };
+
+        const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
+        
 
         return (
           <FormBox onSubmit={handleSubmit}>
@@ -538,15 +610,208 @@ function Reservas({ data = null, isEditing = false }){
                   color: '#FFFFFF'
                 }
               }}>
-                {isEditing ? 'Actualizar Pagos' : 'Agregar Pagos'}
+                {isEditing ? '' : 'Agregar Pagos'}
               </Button>
+              {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
           </Box>
           </FormBox>
           
         )
     }
 
-    function Facturas({ data = null }) {
+    function Autorizados({data = null, isEditing = false}){
+      const initialValues = {
+        CIAutorizado: data?.CIAutorizado || '',
+        NombreAutorizado: data?.NombreAutorizado || '',
+      }
+
+      const [formData, handleChange] = useForm(initialValues);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const endpoint = `${SERVERNAME}/autorizados`;
+        const method = isEditing ? 'PUT' : 'POST';
+    
+        try {
+          await sendData(endpoint, formData, method);
+          alert('Operación realizada correctamente');
+          window.location.reload();
+        } catch (error) {
+          console.error('Error en la operación', error);
+          if (error.message.includes('404')) {
+            alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+          } else {
+            alert('Error en la operación. Por favor, intente nuevamente.');
+          }
+        }
+      }
+
+      const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
+
+      return(
+        <FormBox onSubmit={handleSubmit}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+            <InputField label="CI-AUTORIZADO"
+            type='text'
+            name='CIAutorizado'
+            valor = {formData.CIAutorizado}
+            cambio = {handleChange}/>
+            <InputField label="NOMBRE AUTORIZADO"
+            type='text'
+            name='NombreAutorizado'
+            valor = {formData.NombreAutorizado}
+            cambio = {handleChange}/>
+          </Box>
+        </Box>
+        <Button type='submit'  variant="contained" sx={{
+          margin: '5px 20px',
+          color: '#000000',
+          bgcolor: '#FFFFFF',
+          '&:hover': {
+            bgcolor: '#41B06E',
+            color: '#FFFFFF'
+          }
+        }}>
+          {isEditing ? 'Actualizar Autorizado' : 'Agregar Autorizado'}
+        </Button>
+        {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
+      </FormBox>
+      );
+
+    }
+
+    function OrdenesServicios({ data = null, isEditing = false}) {
+
+      const initialValues = {
+        Nro: data?.Nro || '',
+        FechaHoraE: data?.FechaHoraE || '',
+        FechaHoraSEstimada: data?.FechaHoraS || '',
+        CIAutorizado: data?.CIAutorizado || '',
+        CodVehiculo: data?.CodVehiculo || '',
+        CIEmpleado: data?.CIEmpleado || ''
+      }
+
+      const [formData, handleChange] = useForm(initialValues);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const endpoint = `${SERVERNAME}/ordenes_servicios`;
+        const method = isEditing ? 'PUT' : 'POST';
+    
+        try {
+          await sendData(endpoint, formData, method);
+          alert('Operación realizada correctamente');
+          window.location.reload();
+        } catch (error) {
+          console.error('Error en la operación', error);
+          if (error.message.includes('404')) {
+            alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+          } else {
+            alert('Error en la operación. Por favor, intente nuevamente.');
+          }
+        }
+      }
+
+      const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
+
+      return(
+        <FormBox onSubmit={handleSubmit}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+              <InputField label="FECHA-HORA-E"
+              type='text'
+              name='FechaHoraE'
+              valor = {formData.FechaHoraE}
+              cambio = {handleChange}/>
+              <InputField label="FECHA-SALIDA-ESTIMADA"
+              type='text'
+              name='FechaHoraSEstimada'
+              valor = {formData.FechaHoraSEstimada}
+              cambio = {handleChange}/>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+              <InputField label="CI-AUTORIZADO"
+              type='text'
+              name='CIAutorizado'
+              valor = {formData.CIAutorizado}
+              cambio = {handleChange}/>
+              <InputField label="CODIGO-VEHICULO"
+              type='number'
+              name='CodVehiculo'
+              valor = {formData.CodVehiculo}
+              cambio = {handleChange}/>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}> 
+              <InputField label="CI-EMPLEADO"
+              type='text'
+              name='CIEmpleado'
+              valor = {formData.CIEmpleado}
+              cambio = {handleChange}/>
+            </Box>
+          </Box>
+          <Button type='submit'  variant="contained" sx={{
+            margin: '5px 20px',
+            color: '#000000',
+            bgcolor: '#FFFFFF',
+            '&:hover': {
+              bgcolor: '#41B06E',
+              color: '#FFFFFF'
+            }
+          }}>
+            {isEditing ? 'Actualizar Orden de Servicio' : 'Agregar Orden de Servicio'}
+          </Button>
+          {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
+        </FormBox>
+      );
+
+    }
+
+    function Facturas({ data = null, isEditing = false}) {
       // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados
       const initialValues = {
           Fecha: data?.Fecha || '',
@@ -565,6 +830,7 @@ function Reservas({ data = null, isEditing = false }){
         try {
           await sendData(endpoint, formData, method);
           alert('Operación realizada correctamente');
+          window.location.reload();
         } catch (error) {
           console.error('Error en la operación', error);
           if (error.message.includes('404')) {
@@ -574,6 +840,23 @@ function Reservas({ data = null, isEditing = false }){
           }
         }
       };
+
+      const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
   
       return(
         <FormBox onSubmit={handleSubmit}> 
@@ -629,8 +912,13 @@ function Reservas({ data = null, isEditing = false }){
                 color: '#FFFFFF'
               }
             }}>
-              Agregar Factura
+              {isEditing ? '' : 'Agregar Factura'}
             </Button>
+            {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
             </Box>
         </FormBox>
     );
@@ -662,7 +950,7 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
   );
 }
 
-function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, pagosSeleccionados, facturasSeleccionados, onSeleccionado) {
+function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados, pagosSeleccionados, facturasSeleccionados, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
     case 'Listas de Servicios':
@@ -677,10 +965,14 @@ function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados
       // Renderiza y retorna una lista de actividades seleccionadas
       return renderList(actividadesSeleccionadas, 'NroActividad', 'Descripcion', onSeleccionado);
 
-    case 'Pagos':
+    case 'Autorizados':
+      return renderList(autorizadosSeleccionados, 'CIAutorizado', 'NombreAutorizado', onSeleccionado)
+    case 'Ordenes de Servicios':
       // Renderiza y retorna una lista de pagos seleccionados
-      return renderList(pagosSeleccionados, 'Fecha', 'Monto', onSeleccionado);
-
+      return renderList(ordenesServiciosSeleccionados, 'Nro', 'CIAutorizado', onSeleccionado);
+    
+    case 'Pagos':
+      return renderList(pagosSeleccionados, 'Fecha', 'Monto')
     case 'Facturas':
       // Renderiza y retorna una lista de facturas seleccionadas
       return renderList(facturasSeleccionados, 'CodF', 'Fecha', onSeleccionado);
@@ -705,6 +997,8 @@ function ListServicios({opcion}){
     const [pagosSeleccionados, setPagosSeleccionados] = useState([]);
     const [facturasSeleccionados, setFacturasSeleccionados] = useState([]);
     const [actividadesSeleccionadas, setActividadesSeleccionadas] = useState([]);
+    const [ordenesServiciosSeleccionados, setOrdenesServiciosSeleccionados] = useState([]);
+    const [autorizadosSeleccionados, setAutorizadosSeleccionados] = useState([]);
 
     // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
   useEffect(() => {
@@ -727,6 +1021,8 @@ function ListServicios({opcion}){
     obtenerDatos('SERVICIOS', setListaServiciosSeleccionados);
     obtenerDatos('ACTIVIDADES', setActividadesSeleccionadas);
     obtenerDatos('RESERVAS', setReservasSeleccionados);
+    obtenerDatos('AUTORIZADOS', setAutorizadosSeleccionados);
+    obtenerDatos('ORDENES_SERVICIOS', setOrdenesServiciosSeleccionados);
     obtenerDatos('PAGOS', setPagosSeleccionados);
     obtenerDatos('FACTURAS_SERVICIOS', setFacturasSeleccionados); //REVISAR: endpoint de facturaservicio no existe ES FACTURAS_SERVICIOS
     
@@ -755,10 +1051,14 @@ const renderForm = (info, editar) => {
       return <Actividades data={info} isEditing={editar}/>;
     case 'Reservas':
       return <Reservas data={info} isEditing={editar}/>;
+    case 'Autorizados':
+      return <Autorizados data={info} isEditing={editar}/>;
+    case 'Ordenes de Servicios':
+      return <OrdenesServicios data={info} isEditing={editar}/>;
     case 'Pagos':
       return <Pagos data={info} isEditing={editar}/>;
     case 'Facturas':
-      return <Facturas data ={info} />;
+      return <Facturas data ={info} isEditing={editar}/>;
     default:
       return <div> fallo </div>;
   }
@@ -791,6 +1091,18 @@ const renderContenido = () => {
         RESERVAS
       </Box>
     )
+  }else if(seleccionEnLists && opcion === 'Autorizados'){
+    return(
+      <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        AUTORIZADOS
+      </Box>
+    )
+  }else if(seleccionEnLists && opcion === 'Ordenes de Servicios'){
+    return(
+      <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        ORDENES DE SERVICIOS
+      </Box>
+    )
   }else{
     return (
       <Typography>No se ha seleccionado ningún Servicio</Typography>
@@ -805,7 +1117,7 @@ const renderContenido = () => {
     <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
       <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
-        {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas,pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
+        {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados,pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
         {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
         <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
           Agregar {opcion}
@@ -878,6 +1190,16 @@ Actividades.propTypes={
 }
 
 Reservas.propTypes={
+  data: PropTypes.object,
+  isEditing: PropTypes.bool,
+}
+
+Autorizados.propTypes={
+  data: PropTypes.object,
+  isEditing: PropTypes.bool
+}
+
+OrdenesServicios.propTypes={
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
