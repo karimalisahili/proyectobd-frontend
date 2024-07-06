@@ -452,7 +452,6 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
             {/* Muestra el valor secundario directamente sin un componente específico */}
             {item[secondaryKey]}
 
-
           </ListItem>
         ))}
       </List>
