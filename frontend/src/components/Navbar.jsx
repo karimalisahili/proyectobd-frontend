@@ -67,7 +67,7 @@ function Navbar() {
     };
 
     return (
-        <Box>
+        <Box sx={{width:'100%'}}>
             <Box sx={{ bgcolor: '#41B06E', flexGrow: 1, display: 'flex', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex' }}>
                     <Link to='/Home' style={{ textDecoration: 'none' }}><img src={Logo} alt="Logo" className="logo" /></Link>
@@ -79,37 +79,40 @@ function Navbar() {
                 </Box>
                 <Button variant="outlined" onClick={handleLogout} sx={{ my: 'auto', mr:1, p: 1, color:'#FFFFFF', borderColor:'#FFFFFF', '&:hover': { borderColor:'#FFFFFF', backgroundColor: '#8DECB4'}}} endIcon={<LogoutIcon/>}>Cerrar Sesión</Button>
             </Box>
-            <AppBar position="static" sx={{
+            <AppBar position="static" sx={{minWidth:'100%',
+                width: '100%', display: 'flex', justifyContent: 'end', alignItems: 'end',
+                alignContent: 'end',
                 bgcolor: '#8DECB4',
                boxShadow: shouldChangeBoxShadow ? '0px 3px 5px -3px rgba(0,0,0,0.75)' : '201px 3px 5px -3px rgba(0,0,0,0.75)'
             }}>
-                <Container>
-                    <Toolbar>
-                        <Box sx={{ width:'100%',flexGrow: 1, display: 'flex', justifyContent: 'right' }}>
-                             <Button onClick={() => { handleNbLateral({ title1: 'Personal', title2: 'Cliente', title3: 'Vehiculo', title4: '', padre:'Libreta', listType:'list'}, 'libreta'); }} sx={{ my: 2, ml:5.5, color: 'white', display: 'block', borderBottom: opcionActiva === 'libreta' ? '6px solid green' : 'none' }}>
+                <Container sx={{width:'100%', display: 'flex', justifyContent: 'end', alignItems:'end',  right: 0}}>
+                    <Toolbar sx={{width:'100%', display: 'flex', justifyContent: 'end', alignItems:'end', alignContent:'end', boxSizing: 'border-box'}}>
+                        <Box sx={{ width:'100%',flexGrow: 1, display: 'flex', justifyContent: 'end', alignItems:'end', alignContent:'end', right: 0,boxSizing: 'border-box',
+                left:0}}>
+                             <Button onClick={() => { handleNbLateral({ title1: 'Personal', title2: 'Cliente', title3: 'Vehiculo', title4: '', padre:'Libreta', listType:'list'}, 'libreta'); }} sx={{ my: 2, ml:4, color: 'white', display: 'block', borderBottom: opcionActiva === 'libreta' ? '6px solid green' : 'none' }}>
                                 <Link   to="/Libreta" style={{ textDecoration: 'none', color: 'black' }}>
                                     <p className='PNav'> Libreta </p>
                                 </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({ title1: 'Marcas', title2: 'Tipos Vehiculos', title3: 'Modelos', title4: '', padre:'Marcas', listType:'MarcasLista'}, 'vehiculos');  }}sx={{ my: 2, ml:5.5, color: 'white', display: 'block', borderBottom: opcionActiva === 'vehiculos' ? '6px solid green' : 'none' }}>
-                                <Link   to="/Marcas" style={{ textDecoration: 'none', color: 'black' }}>
+                             <Button onClick={() => { handleNbLateral({ title1: 'Marcas', title2: 'Tipos Vehiculos', title3: 'Modelos', title4: '', padre:'Marcas', listType:'MarcasLista'}, 'vehiculos');  }}sx={{ my: 2, ml:2, mr:0, color: 'white', display: 'block', borderBottom: opcionActiva === 'vehiculos' ? '6px solid green' : 'none' }}>
+                                <Link   to="/Marcas" style={{ textDecoration: 'none', color: 'black', p:0, margin:0 }}>
                                     <p className='PNav'>Vehiculos </p>
                                 </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({  title1: 'Listas de Servicios', title2: 'Actividades', title3: 'Reservas', title4: 'Autorizados',title5: 'Ordenes de Servicios', title6:'Facturas', padre:'servicios', listType:'listService'}, 'servicios'); }} sx={{ my: 2, ml:5.5,color: 'white', display: 'block', borderBottom: opcionActiva === 'servicios' ? '6px solid green' : 'none' }}>
+                            <Button onClick={() => { handleNbLateral({  title1: 'Listas de Servicios', title2: 'Actividades', title3: 'Reservas', title4: 'Autorizados',title5: 'Ordenes de Servicios', title6:'Facturas', padre:'servicios', listType:'listService'}, 'servicios'); }} sx={{ my: 2, ml:4,color: 'white', display: 'block', borderBottom: opcionActiva === 'servicios' ? '6px solid green' : 'none' }}>
                                 <Link to="/Servicios" style={{ textDecoration: 'none', color: 'black' }}><p className='PNav'> Servicios </p> </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({ title1: 'Ventas de Productos', title2: 'Facturas', title3: '', title4: '', title5: '', title6:'', padre:'tienda', listType:'listaTienda'}, 'tienda'); }} sx={{ my: 2, ml:5.5,color: 'white', display: 'block', borderBottom: opcionActiva === 'tienda' ? '6px solid green' : 'none' }}>
+                            <Button onClick={() => { handleNbLateral({ title1: 'Ventas de Productos', title2: 'Facturas', title3: '', title4: '', title5: '', title6:'', padre:'tienda', listType:'listaTienda'}, 'tienda'); }} sx={{ my: 2, ml:4,color: 'white', display: 'block', borderBottom: opcionActiva === 'tienda' ? '6px solid green' : 'none' }}>
                                 <Link to="/Tienda" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'> Tienda </p> </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({title1: 'Proveedores', title2: 'Orden de Compra', title3: 'Facturas', title4: 'Pagos', title5:'',title6:'' ,padre:'proveedores', listType:'InventarioLista'}, 'proveedores'); }} sx={{ my: 2, ml:5.5,color: 'white', display: 'block', borderBottom: opcionActiva === 'proveedores' ? '6px solid green' : 'none' }}>
+                            <Button onClick={() => { handleNbLateral({title1: 'Proveedores', title2: 'Orden de Compra', title3: 'Facturas', title4: 'Pagos', title5:'',title6:'' ,padre:'proveedores', listType:'InventarioLista'}, 'proveedores'); }} sx={{ my: 2, ml:4,color: 'white', display: 'block', borderBottom: opcionActiva === 'proveedores' ? '6px solid green' : 'none' }}>
                                 <Link to="/Proveedores" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'> Proveedores </p></Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({ title1: 'Productos', title2: 'Lineas', title3: 'Inventario', title4: '', title5:'', title6:'', padre:'inventario', listType:'InventarioLista'}, 'inventario'); }} sx={{ my: 2, ml:5.5,color: 'white', display: 'block', borderBottom: opcionActiva === 'inventario' ? '6px solid green' : 'none' }}>
+                            <Button onClick={() => { handleNbLateral({ title1: 'Productos', title2: 'Lineas', title3: 'Inventario', title4: '', title5:'', title6:'', padre:'inventario', listType:'InventarioLista'}, 'inventario'); }} sx={{ my: 2, ml:4,color: 'white', display: 'block', borderBottom: opcionActiva === 'inventario' ? '6px solid green' : 'none' }}>
                            
                                 <Link to="/Inventario" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'>Inventario</p> </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({ title1: '', title2: '', title3: '', title4: '', padre:'', listType:''}, 'configuracion'); }} sx={{ my: 2, ml:5.5, color: 'white', display: 'block', borderBottom: opcionActiva === 'configuracion' ? '6px solid green' : 'none' }}>
+                            <Button onClick={() => { handleNbLateral({ title1: '', title2: '', title3: '', title4: '', padre:'', listType:''}, 'configuracion'); }} sx={{ my: 2, ml:4, color: 'white', display: 'block', borderBottom: opcionActiva === 'configuracion' ? '6px solid green' : 'none' }}>
                                 <Link to="/Configuracion" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'>Configuracion</p> </Link>
                             </Button>
                         </Box>

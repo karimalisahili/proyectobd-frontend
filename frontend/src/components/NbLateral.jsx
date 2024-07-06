@@ -43,7 +43,7 @@ function NbLateral({ title1, title2, title3, title4, title5,title6, padre, listT
     className="btnlat"
     sx={{
         color: 'black',
-        marginBottom: '20px',
+        marginBottom: '10px',
         padding: '0',
         fontWeight: 'bolder',
         fontSize: '15px',
@@ -53,7 +53,7 @@ function NbLateral({ title1, title2, title3, title4, title5,title6, padre, listT
         borderBottom: selectedOption === button.title ? '7px solid green' : 'none', // Línea verde oscuro si está seleccionado
         '&:hover': {
             backgroundColor: 'transparent', // Fondo transparente en hover
-            opacity: 0.8, // Opcional: efecto de opacidad al pasar el mouse
+            opacity: 0.8, 
         },
     }}
 >

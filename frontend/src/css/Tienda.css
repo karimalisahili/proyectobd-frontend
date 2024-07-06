@@ -13,3 +13,12 @@
     text-underline-offset: 20px;
     margin-bottom: 5px;
 }
+
+.h1Factura {
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-color: #8DECB4;
+    color: #41B06E;
+    text-underline-offset: 15px;
+    margin-bottom: 20px;
+}
