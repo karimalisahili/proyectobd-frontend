@@ -50,7 +50,7 @@ function NbLateral({ title1, title2, title3, title4, title5,title6, padre, listT
                 listType === 'listService' ? <ListService {...listsProps} authData={authData} /> :
                 listType === 'InventarioLista' ? <InventarioLista {...listsProps} authData={authData} /> :
                 listType === 'listaTienda' ? <ListaTienda {...listsProps} authData={authData} /> :
-                listType === 'ProveedoreLista' ? <ProveedoresLista {...listsProps} authData={authData} /> :
+                listType === 'ProveedoresLista' ? <ProveedoresLista {...listsProps} authData={authData} /> :
                 listType === 'MarcasLista' ? <MarcasLista {...listsProps} authData={authData} /> :
                 null
 )}        

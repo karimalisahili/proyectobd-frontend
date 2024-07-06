@@ -2,10 +2,10 @@
 import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
-import PersonIcon from '@mui/icons-material/Person';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 // Definición de la variable SERVERNAME que obtiene el valor de la variable de entorno VITE_SERVERNAME.
-// Este valor se utiliza para configurar el NombreP del servidor en la aplicación.
+// Este valor se utiliza para configurar el Nombre del servidor en la aplicación.
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
@@ -54,7 +54,7 @@ function useForm(initialState) {
 
   // Función para manejar los cambios en los campos del formulario
   const handleChange = (e) => {
-    // Extrae el NombreP y el valor del campo que disparó el evento
+    // Extrae el Nombre y el valor del campo que disparó el evento
     const { name, value } = e.target;
     // Actualiza el estado del formulario con el nuevo valor para el campo especificado
     setFormData(prevState => ({
@@ -107,7 +107,7 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
   <TextField
     label={label} // Establece la etiqueta del campo
     type={type} // Establece el tipo de input (ej. text, number)
-    name={name} // Establece el NombreP del campo, importante para identificarlo al enviar el formulario
+    name={name} // Establece el Nombre del campo, importante para identificarlo al enviar el formulario
     sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} // Estilos personalizados
     InputProps={min ? { inputProps: { min } } : {}} // Propiedad condicional para establecer el valor mínimo si se proporciona
     value={valor} // Vincula el valor del campo a la variable 'valor'
@@ -116,21 +116,16 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 );
 
 // Define un componente funcional llamado Personal
+// Define un componente funcional llamado Personal
 function Proveedores({ data = null, isEditing = false }) {
-/*
 
-*/
   const initialValues = {
-    CodProd: data?.CodProd || '',
-    NombreP: data?.NombreP || '',
-    Descripcion: data?.Descripcion || '',
-    Precio: data?.Precio || '',
-    Ecologico: data?.Ecologico || '',
-    Fabricante: data?.Fabricante || '',
-    Maximo: data?.Maximo || '',
-    Minimo: data?.Minimo || '',
-    TipoPro: data?.TipoPro || '',
-    CodLinea: data?.CodLinea || '',
+    Rif: data?.Rif || '',
+    RazonSocial: data?.RazonSocial || '',
+    Direccion: data?.Direccion || '',
+    TelefonoL: data?.TelefonoL || '',
+    TelefonoC: data?.TelefonoC || '',
+    PersonaCont: data?.PersonaCont || '',
   };
 
   const [formData, handleChange] = useForm(initialValues);
@@ -141,7 +136,7 @@ function Proveedores({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/productos`;
+    const endpoint = `${SERVERNAME}/proveedores`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
@@ -162,7 +157,7 @@ function Proveedores({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/productos`; // Asumiendo que CodProd es el identificador único
+    const endpoint = `${SERVERNAME}/proveedores`; // Asumiendo que Rif es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -173,59 +168,43 @@ function Proveedores({ data = null, isEditing = false }) {
     }
   };
 
-  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
     <FormBox onSubmit={handleSubmit}>
       {/* Box para agrupar los campos de entrada con estilo de flexbox */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para el NombreP del empleado */}
-          <InputField label="Nombre-Producto" type='text' name='NombreP'
-            valor={formData.NombreP} cambio={handleChange} />
-          {/* InputField para el Precio del empleado */}
-          <InputField label="Precio" type='number' name='Precio' min={1} valor={formData.Precio} cambio={handleChange} />
-        </Box>
-      </Box>
-      {/* Repite la estructura anterior para otros campos del formulario */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Codigo-Producto" type='text' name='CodProd'
-            valor={formData.CodProd} cambio={handleChange} />
-          <select name="Ecologico" value={formData.Ecologico} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
-            <option value="N">¿Es Ecologico?</option>
-            <option value="S">Sí</option>
-            <option value="N">No</option>
-          </select>
+
+          <InputField disable label="Rif" type='text' name='Rif'
+            valor={formData.Rif} cambio={handleChange} />
+
+          <InputField label="Razon Social" type='text' name='RazonSocial'
+            valor={formData.RazonSocial} cambio={handleChange} />
+
+
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Descripcion" type='text' name='Descripcion'
-            valor={formData.Descripcion} cambio={handleChange} />
-          <InputField label="Codigo-Linea" type='number' name='CodLinea'
-            valor={formData.CodLinea} cambio={handleChange} />
+          <InputField label="Direccion" type='text' name='Direccion'
+            valor={formData.Direccion} cambio={handleChange} />
+          <InputField label="Telefono Local" type='text' name='TelefonoL' valor={formData.TelefonoL} cambio={handleChange} />
+
+
+
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Minimo" type='number' name='Minimo'
-            valor={formData.Minimo} cambio={handleChange} />
-          <InputField label="Maximo" type='number' name='Maximo'
-            valor={formData.Maximo} cambio={handleChange} />
+
+
+          <InputField label="Telefono Contacto" type='text' name='TelefonoC' valor={formData.TelefonoC} cambio={handleChange} />
+
+          <InputField label="Persona Contacto" type='text' name='PersonaCont' valor={formData.PersonaCont} cambio={handleChange} />
+
         </Box>
       </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Fabricante" type='text' name='Fabricante'
-            valor={formData.Fabricante} cambio={handleChange} />
-          <select name="TipoPro" value={formData.TipoPro} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
-            <option value="Tienda">Tipo Producto</option>
-            <option value="Servicio">Servicio</option>
-            <option value="Tienda">Tienda</option>
-          </select>
-        </Box>
-      </Box>
+
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         <Button type='submit' variant="contained" sx={{
           margin: '5px 20px',
@@ -237,7 +216,7 @@ function Proveedores({ data = null, isEditing = false }) {
           }
         }}
         >
-          {isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
+          {isEditing ? 'Actualizar Proveedor' : 'Agregar Proveedor'}
         </Button>
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
@@ -249,12 +228,25 @@ function Proveedores({ data = null, isEditing = false }) {
   );
 }
 
+
 // Define un componente funcional llamado linea
-function Lineas({ data = null, isEditing = false }) {
+function OrdenCompra({ data = null, isEditing = false }) {
+
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para CodLineas y Descripcion
   const initialValues = {
-    CodLineas: data?.CodLineas || '',
+    CodMarcaV: data?.CodMarcaV || '',
+    CodConsec: data?.CodConsec || '',
     Descripcion: data?.Descripcion || '',
+    CantPuestos: data?.CantPuestos || '',
+    Peso: data?.Peso || '',
+    TipoAceite: data?.TipoAceite || '',
+    AceiteCaja: data?.AceiteCaja || '',
+    TipoRefri: data?.TipoRefri || '',
+    Octanaje: data?.Octanaje || '',
+    TipoMant: data?.TipoMant || '',
+    TiempoUsoMant: data?.TiempoUsoMant || '',
+    KilometrajeMant: data?.KilometrajeMant || '',
+    CodTipoV: data?.CodTipoV || '',
   };
 
   const [formData, handleChange] = useForm(initialValues);
@@ -263,7 +255,7 @@ function Lineas({ data = null, isEditing = false }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = `${SERVERNAME}/lineas`;
+    const endpoint = `${SERVERNAME}/OrdenCompravehiculos`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
@@ -286,7 +278,7 @@ function Lineas({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/lineas`; // Asumiendo que CodProd es el identificador único
+    const endpoint = `${SERVERNAME}/OrdenCompravehiculos`; // Asumiendo que CodMarcaVeh es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -297,6 +289,8 @@ function Lineas({ data = null, isEditing = false }) {
     }
   };
 
+
+  
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
     <FormBox onSubmit={handleSubmit}>
@@ -304,10 +298,39 @@ function Lineas({ data = null, isEditing = false }) {
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para la cédula del linea */}
-          {/* InputField para el NombreP del linea */}
-          <InputField label="Descripcion-linea" type='text' name='Descripcion' valor={formData.Descripcion} cambio={handleChange} />
+          <InputField label="CodMarcaV" type='number' name='CodMarcaV' valor={formData.CodMarcaV} cambio={handleChange} />
+          <InputField label="Descripcion-Modelo" type='text' name='Descripcion' valor={formData.Descripcion} cambio={handleChange} />
         </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="CantPuestos" type='number' name='CantPuestos' valor={formData.CantPuestos} cambio={handleChange} />
+          <InputField label="Peso" type='number' name='Peso' valor={formData.Peso} cambio={handleChange} />
+        </Box>
+
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="TipoAceite" type='text' name='TipoAceite' valor={formData.TipoAceite} cambio={handleChange} />
+          <InputField label="AceiteCaja" type='text' name='AceiteCaja' valor={formData.AceiteCaja} cambio={handleChange} />
+        </Box>
+
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="TipoRefri" type='text' name='TipoRefri' valor={formData.TipoRefri} cambio={handleChange} />
+          <select name="Octanaje" value={formData.Octanaje} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
+            <option value="91">Seleccione Octanaje</option>
+            <option value="91">91</option>
+            <option value="95">95</option>
+          </select>
+        </Box>
+
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="TipoMant" type='text' name='TipoMant' valor={formData.TipoMant} cambio={handleChange} />
+          <InputField label="TiempoUsoMant" type='number' name='TiempoUsoMant' valor={formData.TiempoUsoMant} cambio={handleChange} />
+        </Box>
+
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="KilometrajeMant" type='text' name='KilometrajeMant' valor={formData.KilometrajeMant} cambio={handleChange} />
+          <InputField label="CodTipoV" type='text' name='CodTipoV' valor={formData.CodTipoV} cambio={handleChange} />
+        </Box>
+
+
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         <Button type='submit' variant="contained" sx={{
@@ -319,7 +342,7 @@ function Lineas({ data = null, isEditing = false }) {
             color: '#FFFFFF'
           }
         }}>
-          {isEditing ? 'Actualizar linea' : 'Agregar linea'}
+          {isEditing ? 'Actualizar Modelo Vehiculo' : 'Agregar Modelo Vehiculo'}
         </Button>
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
@@ -332,13 +355,12 @@ function Lineas({ data = null, isEditing = false }) {
 }
 
 // Define un componente funcional llamado Vehiculo
-function Inventario({ data = null, isEditing = false }) {
-  //RIFSuc,p.CodProd, p.NombreP, i.Existencia
+function Tipos_Vehiculos({ data = null, isEditing = false }) {
+
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
   const initialValues = {
-    CodProd: data?.CodProd || '',
-    NombreP: data?.NombreP || '',
-    Existencia: data?.Existencia || '',
+    CodTipoV: data?.CodTipoV || '',
+    Descripcion: data?.Descripcion || '',
 
   };
 
@@ -349,7 +371,7 @@ function Inventario({ data = null, isEditing = false }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData)
-    const endpoint = `${SERVERNAME}/vehiculos`;
+    const endpoint = `${SERVERNAME}/tiposvehiculos`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
@@ -370,7 +392,7 @@ function Inventario({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que CodProd es el identificador único
+    const endpoint = `${SERVERNAME}/tiposvehiculos`; // Asumiendo que CodTipoV es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -386,20 +408,12 @@ function Inventario({ data = null, isEditing = false }) {
     <FormBox onSubmit={handleSubmit}>
       {/* Box para agrupar los campos de entrada con estilo de flexbox */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        {/* Box para agrupar dos campos de entrada horizontalmente */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para la cédula del responsable */}
-          <InputField label="CodProd-linea" type='text' name='Existencia'
-            valor={formData.Existencia} cambio={handleChange} />
-        </Box>
       </Box>
       {/* Repite la estructura anterior para otros campos del formulario */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="CodProd-Inventario" type='text' name='CodProd'
-            valor={formData.CodProd} cambio={handleChange} />
-          <InputField label="TIPO-ACEITE" type='text' name='NombreP'
-            valor={formData.NombreP} cambio={handleChange} />
+          <InputField label="Descripcion" type='text' name='Descripcion'
+            valor={formData.Descripcion} cambio={handleChange} />
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -412,7 +426,7 @@ function Inventario({ data = null, isEditing = false }) {
             color: '#FFFFFF'
           }
         }}>
-          {isEditing ? 'Actualizar Inventario' : 'Agregar Inventario'}
+          {isEditing ? 'Actualizar Tipo Vehiculo' : 'Agregar Tipo Vehiculo'}
         </Button>
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
@@ -446,6 +460,7 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
           <ListItemText primary={item[textKey]} />
           {/* Muestra el valor secundario directamente sin un componente específico */}
           {item[secondaryKey]}
+
         </ListItem>
       ))}
     </List>
@@ -456,25 +471,26 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
 function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
-    case 'Productos':
+    case 'Proveedores':
       // Renderiza y retorna una lista de empleados seleccionados
-      return renderList(empleadosSeleccionados, 'NombreP', 'CodProd', onSeleccionado);
-    case 'Lineas':
+      return renderList(empleadosSeleccionados, 'Rif', 'RazonSocial', onSeleccionado);
+    case 'ORDEN DE COMPRA':
       // Renderiza y retorna una lista de lineas seleccionados
-      return renderList(lineasSeleccionados, 'Descripcion', 'CodLineas', onSeleccionado);
-    case 'Inventario':
+      return renderList(lineasSeleccionados, 'CodMarcaV', 'Descripcion', onSeleccionado);
+    case 'FACTURAS':
       // Renderiza y retorna una lista de vehículos seleccionados
-      return renderList(vehiculosSeleccionados, 'CodProd', 'NombreP', onSeleccionado);
+      return renderList(vehiculosSeleccionados, 'CodTipoV', 'Descripcion', onSeleccionado);
+    case 'PAGOS':
+      // Renderiza y retorna una lista de vehículos seleccionados
+      return renderList(vehiculosSeleccionados, 'CodTipoV', 'Descripcion', onSeleccionado);
     default:
       // Retorna un párrafo indicando que se debe seleccionar una opción si ninguna coincide
       return <p>Seleccione una opción</p>;
   }
 }
 
-
-
 // Define el componente Lists que recibe una prop 'opcion'
-function InventarioLista({ opcion }) {
+function ProveedoresLista({ opcion }) {
 
   // Estado para controlar la visibilidad del modal
   const [open, setOpen] = useState(false);
@@ -486,6 +502,8 @@ function InventarioLista({ opcion }) {
   const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
   const [lineasSeleccionados, setlineasSeleccionados] = useState([]);
   const [vehiculosSeleccionados, setVehiculosSeleccionados] = useState([]);
+
+
 
   // useEffect para cargar datos de empleados, lineas y vehículos al montar el componente
   useEffect(() => {
@@ -507,9 +525,9 @@ function InventarioLista({ opcion }) {
 
 
     // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos(`productos`, setEmpleadosSeleccionados);
-    obtenerDatos('lineas', setlineasSeleccionados);
-    obtenerDatos(`inventario_view/${user.RIFSuc}`, setVehiculosSeleccionados);
+    obtenerDatos(`proveedores`, setEmpleadosSeleccionados);
+    obtenerDatos('OrdenCompravehiculos', setlineasSeleccionados);
+    obtenerDatos(`tiposvehiculos`, setVehiculosSeleccionados);
   }, []);
 
   // Función para manejar la apertura del modal y establecer el tipo de formulario
@@ -530,12 +548,12 @@ function InventarioLista({ opcion }) {
   // Función para renderizar el formulario correspondiente en el modal
   const renderForm = (info, editar) => {
     switch (formType) {
-      case 'Productos':
+      case 'Proveedores':
         return <Proveedores data={info} isEditing={editar} />;
-      case 'Lineas':
-        return <Lineas data={info} isEditing={editar} />;
-      case 'Inventario':
-        return <Inventario data={info} isEditing={editar} />;
+      case 'OrdenCompra':
+        return <OrdenCompra data={info} isEditing={editar} />;
+      case 'Tipos Vehiculos':
+        return <Tipos_Vehiculos data={info} isEditing={editar} />;
       default:
         return <div> fallo </div>;
     }
@@ -543,12 +561,14 @@ function InventarioLista({ opcion }) {
 
   const [seleccionEnLists, setSeleccionEnLists] = useState(null);
 
+
   // Función para manejar la selección desde renderList
   const manejarSeleccionEnLists = (seleccion) => {
     setSeleccionEnLists(seleccion);
     // Aquí puedes hacer algo más con la selección en el componente Lists
   };
 
+  console.log(seleccionEnLists)
 
   // Renderiza el componente
   return (
@@ -559,11 +579,11 @@ function InventarioLista({ opcion }) {
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
           {mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
-          {opcion !== 'Inventario' && (
-            <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
-              Agregar {opcion}
-            </Button>
-          )}
+
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
+            Agregar {opcion}
+          </Button>
+
           {/* Modal que se muestra u oculta basado en el estado 'open' */}
           <Modal open={open} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
@@ -575,20 +595,20 @@ function InventarioLista({ opcion }) {
         {seleccionEnLists ? (
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <div className="circle">
-              <PersonIcon sx={{ fontSize: 150 }} />
+              <DirectionsCarIcon sx={{ fontSize: 150 }} />
             </div>
-            <h2>{seleccionEnLists.NombreP || ''}</h2>
+            <h2>{seleccionEnLists.Nombre || ''}</h2>
             <h2>{seleccionEnLists.CodProd || ''}</h2>
             <h2>{seleccionEnLists.Descripcion || ''}</h2>
             <h2>{seleccionEnLists.CodLineas || ''}</h2>
           </Box>
         ) : (
-          <Typography>No se ha seleccionado ningún empleado</Typography>
+          <Typography>No se ha seleccionado ningún elemento</Typography>
         )}
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
           <List sx={style}>
-            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Descripcion' || entry[0] === 'Descripcion')).map(([key, value]) => (
+            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Rif' || entry[0] === 'Rif')).map(([key, value]) => (
               <React.Fragment key={key}>
                 <ListItem>
                   <ListItemText primary={`${key}: `} />
@@ -599,12 +619,11 @@ function InventarioLista({ opcion }) {
             ))}
           </List>
           {/* Botón para modificar, aún no implementado completamente */}
-          {opcion !== 'Inventario' && (
-            <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
-              Modificar
-            </Button>
-          )
-          }
+
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
+            Modificar
+          </Button>
+
 
           <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
@@ -617,7 +636,7 @@ function InventarioLista({ opcion }) {
 }
 
 // Define las propiedades esperadas para el componente Lists
-InventarioLista.propTypes = {
+ProveedoresLista.propTypes = {
   opcion: PropTypes.string.isRequired, // 'opcion' debe ser una cadena de texto y es requerida
   raiz: PropTypes.string.isRequired, // 'raiz' debe ser una cadena de texto y es requerida
 };
@@ -643,14 +662,14 @@ Proveedores.propTypes = {
   isEditing: PropTypes.bool,
 }
 
-Lineas.propTypes = {
+OrdenCompra.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
 
-Inventario.propTypes = {
+Tipos_Vehiculos.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
 
-export default InventarioLista;
+export default ProveedoresLista;
