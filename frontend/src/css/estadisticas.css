@@ -1,0 +1,18 @@
+h1 {
+    color: black;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+* {
+    padding: 10%;
+}
+
+.container {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    padding: 50px; /* Agrega un padding alrededor del contenedor */
+  }
+  
+
+  
