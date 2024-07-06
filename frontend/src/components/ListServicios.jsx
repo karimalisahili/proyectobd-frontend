@@ -127,6 +127,7 @@ function ListaDeServicios({ data = null, isEditing = false }){
       console.log(formData)
       await sendData(endpoint, formData, method);
       alert('Operación realizada correctamente');
+      window.location.reload();
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -146,6 +147,7 @@ function ListaDeServicios({ data = null, isEditing = false }){
   try {
     await sendData(endpoint, formData.CodigoServ, 'DELETE');
     alert('Empleado eliminado correctamente');
+    window.location.reload();
     // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
   } catch (error) {
     console.error('Error al eliminar el empleado', error);
@@ -214,6 +216,7 @@ function Actividades({ data = null, isEditing = false }){
     try {
       await sendData(endpoint, formData, method);
       alert('Operación realizada correctamente');
+      window.location.reload();
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -304,6 +307,7 @@ function Reservas({ data = null, isEditing = false }){
     try {
       await sendData(endpoint, formData, method);
       alert('Operación realizada correctamente');
+      window.location.reload();
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -469,6 +473,7 @@ function Reservas({ data = null, isEditing = false }){
           try {
             await sendData(endpoint, formData, method);
             alert('Operación realizada correctamente');
+            window.location.reload();
           } catch (error) {
             console.error('Error en la operación', error);
             if (error.message.includes('404')) {
@@ -546,6 +551,149 @@ function Reservas({ data = null, isEditing = false }){
         )
     }
 
+    function Autorizados({data = null, isEditing = false}){
+      const initialValues = {
+        CIAutorizado: data?.CIAutorizado || '',
+        NombreAutorizado: data?.NombreAutorizado || '',
+      }
+
+      const [formData, handleChange] = useForm(initialValues);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const endpoint = `${SERVERNAME}/autorizados`;
+        const method = isEditing ? 'PUT' : 'POST';
+    
+        try {
+          await sendData(endpoint, formData, method);
+          alert('Operación realizada correctamente');
+          window.location.reload();
+        } catch (error) {
+          console.error('Error en la operación', error);
+          if (error.message.includes('404')) {
+            alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+          } else {
+            alert('Error en la operación. Por favor, intente nuevamente.');
+          }
+        }
+      }
+
+      return(
+        <FormBox onSubmit={handleSubmit}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+            <InputField label="CI-AUTORIZADO"
+            type='text'
+            name='CIAutorizado'
+            valor = {formData.CIAutorizado}
+            cambio = {handleChange}/>
+            <InputField label="NOMBRE AUTORIZADO"
+            type='text'
+            name='NombreAutorizado'
+            valor = {formData.NombreAutorizado}
+            cambio = {handleChange}/>
+          </Box>
+        </Box>
+        <Button type='submit'  variant="contained" sx={{
+          margin: '5px 20px',
+          color: '#000000',
+          bgcolor: '#FFFFFF',
+          '&:hover': {
+            bgcolor: '#41B06E',
+            color: '#FFFFFF'
+          }
+        }}>
+          {isEditing ? 'Actualizar Autorizado' : 'Agregar Autorizado'}
+        </Button>
+      </FormBox>
+      );
+
+    }
+
+    function OrdenesServicios({ data = null, isEditing = false}) {
+
+      const initialValues = {
+        FechaHoraE: data?.FechaHoraE || '',
+        FechaHoraSEstimada: data?.FechaHoraS || '',
+        CIAutorizado: data?.CIAutorizado || '',
+        CodVehiculo: data?.CodVehiculo || '',
+        CIEmpleado: data?.CIEmpleado || ''
+      }
+
+      const [formData, handleChange] = useForm(initialValues);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const endpoint = `${SERVERNAME}/ordenes_servicios`;
+        const method = isEditing ? 'PUT' : 'POST';
+    
+        try {
+          await sendData(endpoint, formData, method);
+          alert('Operación realizada correctamente');
+          window.location.reload();
+        } catch (error) {
+          console.error('Error en la operación', error);
+          if (error.message.includes('404')) {
+            alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+          } else {
+            alert('Error en la operación. Por favor, intente nuevamente.');
+          }
+        }
+      }
+
+      return(
+        <FormBox onSubmit={handleSubmit}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+              <InputField label="FECHA-HORA-E"
+              type='text'
+              name='FechaHoraE'
+              valor = {formData.FechaHoraE}
+              cambio = {handleChange}/>
+              <InputField label="FECHA-SALIDA-ESTIMADA"
+              type='text'
+              name='FechaHoraSEstimada'
+              valor = {formData.FechaHoraSEstimada}
+              cambio = {handleChange}/>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+              <InputField label="CI-AUTORIZADO"
+              type='text'
+              name='CIAutorizado'
+              valor = {formData.CIAutorizado}
+              cambio = {handleChange}/>
+              <InputField label="CODIGO-VEHICULO"
+              type='number'
+              name='CodVehiculo'
+              valor = {formData.CodVehiculo}
+              cambio = {handleChange}/>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}> 
+              <InputField label="CI-EMPLEADO"
+              type='text'
+              name='CIEmpleado'
+              valor = {formData.CIEmpleado}
+              cambio = {handleChange}/>
+            </Box>
+          </Box>
+          <Button type='submit'  variant="contained" sx={{
+            margin: '5px 20px',
+            color: '#000000',
+            bgcolor: '#FFFFFF',
+            '&:hover': {
+              bgcolor: '#41B06E',
+              color: '#FFFFFF'
+            }
+          }}>
+            {isEditing ? 'Actualizar Orden de Servicio' : 'Agregar Orden de Servicio'}
+          </Button>
+        </FormBox>
+      );
+
+    }
+
     function Facturas({ data = null }) {
       // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados
       const initialValues = {
@@ -565,6 +713,7 @@ function Reservas({ data = null, isEditing = false }){
         try {
           await sendData(endpoint, formData, method);
           alert('Operación realizada correctamente');
+          window.location.reload();
         } catch (error) {
           console.error('Error en la operación', error);
           if (error.message.includes('404')) {
@@ -662,7 +811,7 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
   );
 }
 
-function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, pagosSeleccionados, facturasSeleccionados, onSeleccionado) {
+function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados, pagosSeleccionados, facturasSeleccionados, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
     case 'Listas de Servicios':
@@ -677,10 +826,14 @@ function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados
       // Renderiza y retorna una lista de actividades seleccionadas
       return renderList(actividadesSeleccionadas, 'NroActividad', 'Descripcion', onSeleccionado);
 
-    case 'Pagos':
+    case 'Autorizados':
+      return renderList(autorizadosSeleccionados, 'CIAutorizado', 'NombreAutorizado', onSeleccionado)
+    case 'Ordenes de Servicios':
       // Renderiza y retorna una lista de pagos seleccionados
-      return renderList(pagosSeleccionados, 'Fecha', 'Monto', onSeleccionado);
-
+      return renderList(ordenesServiciosSeleccionados, 'Nro', 'CIAutorizado', onSeleccionado);
+    
+    case 'Pagos':
+      return renderList(pagosSeleccionados, 'Fecha', 'Monto')
     case 'Facturas':
       // Renderiza y retorna una lista de facturas seleccionadas
       return renderList(facturasSeleccionados, 'CodF', 'Fecha', onSeleccionado);
@@ -705,6 +858,8 @@ function ListServicios({opcion}){
     const [pagosSeleccionados, setPagosSeleccionados] = useState([]);
     const [facturasSeleccionados, setFacturasSeleccionados] = useState([]);
     const [actividadesSeleccionadas, setActividadesSeleccionadas] = useState([]);
+    const [ordenesServiciosSeleccionados, setOrdenesServiciosSeleccionados] = useState([]);
+    const [autorizadosSeleccionados, setAutorizadosSeleccionados] = useState([]);
 
     // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
   useEffect(() => {
@@ -727,6 +882,8 @@ function ListServicios({opcion}){
     obtenerDatos('SERVICIOS', setListaServiciosSeleccionados);
     obtenerDatos('ACTIVIDADES', setActividadesSeleccionadas);
     obtenerDatos('RESERVAS', setReservasSeleccionados);
+    obtenerDatos('AUTORIZADOS', setAutorizadosSeleccionados);
+    obtenerDatos('ORDENES_SERVICIOS', setOrdenesServiciosSeleccionados);
     obtenerDatos('PAGOS', setPagosSeleccionados);
     obtenerDatos('FACTURAS_SERVICIOS', setFacturasSeleccionados); //REVISAR: endpoint de facturaservicio no existe ES FACTURAS_SERVICIOS
     
@@ -755,6 +912,10 @@ const renderForm = (info, editar) => {
       return <Actividades data={info} isEditing={editar}/>;
     case 'Reservas':
       return <Reservas data={info} isEditing={editar}/>;
+    case 'Autorizados':
+      return <Autorizados data={info} isEditing={editar}/>;
+    case 'Ordenes de Servicios':
+      return <OrdenesServicios data={info} isEditing={editar}/>;
     case 'Pagos':
       return <Pagos data={info} isEditing={editar}/>;
     case 'Facturas':
@@ -791,6 +952,18 @@ const renderContenido = () => {
         RESERVAS
       </Box>
     )
+  }else if(seleccionEnLists && opcion === 'Autorizados'){
+    return(
+      <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        AUTORIZADOS
+      </Box>
+    )
+  }else if(seleccionEnLists && opcion === 'Ordenes de Servicios'){
+    return(
+      <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        ORDENES DE SERVICIOS
+      </Box>
+    )
   }else{
     return (
       <Typography>No se ha seleccionado ningún Servicio</Typography>
@@ -805,7 +978,7 @@ const renderContenido = () => {
     <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
       <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
-        {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas,pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
+        {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados,pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
         {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
         <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
           Agregar {opcion}
@@ -878,6 +1051,16 @@ Actividades.propTypes={
 }
 
 Reservas.propTypes={
+  data: PropTypes.object,
+  isEditing: PropTypes.bool,
+}
+
+Autorizados.propTypes={
+  data: PropTypes.object,
+  isEditing: PropTypes.bool
+}
+
+OrdenesServicios.propTypes={
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
