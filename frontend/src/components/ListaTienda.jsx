@@ -12,30 +12,32 @@ const userJson = localStorage.getItem('user');
 const user = JSON.parse(userJson);
 
 const style = {
-    py: 0,
-    width: '80%',
-    borderColor: 'divider',
-    backgroundColor: 'Transparent',
-    color: 'black',
-  };
-  
-  // Estilos comunes para los modales. Incluye la posición, alineación, color de fondo, bordes,
-  // sombra, padding, y otros estilos para asegurar una apariencia consistente y centrada de los modales.
-  // Estos estilos se aplican a los componentes Modal de Material UI.
-  const commonStyles = {
+  py: 0,
+  width: '80%',
+  borderColor: 'divider',
+  color: 'black',
+};
 
-    display: 'flex',
-    flexDirection: 'column',
-    bgcolor: '#41B06E',
-    borderRadius: '10px',
-    width: '700px',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 'auto',
-    border: '2px solid #ffffff',
-    boxShadow: 24,
-    p: 4,
-  };
+// Estilos comunes para los modales. Incluye la posición, alineación, color de fondo, bordes,
+// sombra, padding, y otros estilos para asegurar una apariencia consistente y centrada de los modales.
+// Estos estilos se aplican a los componentes Modal de Material UI.
+const commonStyles = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  display: 'flex',
+  flexDirection: 'column',
+  bgcolor: '#41B06E',
+  borderRadius: '10px',
+  width: '700px',
+  alignItems: 'center',
+  justifyContent: 'center',
+  margin: 'auto',
+  border: '2px solid #ffffff',
+  boxShadow: 24,
+  p: 4,
+};
   
   // Define un estilo base para la lista y lo extiende con propiedades específicas para controlar su altura máxima y el desbordamiento vertical
   const listStyle = { ...style, maxHeight: '320px', overflowY: 'auto', marginTop: '20px'};
@@ -59,6 +61,27 @@ function useForm(initialState) {
   const resetForm = () => setFormData(initialState);
 
   return [formData, handleChange, resetForm];
+}
+
+function useForm2(initialState) {
+  // Inicializa el estado del formulario con el estado inicial proporcionado
+  const [formData, setFormData] = useState(initialState);
+
+  // Función para manejar los cambios en los campos del formulario
+  const handleChange2 = (e) => {
+    // Extrae el nombre y el valor del campo que disparó el evento
+    const { name, value } = e.target;
+    // Actualiza el estado del formulario con el nuevo valor para el campo especificado
+    setFormData(prevState => ({
+      ...prevState, // Copia el estado anterior del formulario
+      [name]: value // Actualiza el valor del campo especificado
+    }));
+  };
+
+  // Devuelve el estado actual del formulario y la función handleChange
+  const resetForm = () => setFormData(initialState);
+
+  return [formData, handleChange2, resetForm];
 }
 
 // Define una función asíncrona llamada sendData
@@ -108,267 +131,11 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
     onChange={cambio} // Maneja el evento de cambio para actualizar el estado con el nuevo valor del campo
   />
 );
-//Facturas
+
+function ListaTienda() {
 
 
 
-function FacturaTienda({ data = null, isEditing = false }) {
-    const initialValues = {
-      Fecha: data?.Fecha,
-      Monto: data?.Monto || '',
-      Descuento: data?.Descuento || '',
-      CodPago: data?.CodPago || ''
-    };
-  
-    const [formData, handleChange] = useForm(initialValues);
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-    const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
-    if (!isConfirmed) {
-      return; // Si el usuario no confirma, detiene la función aquí
-    }
-    
-    const endpoint = `${SERVERNAME}/pagos`;
-    const method = isEditing ? 'PUT' : 'POST';
-  
-    try {
-      await sendData(endpoint, formData, method);
-      alert('Operación realizada correctamente');
-    } catch (error) {
-      console.error('Error en la operación', error);
-      if (error.message.includes('404')) {
-        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-      } else {
-        alert('Error en la operación. Por favor, intente nuevamente.');
-      }
-    }
-    };
-    
-    const handleDelete = async () => {
-    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar esta Factura?');
-    if (!isConfirmed) {
-      return; // Si el usuario no confirma, detiene la función aquí
-    }
-    const endpoint = `${SERVERNAME}/facturastiendas`; // Asumiendo que Cedula es el identificador único
-    try {
-      await sendData(endpoint, formData, 'DELETE');
-      alert('Factura eliminada correctamente');
-      // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
-    } catch (error) {
-      console.error('Error al eliminar la Factura', error);
-      alert('Error al eliminar la factura. Por favor, intente nuevamente.');
-    }
-  };
-  
-    // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
-    return (
-      <FormBox onSubmit={handleSubmit}> 
-        {/* Box para agrupar los campos de entrada con estilo de flexbox */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-          {/* Box para agrupar dos campos de entrada horizontalmente */}
-          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-            {/* InputField para el Monto del  pago */}
-            <InputField label="Monto" type='number' name='Monto' min={0}
-              valor={formData.Monto} cambio={handleChange}/>
-            {/* InputField para el tipo de pago*/}
-            <InputField label="Tipo-Pago" type='text' name='TipoPago'
-              valor={formData.TipoPago} cambio={handleChange}/>
-          </Box>
-  
-          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-            {/* InputField para el tipo de Efectivo del  pago */}
-            <InputField label="Tipo-Efectivo" type='text' name='TipoEfectivo'
-              valor={formData.TipoEfectivo} cambio={handleChange}/>
-            {/* InputField para Referencia de pago*/}
-            <InputField label="Nro-Reference" type='number' name='Referencia'
-              valor={formData.Referencia} cambio={handleChange}/>
-          </Box>
-  
-          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-            {/* InputField para el Nro de telefono*/}
-            <InputField label="Nro_Telefono" type='text' name='NroTelf'
-              valor={formData.NroTelf} cambio={handleChange}/>
-            {/* InputField para Referencia de pago*/}
-            <InputField label="Tipo_Tarjeta" type='text' name='TipoTarjeta'
-              valor={formData.TipoTarjeta} cambio={handleChange}/>
-          </Box>
-  
-          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-            {/* InputField para el Banco*/}
-            <InputField label="Banco" type='text' name='Banco'
-              valor={formData.Banco} cambio={handleChange}/>
-            {/* InputField para NumTarjeta de pago*/}
-            <InputField label="Numero_Tarjeta" type='text' name='NumTarjeta'
-              valor={formData.NumTarjeta} cambio={handleChange}/>
-          </Box>
-  
-          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-            {/* InputField para NumFacturaServicio del pago*/}
-            <InputField label="Numero_Factura_Servicio" type='number' name='NumFacturaServicio'
-              valor={formData.NumFacturaServicio} cambio={handleChange}/>
-            {/* InputField para NumTarjeta de pago*/}
-            <InputField label="Numero_Reserva" type='number' name='NumR'
-              valor={formData.NumR} cambio={handleChange}/>
-          </Box>
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Button type='submit'  variant="contained" sx={{
-          margin: '5px 20px',
-          color: '#000000',
-          bgcolor: '#FFFFFF',
-          '&:hover': {
-              bgcolor: '#41B06E',
-              color: '#FFFFFF'
-            }
-          }}
-          >
-          {isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
-        </Button>
-        {isEditing && (
-    <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-      Eliminar
-    </Button>
-  )}
-        </Box>
-      </FormBox>
-    );
-  }
-
-  // Pagos
-
-  
-function VentasProductos({ data = null, isEditing = false }) {
-    const initialValues = {
-      CodProd: data?.CodProd || ''
-    };
-  
-    const [formData, handleChange] = useForm(initialValues);
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-    const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
-    if (!isConfirmed) {
-      return; // Si el usuario no confirma, detiene la función aquí
-    }
-    
-    const endpoint = `${SERVERNAME}/productos_tienda`;
-    const method = isEditing ? 'PUT' : 'POST';
-  
-    try {
-      await sendData(endpoint, formData, method);
-      alert('Operación realizada correctamente');
-    } catch (error) {
-      console.error('Error en la operación', error);
-      if (error.message.includes('404')) {
-        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-      } else {
-        alert('Error en la operación. Por favor, intente nuevamente.');
-      }
-    }
-    };
-    
-    const handleDelete = async () => {
-    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este producto?');
-    if (!isConfirmed) {
-      return; // Si el usuario no confirma, detiene la función aquí
-    }
-    const endpoint = `${SERVERNAME}/productos_tienda`; // Asumiendo que Cedula es el identificador único
-    try {
-      await sendData(endpoint, formData, 'DELETE');
-      alert('Producto eliminado correctamente');
-      // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
-    } catch (error) {
-      console.error('Error al eliminar el producto', error);
-      alert('Error al eliminar el producto. Por favor, intente nuevamente.');
-    }
-  };
-  
-    // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
-    return (
-      <FormBox onSubmit={handleSubmit}> 
-        {/* Box para agrupar los campos de entrada con estilo de flexbox */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-          {/* Box para agrupar dos campos de entrada horizontalmente */}
-          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-            {/* InputField para el nombre del empleado */}
-            <InputField label="CÓDIGO-PRODUCTO" type='number' name='CodProd' min={0}
-              valor={formData.CodProd} cambio={handleChange}/>
-            {/* InputField para el salario del empleado */}
-          </Box>
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Button type='submit'  variant="contained" sx={{
-          margin: '5px 20px',
-          color: '#000000',
-          bgcolor: '#FFFFFF',
-          '&:hover': {
-              bgcolor: '#41B06E',
-              color: '#FFFFFF'
-            }
-          }}
-          >
-          {isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
-        </Button>
-        {isEditing && (
-    <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-      Eliminar
-    </Button>
-  )}
-        </Box>
-      </FormBox>
-    );
-  }
-
-
-
-  // Tienda
-
-
-  
-
-  
-  function renderList(items, items2, textKey, secondaryKey, onSeleccionado) {
-  
-    const [Seleccionado, setSeleccionado] = useState(null);
-  
-    const manejarClicSeleccionado = (seleccion) => {
-      setSeleccionado(seleccion);
-      onSeleccionado(seleccion);
-  };
-    // Retorna un componente List de Material-UI con un estilo personalizado
-    return (
-      <List sx={listStyle}>
-        {/* Mapea cada elemento del array 'items' a un componente ListItem */}
-        {items.map((item, index) => (
-          // Cada ListItem tiene una key única basada en su índice para optimizar el renderizado
-          <ListItem key={index} button onClick={() => manejarClicSeleccionado(item)}>
-            {/* ListItemText muestra el texto principal y secundario basado en las claves proporcionadas */}
-            <ListItemText primary={item[textKey]} />
-              {/* Muestra el valor secundario directamente sin un componente específico */}
-              {item[secondaryKey]}
-          </ListItem>
-        ))}
-      </List>
-    );
-  }
-  
-  
-  // Define una función para mostrar una lista basada en la opción seleccionada
-  function mostrarLista(opcion, productosTiendaSeleccionados, productoSeleccionado, onSeleccionado) {
-    // Utiliza una estructura switch para manejar las diferentes opciones
-    switch (opcion) {
-      case 'Ventas de Productos':
-        // Renderiza y retorna una lista de empleados seleccionados
-        return renderList(productoSeleccionado, productosTiendaSeleccionados, 'NombreP', 'Descripcion', onSeleccionado);
-      default:
-        // Retorna un párrafo indicando que se debe seleccionar una opción si ninguna coincide
-        return <p>Seleccione una opción</p>;
-    }
-  }
-
-function ListaTienda({ opcion }) {
-    
   const initialValues = {
     Fecha: new Date().toISOString().split('T')[0],
     Monto:  0,
@@ -387,25 +154,36 @@ function ListaTienda({ opcion }) {
     Fecha: null,
     Monto: 0,
     Descuento: 0,
-    CodPago: null
+    CodPago: 0,
+    CIResponsable:''
   };
+
+
 
   const [formData, handleChange, resetForm] = useForm(initialValues);
 
-  const [formDataFactura, handleChange2, resetForm2] = useForm(initialValues);
+  const [formDataFactura, handleChange2, resetForm2] = useForm2(initialValuesFacturas);
+   const [facturaEmitida, setFacturaEmitida] = useState(false);
+
   const handleSubmitFactura = async (e) => {
     e.preventDefault();
   const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
   if (!isConfirmed) {
     return; // Si el usuario no confirma, detiene la función aquí
-  }
-  
+    }
+    
+    formDataFactura.Fecha = new Date().toISOString().split('T')[0];
+    formDataFactura.Monto = total;
+    formDataFactura.Descuento = Descuento[0].PorcentajeDesc;
+    formDataFactura.CodPago = localStorage.getItem('codigoPago');
+
   const endpoint = `${SERVERNAME}/facturas_tiendas`;
   const method = 'POST';
 
   try {
   await sendData(endpoint, formDataFactura, method);
-  alert('Operación realizada correctamente');
+    alert('Operación realizada correctamente');
+    setFacturaEmitida(true);
 } catch (error) {
   console.error('Error en la operación', error);
   // Assuming error is an object with a message property
@@ -416,7 +194,8 @@ function ListaTienda({ opcion }) {
   } else {
     alert('Error en la operación. Por favor, intente nuevamente.');
   }
-}
+    }
+
   };
 
     const handleSubmit = async (e) => {
@@ -447,16 +226,11 @@ function ListaTienda({ opcion }) {
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
      // Estado para controlar la visibilidad del modal
-  const [open, setOpen] = useState(false);
-  // Estado para determinar el tipo de formulario a mostrar en el modal
-  const [formType, setFormType] = useState('');
   const [open2, setOpen2] = useState(false);
-
-
-  const [productosTiendaSeleccionados, setproductosTiendaSeleccionados] = useState([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState([]);
   const [Descuento, setDescuento] = useState([]);
   const [Pagos, setPagos] = useState([]);
+  const [Clientes, setClientes] = useState([]);
 
    // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
    useEffect(() => {
@@ -476,46 +250,30 @@ function ListaTienda({ opcion }) {
     };
 
     // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos('productos_tiendas', setproductosTiendaSeleccionados);
      obtenerDatos('productos', setProductoSeleccionado);
      obtenerDatos(`descuentos/${user.RIFSuc}`, setDescuento);
-      obtenerDatos(`pagos`, setPagos);
+     obtenerDatos(`pagos`, setPagos);
+      obtenerDatos(`responsables`, setClientes);
   }, []);
   
-  // Función para manejar la apertura del modal y establecer el tipo de formulario
-  const handleOpen = (type) => {
-    setFormType(type);
-    setOpen(true);
-  };
+    if (Pagos && Pagos.length > 0) {
+  // Suponiendo que quieres guardar el código de pago del primer elemento de la lista
+  const codigoPago = Pagos[Pagos.length -1].CodPago; // Ajusta el índice según sea necesario
+  localStorage.setItem('codigoPago', Number(codigoPago)+1);
+  } else if (Pagos && Pagos.length == 0) {
+    localStorage.setItem('codigoPago', 1);
+  }
 
-  const handleOpen2 = (type) => {
-    setFormType(type);
+  const handleOpen2 = () => {
     setOpen2(true);
     resetForm();
+    setActiveStep(0)
   };
 
   const closeModal = () => {
-    setOpen(false);
     setOpen2(false);
+    window.location.reload();
 };
-
-  // Función para renderizar el formulario correspondiente en el modal
-  const renderForm = (info, editar) => {
-    switch (formType) {
-      case 'Ventas de Productos':
-        return <Pagos data={info} isEditing={editar}/>;
-      default:
-        return <div> fallo </div>;
-    }
-  };
-
-  const [seleccionEnLists, setSeleccionEnLists] = useState(null);
-
-  // Función para manejar la selección desde renderList
-  const manejarSeleccionEnLists = (seleccion) => {
-    setSeleccionEnLists(seleccion);
-    // Aquí puedes hacer algo más con la selección en el componente Lists
-    };
 
      const [openDialog, setOpenDialog] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({});
@@ -569,7 +327,6 @@ function ListaTienda({ opcion }) {
 
   const subtotal = selectedProducts.reduce((acc, product) => acc + product.total, 0);
 
-
 // Paso 2 y 3: Verificar si `descuento` tiene datos y calcular el total con descuento
 let total
 if (Descuento && Descuento.length > 0) {
@@ -581,243 +338,200 @@ if (Descuento && Descuento.length > 0) {
   // Si no hay descuento, el total es el subtotal
   total = subtotal;
   }
-    return (
-        <Box>
-        <div className="vertical_line"></div>
-        <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '35%', height: 'auto' }}>
-          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-            <h2>Productos Disponibles</h2>
-            {/* Renderiza la lista de productos disponibles */}
- <List sx={listStyle}>
-   {productoSeleccionado.map((product, index) => (
-          <ListItem key={index} button onClick={() => handleSelectProduct(product)}>
-            <ListItemText primary={product.NombreP} />
-            {product.Descripcion}
-          </ListItem>
-        ))}
-            </List>
-            <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Ingrese la cantidad</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="quantity"
-            label="Cantidad"
-            type="number"
-            fullWidth
-            variant="standard"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancelar</Button>
-          <Button onClick={handleConfirmQuantity}>Confirmar</Button>
-        </DialogActions>
-      </Dialog>
-          </Box>
+  return (
+    <Box>
+      <div className="vertical_line"></div>
+      <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
+        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <h1 className='h1Tienda'>Productos Disponibles</h1>
+          {/* Renderiza la lista de productos disponibles */}
+          <List sx={listStyle}>
+            {productoSeleccionado.map((product, index) => (
+              <ListItem key={index} button onClick={() => handleSelectProduct(product)}  sx={{    '&:hover': {
+      backgroundColor: '#41B06E'
+    },}}>
+                <ListItemText primary={product.NombreP} />
+                {product.Descripcion}
+              </ListItem>
+            ))}
+          </List>
+          <Dialog open={openDialog} onClose={handleCloseDialog}>
+            <DialogTitle>Ingrese la cantidad</DialogTitle>
+            <DialogContent>
+              <TextField autoFocus margin="dense" id="quantity" label="Cantidad" type="number" fullWidth variant="standard" value={quantity} onChange={(e) => setQuantity(e.target.value)}/>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>Cancelar</Button>
+              <Button onClick={handleConfirmQuantity}>Confirmar</Button>
+            </DialogActions>
+          </Dialog>
         </Box>
-        <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '35%', height: 'auto', alignItems:'center', display:'flex', flexDirection:'column'}}>
-          <h2>Productos Seleccionados</h2>
+      </Box>
+      <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '30%', height: 'auto', alignItems:'center', display:'flex', flexDirection:'column'}}>
+        <h1 className='h1Tienda'>Productos Seleccionados</h1>
         {/* Renderiza la lista de productos seleccionados */}
-         <List sx={listStyle}>
-         {selectedProducts.map((product, index) => (
-          <ListItem key={index}>
+        <List sx={listStyle}>
+          {selectedProducts.map((product, index) => (
+            <ListItem key={index}>
              <ListItemText primary={product.NombreP} secondary={product.Descripcion} />
              {`Cantidad: ${product.quantity}, Total: $${product.total}`}
-          </ListItem>
-        ))}
-          </List>
-          <ListItem sx={listStyle}>
-            <ListItemText primary="SubTotal" />
-            ${selectedProducts.reduce((acc, product) => acc + product.total, 0)}
-            
-          </ListItem>
-          <ListItem sx={listStyle}>
-  <ListItemText primary="Descuento" />
-  {Descuento && Descuento.length > 0 ? `${Descuento[0].PorcentajeDesc}%` : 'No disponible'}
-</ListItem>
+            </ListItem>
+          ))}
+        </List>
+        <ListItem sx={listStyle}>
+          <ListItemText primary="SubTotal" />
+          ${selectedProducts.reduce((acc, product) => acc + product.total, 0)}  
+        </ListItem>
+        <ListItem sx={listStyle}>
+          <ListItemText primary="Descuento" />
+          {Descuento && Descuento.length > 0 ? `${Descuento[0].PorcentajeDesc}%` : 'No disponible'}
+        </ListItem>
           <ListItem sx={listStyle}>
             <ListItemText primary="Total" />
             ${total}
           </ListItem>
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2()}>
             Emitir Factura
           </Button>
           <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             <Box sx={{ width: '100%', alignItems: 'center', display: 'flex', flexDirection: 'column', }} mt={5}>
-              <Stepper activeStep={activeStep} sx={{
-                '.MuiStepLabel-label': { color: 'white' }, marginBottom:'10px'
-}}>
-        {steps.map((label) => {
-          return (
-            <Step key={label} >
-              <StepLabel sx={{
-          '.MuiStepLabel-label': { color: 'white', '&.Mui-active': { color: 'white' }, '&.Mui-completed': { color: 'white' } }, // Asegura que el texto sea blanco en todos los estados
-          '.MuiStepIcon-root': { '&.Mui-completed': { color: '#8DECB4' }, '&.Mui-active': { color: '#41B06E' } }, // Asegura que los iconos sean blancos en todos los estados
-        }}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
-      {activeStep === steps.length ? (
-        <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            Factura Creada Correctamente
-          </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={closeModal}>Salir</Button>
-          </Box>
-        </React.Fragment>
+              <Stepper activeStep={activeStep} sx={{'.MuiStepLabel-label': { color: 'white' }, marginBottom:'10px'}}>
+                {steps.map((label) => {
+                  return (
+                    <Step key={label} >
+                      <StepLabel sx={{ '.MuiStepLabel-label': { color: 'white', '&.Mui-active': { color: 'white' }, '&.Mui-completed': { color: 'white' } }, '.MuiStepIcon-root': { '&.Mui-completed': { color: '#8DECB4' }, '&.Mui-active': { color: '#41B06E' } } }}>
+                        {label}           
+                      </StepLabel>
+                    </Step>
+                  );
+                })}
+              </Stepper>
+              {activeStep === steps.length ? (
+                <React.Fragment>
+                  <Typography sx={{ mt: 2, mb: 1, color:'#FFFFFF', fontSize:'30px'}}>
+                    Factura Creada Correctamente
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                    <Box sx={{ flex: '1 1 auto' }} />
+                    <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={closeModal}>
+                        Salir 
+                    </Button>
+                  </Box>
+                </React.Fragment>
               ) : (
-    <React.Fragment>
-  {activeStep === 0 && (
-    <FormBox onSubmit={handleSubmit} > 
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <TextField select label='Tipo-Pago' type='text' name='TipoPago' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoPago} onChange={handleChange}>
-            <MenuItem value="E">Efectivo</MenuItem>
-            <MenuItem value="P">Pago Móvil</MenuItem>
-            <MenuItem value="T">Tarjeta</MenuItem>
-          </TextField>        
+              <React.Fragment>
+                {activeStep === 0 && (
+                  <FormBox onSubmit={handleSubmit} > 
+                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                        <TextField select label='Tipo-Pago' type='text' name='TipoPago' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoPago} onChange={handleChange}>
+                          <MenuItem value="E">Efectivo</MenuItem>
+                          <MenuItem value="P">Pago Móvil</MenuItem>
+                          <MenuItem value="T">Tarjeta</MenuItem>
+                        </TextField>        
+                      </Box>
+                      {formData.TipoPago === "E" && (
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                          <TextField select label="Tipo-Efectivo" name='TipoEfectivo'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoEfectivo} onChange={handleChange}>
+                            <MenuItem value="D">Divisa</MenuItem>
+                            <MenuItem value="B">Bolivares</MenuItem>
+                          </TextField>
+                        </Box>
+                      )}
+                      {formData.TipoPago === "P" && (
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                          <InputField label="Nro_Telefono" type='text' name='NroTelf'valor={formData.NroTelf} cambio={handleChange} />
+                          <InputField label="Nro-Reference" type='number' name='Referencia' valor={formData.Referencia} cambio={handleChange}/>
+                        </Box>
+                      )}
+                      {formData.TipoPago === "T" && (
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                          <TextField select label="Tipo_Tarjeta" type='text' name='TipoTarjeta' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoTarjeta} onChange={handleChange}>
+                            <MenuItem value="Debito">Debito</MenuItem>
+                            <MenuItem value="Credito">Credito</MenuItem>
+                          </TextField>
+                          <InputField label="Numero_Tarjeta" type='text' name='NumTarjeta'valor={formData.NumTarjeta} cambio={handleChange} />
+                          <InputField label="Banco" type='text' name='Banco'valor={formData.Banco} cambio={handleChange} />
+                        </Box>
+                      )}
+                      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = selectedProducts.reduce((acc, product) => acc + product.total, 0)} onChange={handleChange} disabled ></TextField>
+                        <TextField select label="Cédula Cliente" name='CIResponsable' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataFactura.CIResponsable} onChange={handleChange2}>
+                          {Clientes.map((cliente, index) => (
+                            <MenuItem key={index} value={cliente.CIResponsable}>
+                              {cliente.CIResponsable}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </Box>
+                      <Button type='submit' variant="contained" sx={{margin: '5px 0', color: '#000000', bgcolor: '#FFFFFF', '&:hover': {bgcolor: '#41B06E',color: '#FFFFFF'}}}>
+                      Registrar Pago
+                      </Button>
+                    </Box>
+                  </FormBox>
+                )}
+                {activeStep === 1 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                    <TableContainer component={Paper}>
+                      <h1 style={{color:'black'}}>M&M</h1>
+                      <p className='p_factura'>RIF: {user.RIFSuc}</p>
+                      <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
+                      <Table aria-label="simple table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Descripción</TableCell>
+                            <TableCell align="right">Cantidad</TableCell>
+                            <TableCell align="right">Precio</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {selectedProducts.map((product, index) => (  
+                            <TableRow key={index}>
+                              <TableCell component="th" scope="row">
+                                {product.Descripcion}
+                              </TableCell>
+                              <TableCell align="right">{product.quantity}</TableCell>
+                              <TableCell align="right">{product.Precio}</TableCell>
+                            </TableRow>
+                          ))}
+                          <TableRow>
+                            <TableCell rowSpan={3} />
+                            <TableCell colSpan={2}>Total</TableCell>
+                            <TableCell align="right">${total }</TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Box>
+                )}
+                <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                  <Button disabled={activeStep === 0} onClick={handleBack} variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E', mr: 1  } }}>
+                    Regresar
+                  </Button>
+                  {activeStep === steps.length - 1 ? (
+                    facturaEmitida ? (
+                      <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF', mr: 1 } }}>
+                        Finalizar
+                      </Button>
+                    ) : (
+                      <Button type="submit" onClick={handleSubmitFactura} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E', mr: 1 } }}>
+                        Emitir Factura
+                      </Button>
+                    )
+                  ) : (
+                  <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF', mr: 1 } }}>
+                    Siguiente
+                  </Button>
+                )}
+              </Box>
+            </React.Fragment>
+          )}
         </Box>
-        {formData.TipoPago === "E" && (
-          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-            <TextField 
-              select 
-              label="Tipo-Efectivo" 
-              name='TipoEfectivo'
-              sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} 
-              value={formData.TipoEfectivo} 
-              onChange={handleChange}
-            >
-              <MenuItem value="D">Divisa</MenuItem>
-              <MenuItem value="B">Bolivares</MenuItem>
-            </TextField>
-          </Box>
-        )}
-        {formData.TipoPago === "P" && (
-                            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                              <InputField label="Nro_Telefono" type='text' name='NroTelf'
-            valor={formData.NroTelf} cambio={handleChange} />
-            <InputField label="Nro-Reference" type='number' name='Referencia'
-              valor={formData.Referencia} cambio={handleChange}/>
-          </Box>
-        )}
-        {formData.TipoPago === "T" && (
-          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-            <TextField select label="Tipo_Tarjeta" type='text' name='TipoTarjeta' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoTarjeta} onChange={handleChange}>
-              <MenuItem value="Debito">Debito</MenuItem>
-              <MenuItem value="Credito">Credito</MenuItem>
-            </TextField>
-            <InputField label="Numero_Tarjeta" type='text' name='NumTarjeta'
-                                valor={formData.NumTarjeta} cambio={handleChange} />
-                               <InputField label="Banco" type='text' name='Banco'
-              valor={formData.Banco} cambio={handleChange} />
-          </Box>
-        )}
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          
-          <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = selectedProducts.reduce((acc, product) => acc + product.total, 0)} onChange={handleChange} disabled ></TextField>
-                          </Box>
-        <Button type='submit' variant="contained" sx={{
-        margin: '5px 0',
-        color: '#000000',
-        bgcolor: '#FFFFFF',
-        '&:hover': {
-          bgcolor: '#41B06E',
-          color: '#FFFFFF'
-        }
-      }}>
-        Registrar Pago
-      </Button>
-      </Box>
-    </FormBox>
-  )}
-  {activeStep === 1 && (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                        <TableContainer component={Paper}>
-                          <h1 style={{color:'black'}}>M&M</h1>
-                          <p className='p_factura'>RIF: {user.RIFSuc}</p>
-                          <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
-
-      <Table aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Descripción</TableCell>
-            <TableCell align="right">Cantidad</TableCell>
-            <TableCell align="right">Precio</TableCell>
-            <TableCell align="right">Subtotal</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-         {selectedProducts.map((product, index) => (
-
-        
-            <TableRow key={index}>
-              <TableCell component="th" scope="row">
-{product.Descripcion}
-              </TableCell>
-              <TableCell align="right">{product.quantity}</TableCell>
-              <TableCell align="right">{product.Precio}</TableCell>
-              <TableCell align="right">{product.total}</TableCell>
-            </TableRow>
-
-          ))}
-           <TableRow>
-            <TableCell rowSpan={3} />
-            <TableCell colSpan={2}>Total</TableCell>
-                                <TableCell align="right">${total }</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
+      </Modal>
     </Box>
-                    )}
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-    <Button
-      disabled={activeStep === 0}
-      onClick={handleBack}
-      variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E', mr: 1  } }} 
-    >
-      Regresar
-    </Button>
-{activeStep === steps.length - 1 ? (
-  <Button
-    type="submit"
-    onClick={handleNext}
-    variant="contained"
-    sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E', mr: 1 } }}
-  >
-    Emitir Factura
-  </Button>
-) : (
-  <Button
-    type="button"
-    onClick={handleNext}
-    variant="contained"
-    sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF', mr: 1 } }}
-  >
-    Siguiente
-  </Button>
-)}
-    
   </Box>
-</React.Fragment>
-            )}
-                </Box>
-          </Modal>
-        </Box>
-      </Box>
-    );
-  }
-
-  ListaTienda.propTypes = {
-    opcion: PropTypes.string.isRequired, // 'opcion' debe ser una cadena de texto y es requerida
-    raiz: PropTypes.string.isRequired, // 'raiz' debe ser una cadena de texto y es requerida
-  };
+);
+}
   
   // Define las propiedades esperadas para el componente FormBox
   FormBox.propTypes = {
@@ -834,17 +548,6 @@ if (Descuento && Descuento.length > 0) {
     cambio: PropTypes.func, // 'cambio' debe ser una función, pero no es requerida
     valor: PropTypes.string, // 'valor' debe ser una cadena de texto, pero no es requerida
   };
-  
-  VentasProductos.propTypes = {
-    data: PropTypes.object,
-    isEditing: PropTypes.bool,
-  }
-  
-  
-  FacturaTienda.propTypes = {
-    data: PropTypes.object,
-    isEditing: PropTypes.bool,
-  }
 
   export default ListaTienda;
   

@@ -26,3 +26,17 @@
     font-size: medium;
 }
 
+.h1Libreta{
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-color: #8DECB4;
+    color: #41B06E;
+    text-underline-offset: 15px;
+    margin-bottom: 20px;
+}
+.h2Libreta{
+    font-weight: bolder;
+    color: #41B06E;
+}
+

@@ -1,5 +1,5 @@
 // Importación de componentes de Material UI, PropTypes y hooks de React.
-import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography, MenuItem } from '@mui/material';
 import PropTypes from 'prop-types';
 import React,{ useState, useEffect } from 'react';
 import PersonIcon from '@mui/icons-material/Person';
@@ -19,7 +19,6 @@ const style = {
   py: 0,
   width: '80%',
   borderColor: 'divider',
-  backgroundColor: 'Transparent',
   color: 'black',
 };
 
@@ -89,6 +88,59 @@ async function sendData(endpoint, formData, method) {
   }
 }
 
+function Formulario({ data, isEditing, endpointUrl, initialValues, children }) {
+  const [formData, handleChange] = useForm(initialValues);
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+    if (!isConfirmed) {
+      return;
+    }
+    const method = isEditing ? 'PUT' : 'POST';
+    try {
+      await sendData(endpointUrl, formData, method);
+      alert('Operación realizada correctamente');
+      window.location.reload();
+    } catch (error) {
+      console.error('Error en la operación', error);
+      alert('Error en la operación. Por favor, intente nuevamente.');
+    }
+  };
+
+  const handleDelete = async () => {
+    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este elemento?');
+    if (!isConfirmed) {
+      return;
+    }
+    try {
+      await sendData(endpointUrl, formData, 'DELETE');
+      alert('Elemento eliminado correctamente');
+      window.location.reload();
+    } catch (error) {
+      console.error('Error al eliminar el elemento', error);
+      alert('Error al eliminar el elemento. Por favor, intente nuevamente.');
+    }
+  };
+
+  return (
+    <FormBox onSubmit={handleSubmit}>
+      {children({ formData, handleChange })}
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+        <Button type='submit' variant="contained" sx={{ margin: '5px 20px', color: '#000000', bgcolor: '#FFFFFF', '&:hover': { bgcolor: '#41B06E', color: '#FFFFFF' } }}>
+          {isEditing ? 'Actualizar' : 'Agregar'}
+        </Button>
+        {isEditing && (
+          <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+            Eliminar
+          </Button>
+        )}
+      </Box>
+    </FormBox>
+  );
+}
+
+
 // Define un componente funcional FormBox que acepta props, incluyendo children y onSubmit
 const FormBox = ({ children, onSubmit, ...props  }) => (
   // Retorna un componente Box actuando como un formulario
@@ -125,58 +177,14 @@ function Personal({ data = null, isEditing = false }) {
     RIFSuc: user.RIFSuc, // Asumiendo que user está disponible en el contexto
   };
 
-  const [formData, handleChange] = useForm(initialValues);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
-
   const endpoint = `${SERVERNAME}/trabajadores`;
-  const method = isEditing ? 'PUT' : 'POST';
 
-  try {
-    await sendData(endpoint, formData, method);
-    alert('Operación realizada correctamente');
-
-   window.location.reload();
-
-
-  } catch (error) {
-    console.error('Error en la operación', error);
-    if (error.message.includes('404')) {
-      alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-    } else {
-      alert('Error en la operación. Por favor, intente nuevamente.');
-    }
-  }
-  };
   
-  const handleDelete = async () => {
-  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
-  const endpoint = `${SERVERNAME}/trabajadores`; // Asumiendo que Cedula es el identificador único
-  try {
-    await sendData(endpoint, formData, 'DELETE');
-    alert('Empleado eliminado correctamente');
-    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
-    window.location.reload()
-  } catch (error) {
-    console.error('Error al eliminar el empleado', error);
-    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
-  }
-};
-
-  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
-    <FormBox onSubmit={handleSubmit}> 
-      {/* Box para agrupar los campos de entrada con estilo de flexbox */}
+    <Formulario data={data} isEditing={isEditing} endpointUrl={endpoint} initialValues={initialValues}>
+      {({ formData, handleChange }) => (
+        <>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           {/* InputField para el nombre del empleado */}
           <InputField label="NOMBRE-EMPLEADO" type='text' name='Nombre'
@@ -185,7 +193,6 @@ function Personal({ data = null, isEditing = false }) {
           <InputField label="SUELDO-EMPLEADO" type='number' name='Salario' min={1} valor={formData.Salario} cambio={handleChange}/>
         </Box>
       </Box>
-      {/* Repite la estructura anterior para otros campos del formulario */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="CEDULA-EMPLEADO" type='text' name='Cedula'
@@ -199,27 +206,10 @@ function Personal({ data = null, isEditing = false }) {
           <InputField label="DIRECCION-EMPLEADO" type='text' name='Direccion'
             valor={formData.Direccion} cambio={handleChange}/>
         </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-      <Button type='submit'  variant="contained" sx={{
-        margin: '5px 20px',
-        color: '#000000',
-        bgcolor: '#FFFFFF',
-        '&:hover': {
-            bgcolor: '#41B06E',
-            color: '#FFFFFF'
-          }
-        }}
-        >
-        {isEditing ? 'Actualizar Personal' : 'Agregar Personal'}
-      </Button>
-      {isEditing && (
-  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-    Eliminar
-  </Button>
-)}
-      </Box>
-    </FormBox>
+          </Box>
+          </>
+ )}
+    </Formulario>
   );
 }
 
@@ -230,50 +220,14 @@ function Cliente({ data = null, isEditing = false }) {
     CIResponsable: data?.CIResponsable || '',
     NombreResponsable: data?.NombreResponsable || '',
   };
-
-  const [formData, handleChange] = useForm(initialValues);
-
-  // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
-  const handleSubmit = async (e) => {
-  e.preventDefault();
   const endpoint = `${SERVERNAME}/responsables`;
-  const method = isEditing ? 'PUT' : 'POST';
 
-  try {
-    await sendData(endpoint, formData, method);
-    alert('Operación realizada correctamente');
-    window.location.reload()
-  } catch (error) {
-    console.error('Error en la operación', error);
-    if (error.message.includes('404')) {
-      alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-    } else {
-      alert('Error en la operación. Por favor, intente nuevamente.');
-    }
-  }
-  };
   
-    const handleDelete = async () => {
-  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
-  const endpoint = `${SERVERNAME}/responsables`; // Asumiendo que Cedula es el identificador único
-  try {
-    await sendData(endpoint, formData, 'DELETE');
-    alert('Empleado eliminado correctamente');
-    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
-    window.location.reload()
-  } catch (error) {
-    console.error('Error al eliminar el empleado', error);
-    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
-  }
-};
-
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
-    <FormBox onSubmit={handleSubmit}>
-      {/* Box para agrupar los campos de entrada con estilo de flexbox */}
+    <Formulario data={data} isEditing={isEditing} endpointUrl={endpoint} initialValues={initialValues}>
+      {({ formData, handleChange }) => (
+        <>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
@@ -284,25 +238,9 @@ function Cliente({ data = null, isEditing = false }) {
           <InputField label="NOMBRE-CLIENTE" type='text' name='NombreResponsable' valor={formData.NombreResponsable} cambio={handleChange}/>
         </Box>
       </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-      <Button type='submit' variant="contained" sx={{
-        margin: '5px 0',
-        color: '#000000',
-        bgcolor: '#FFFFFF',
-        '&:hover': {
-          bgcolor: '#41B06E',
-          color: '#FFFFFF'
-        }
-      }}>
-        {isEditing ? 'Actualizar Cliente' : 'Agregar Cliente'}
-      </Button>
-      {isEditing && (
-  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-    Eliminar
-  </Button>
-)}
-      </Box>
-    </FormBox>
+          </>
+ )}
+    </Formulario>
   );
 }
 
@@ -319,60 +257,53 @@ function Vehiculo({ data = null, isEditing = false }) {
     NumModelo: data?.NumModelo || '',
     
   };
+  const endpoint = `${SERVERNAME}/vehiculos`;
 
-  const [formData, handleChange] = useForm(initialValues);
-
-  // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-     console.log(formData)
-    const endpoint = `${SERVERNAME}/vehiculos`;
-    const method = isEditing ? 'PUT' : 'POST';
-
-    try {
-      await sendData(endpoint, formData, method);
-      alert('Operación realizada correctamente');
-      window.location.reload()
-    } catch (error) {
-      console.error('Error en la operación', error);
-      if (error.message.includes('404')) {
-        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-      } else {
-        alert('Error en la operación. Por favor, intente nuevamente.');
+  const [clientesSeleccionados, setClientesSeleccionados] = useState([]);
+  const [modelosVehiculos, setModelosVehiculos] = useState([]);
+  useEffect(() => {
+    // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
+    const obtenerDatos = async (endpoint, setter) => {
+      try {
+        console.log(`${SERVERNAME}/${endpoint}`)
+        // Realiza la petición fetch al servidor y espera la respuesta
+        const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
+        // Convierte la respuesta a formato JSON
+        const datos = await respuesta.json();
+        // Actualiza el estado correspondiente con los datos obtenidos
+        setter(datos);
+      } catch (error) {
+        // Captura y registra errores en la consola
+        console.error(`Error al obtener datos de ${endpoint}:`, error);
       }
-    }
-  };
+    };
+    // Llama a obtenerDatos para cada tipo de dato necesario
+    obtenerDatos('RESPONSABLES', setClientesSeleccionados);
+    obtenerDatos('modelosvehiculos', setModelosVehiculos);
+  }, []);
 
-  const handleDelete = async () => {
-  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
-  const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que Cedula es el identificador único
-  try {
-    await sendData(endpoint, formData, 'DELETE');
-    alert('Empleado eliminado correctamente');
-    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
-    window.location.reload()
-  } catch (error) {
-    console.error('Error al eliminar el empleado', error);
-    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
-  }
-};
-
-  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
-    <FormBox onSubmit={handleSubmit}>
-      {/* Box para agrupar los campos de entrada con estilo de flexbox */}
+  <Formulario data={data} isEditing={isEditing} endpointUrl={endpoint} initialValues={initialValues}>
+      {({ formData, handleChange }) => (
+        <>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           {/* InputField para la cédula del responsable */}
-          <InputField label="CEDULA-CLIENTE" type='text' name='ciResp' 
-            valor={formData.ciResp} cambio={handleChange}/>
-          <InputField label="No-MODELO" type='text' name='NumModelo'
-            valor={formData.NumModelo} cambio={handleChange}/>
+          <TextField select label="CEDULA-CLIENTE" name='ciResp' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.ciResp} onChange={handleChange}>
+            {clientesSeleccionados.map((cliente, index) => (
+              <MenuItem key={index} value={cliente.CIResponsable}>
+                {cliente.CIResponsable}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField select label="No-MODELO" name='NumModelo' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.NumModelo} onChange={handleChange}>
+            {modelosVehiculos.map((modelo, index) => (
+              <MenuItem key={index} value={modelo.CodConsec}>
+                {modelo.CodConsec}
+              </MenuItem>
+            ))}
+          </TextField>
         </Box>
       </Box>
       {/* Repite la estructura anterior para otros campos del formulario */}
@@ -386,29 +317,18 @@ function Vehiculo({ data = null, isEditing = false }) {
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="COD-MARCA" type='text' name='CodMarca'
-            valor={formData.CodMarca} cambio={handleChange}/>
+          <TextField select label="COD-MARCA" name='CodMarca' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodMarca} onChange={handleChange}>
+            {modelosVehiculos.map((modelo, index) => (
+              <MenuItem key={index} value={modelo.CodMarcaV}>
+                {modelo.CodMarcaV}
+              </MenuItem>
+            ))}
+          </TextField>
         </Box>
       </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-      <Button type='submit' variant="contained" sx={{
-        margin: '5px 0',
-        color: '#000000',
-        bgcolor: '#FFFFFF',
-        '&:hover': {
-          bgcolor: '#41B06E',
-          color: '#FFFFFF'
-        }
-      }}>
-        {isEditing ? 'Actualizar Vehiculo' : 'Agregar Vehiculo'}
-        </Button>
-        {isEditing && (
-  <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-    Eliminar
-  </Button>
-)}
-      </Box>
-    </FormBox>
+          </>
+ )}
+    </Formulario>
   );
 }
 
@@ -428,13 +348,17 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
     <List sx={listStyle}>
       {/* Mapea cada elemento del array 'items' a un componente ListItem */}
       {items.map((item, index) => (
-        // Cada ListItem tiene una key única basada en su índice para optimizar el renderizado
-        <ListItem key={index} button onClick={() => manejarClicSeleccionado(item)}>
+        <>
+        <ListItem key={index} button onClick={() => manejarClicSeleccionado(item)} sx={{    '&:hover': {
+      backgroundColor: '#41B06E',
+    },}}>
           {/* ListItemText muestra el texto principal y secundario basado en las claves proporcionadas */}
           <ListItemText primary={item[textKey]} />
             {/* Muestra el valor secundario directamente sin un componente específico */}
             {item[secondaryKey]}
         </ListItem>
+          <Divider />
+          </>
       ))}
     </List>
   );
@@ -544,8 +468,9 @@ function Lists({ opcion }) {
   return (
     <Box>
       <div className="vertical_line"></div>
-      <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
-        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+      <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
+        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+          <h1 className='h1Libreta'>Lista de {opcion}</h1>
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
           {mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
@@ -559,19 +484,19 @@ function Lists({ opcion }) {
           </Modal>
         </Box>
       </Box>
-      <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '35%', height: 'auto' }}>
+      <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '30%', height: 'auto' }}>
         {seleccionEnLists ? (
           <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
             <div className="circle">
                 <PersonIcon sx={{ fontSize: 150 }} />
             </div>
-            <h2>{ seleccionEnLists.Nombre || '' }</h2>
-            <h2>{seleccionEnLists.Cedula || ''}</h2>
-            <h2>{seleccionEnLists.NombreResponsable || ''}</h2>
-            <h2>{seleccionEnLists.CIResponsable || ''}</h2>
+            <h2 className='h2Libreta'>{ seleccionEnLists.Nombre || '' }</h2>
+            <h2 className='h2Libreta'>{seleccionEnLists.Cedula || ''}</h2>
+            <h2 className='h2Libreta'>{seleccionEnLists.NombreResponsable || ''}</h2>
+            <h2 className='h2Libreta'>{seleccionEnLists.CIResponsable || ''}</h2>
           </Box>
         ) : (
-            <Typography>No se ha seleccionado ningún {opcion}</Typography>
+            <Typography textAlign={'center'}>No se ha seleccionado ningún {opcion}</Typography>
         )}
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
