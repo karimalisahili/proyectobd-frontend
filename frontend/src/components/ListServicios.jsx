@@ -1076,31 +1076,31 @@ const renderContenido = () => {
   if (seleccionEnLists && opcion === 'Listas de Servicios') {
     return (
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        SERVICIOS
+        <h2 className='h2Libreta'>SERVICIOS</h2>
       </Box>
     );
   } else if(seleccionEnLists && opcion === 'Actividades'){
     return(
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        ACTIVIDADES
+        <h2 className='h2Libreta'>ACTIVIDADES</h2>
       </Box>
     )
   }else if(seleccionEnLists && opcion === 'Reservas'){
     return(
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        RESERVAS
+        <h2 className='h2Libreta'>RESERVAS</h2>
       </Box>
     )
   }else if(seleccionEnLists && opcion === 'Autorizados'){
     return(
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        AUTORIZADOS
+        <h2 className='h2Libreta'>AUTORIZADOS</h2>
       </Box>
     )
   }else if(seleccionEnLists && opcion === 'Ordenes de Servicios'){
     return(
       <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-        ORDENES DE SERVICIOS
+        <h2 className='h2Libreta'>ORDENES DE SERVICIOS</h2>
       </Box>
     )
   }else{

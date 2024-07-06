@@ -576,10 +576,10 @@ function InventarioLista({ opcion }) {
             <div className="circle">
               <PersonIcon sx={{ fontSize: 150 }} />
             </div>
-            <h2>{seleccionEnLists.NombreP || ''}</h2>
-            <h2>{seleccionEnLists.CodProd || ''}</h2>
-            <h2>{seleccionEnLists.Descripcion || ''}</h2>
-            <h2>{seleccionEnLists.CodLineas || ''}</h2>
+            <h2 className='h2Libreta'>{seleccionEnLists.NombreP || ''}</h2>
+            <h2 className='h2Libreta'>{seleccionEnLists.CodProd || ''}</h2>
+            <h2 className='h2Libreta'>{seleccionEnLists.Descripcion || ''}</h2>
+            <h2 className='h2Libreta'>{seleccionEnLists.CodLineas || ''}</h2>
           </Box>
         ) : (
           <Typography textAlign={'center'}>No se ha seleccionado ningún {opcion}</Typography>
