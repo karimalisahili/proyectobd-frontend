@@ -9,11 +9,7 @@ import Proveedores from '../pages/Proveedores'
 import Inventario from '../pages/Inventario'
 import Configuracion from '../pages/Configuracion'
 import Register from '../pages/register'
-<<<<<<< HEAD
-import Marcas_servicio from '../pages/Marcas_servicio'
-=======
 import Marcas from '../pages/Marcas'
->>>>>>> 4a6aaea4b7be4016466969a91c5251ee34aada7e
 
 export default function AppRouter() {
     return (
@@ -27,11 +23,7 @@ export default function AppRouter() {
                 <Route path="/Inventario" element={<Inventario />} />
                 <Route path="/Configuracion" element={<Configuracion />} />
                 <Route path="/Register" element={<Register />} />
-<<<<<<< HEAD
-                <Route path="/marcas_servicio" element={<Marcas_servicio />} />
-=======
                 <Route path="/Marcas" element={<Marcas/>} />
->>>>>>> 4a6aaea4b7be4016466969a91c5251ee34aada7e
         </Routes>
     )
 }
