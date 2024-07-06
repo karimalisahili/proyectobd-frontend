@@ -959,7 +959,7 @@ function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados
 
     case 'Reservas':
       // Renderiza y retorna una lista de reservas seleccionadas
-      return renderList(reservasSeleccionados, 'FechaR', 'Abono', onSeleccionado);
+      return renderList(reservasSeleccionados, 'CodVehiculo', 'Abono', onSeleccionado);
 
     case 'Actividades':
       // Renderiza y retorna una lista de actividades seleccionadas
@@ -1105,7 +1105,7 @@ const renderContenido = () => {
     )
   }else{
     return (
-      <Typography>No se ha seleccionado ningún Servicio</Typography>
+      <Typography textAlign={'center'}>No se ha seleccionado ningún {opcion}</Typography>
     );
   }
 };
@@ -1114,8 +1114,9 @@ const renderContenido = () => {
   return (
     <Box>
     <div className="vertical_line"></div>
-    <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
+    <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
       <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <h1 className='h1Libreta'>Lista de {opcion}</h1>
         {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
         {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados,pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
         {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}

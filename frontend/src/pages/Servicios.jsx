@@ -8,7 +8,6 @@ function Servicios() {
         <div>
             <NbLateral />
             <Navbar />
-            <SearchBar />
         </div>
     )
 }
