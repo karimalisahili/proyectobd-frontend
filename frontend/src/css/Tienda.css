@@ -3,3 +3,13 @@
     margin-left: 10px;
     color: black
 }
+
+.h1Tienda {
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-color: #8DECB4;
+    color: #41B06E;
+    text-underline-offset: 20px;
+    margin-bottom: 5px;
+}
