@@ -1,5 +1,5 @@
 
-import { Box, Button, List, ListItem, ListItemText, Modal, TextField, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Stepper, Step, StepLabel, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Modal, TextField, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Stepper, Step, StepLabel, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox, Grid, Divider } from '@mui/material';
 import PropTypes from 'prop-types';
 import React,{ useState, useEffect } from 'react';
 
@@ -132,10 +132,7 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
   />
 );
 
-function ListaTienda() {
-
-
-
+function Ventas() {
   const initialValues = {
     Fecha: new Date().toISOString().split('T')[0],
     Monto:  0,
@@ -149,6 +146,8 @@ function ListaTienda() {
     NumFacturaServicio: null,
     NumR: null
   };
+
+  console.log(initialValues)
 
   const initialValuesFacturas = {
     Fecha: null,
@@ -505,21 +504,21 @@ if (Descuento && Descuento.length > 0) {
                   </Box>
                 )}
                 <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                  <Button disabled={activeStep === 0} onClick={handleBack} variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E', mr: 1  } }}>
+                  <Button disabled={activeStep === 0} onClick={handleBack} variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E'  } }}>
                     Regresar
                   </Button>
                   {activeStep === steps.length - 1 ? (
                     facturaEmitida ? (
-                      <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF', mr: 1 } }}>
+                      <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF',  } }}>
                         Finalizar
                       </Button>
                     ) : (
-                      <Button type="submit" onClick={handleSubmitFactura} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E', mr: 1 } }}>
+                      <Button type="submit" onClick={handleSubmitFactura} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E',  } }}>
                         Emitir Factura
                       </Button>
                     )
                   ) : (
-                  <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF', mr: 1 } }}>
+                  <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF',  } }}>
                     Siguiente
                   </Button>
                 )}
@@ -532,7 +531,184 @@ if (Descuento && Descuento.length > 0) {
   </Box>
 );
 }
+
+function Facturas() {
+  const [facturas, setFacturas] = useState([]);
+  const [selectedFactura, setSelectedFactura] = useState(null);
+
+  useEffect(() => {
+    const fetchFacturas = async () => {
+      try {
+        const response = await fetch(`${SERVERNAME}/facturas_tiendas`);
+        const data = await response.json();
+        setFacturas(data);
+      } catch (error) {
+        console.error('Error fetching facturas:', error);
+      }
+    };
+
+    fetchFacturas();
+  }, []);
+
+  const handleSelectFactura = (nroFactura) => {
+    setSelectedFactura(nroFactura);
+  };
+
+  const [openModal, setOpenModal] = useState(false);
+  const [closeModal, setCloseModal] = useState(false);
+
+const handleOpenModal = () => setOpenModal(true);
+const handleCloseModal = () => setOpenModal(false);
+
+// Función para renderizar los detalles de la factura seleccionada
+const renderFacturaDetails = () => {
+  const factura = facturas.find(f => f.CodF === selectedFactura);
+  if (!factura) return <p>No se encontró la factura</p>;
+
+  return (
+    <Box sx={{  display: 'flex', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100vw', // Ancho de la vista completa
+  height: '100vh', // Altura de la vista completa
+  flexDirection: 'column',
+  top: 0, // Alineado al top de la pantalla
+  left: 0, // Alineado al lado izquierdo de la pantalla
+  overflowY: 'auto', // Permite desplazamiento vertical si el contenido es más alto que la pantalla
+  zIndex: 1000, }}>
+                    <TableContainer component={Paper} sx={{ maxWidth: '75%' }}>
+                      <h1 style={{color:'black'}}>M&M</h1>
+                      <p className='p_factura'>RIF: {user.RIFSuc}</p>
+                      <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
+                      <Table aria-label="simple table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Nro. Factura</TableCell>
+                            <TableCell align="right">Fecha Emision</TableCell>
+                            <TableCell align="right">Monto</TableCell>
+                            <TableCell align="right">Descuento</TableCell>
+              <TableCell align="right">Cod. Pago</TableCell>
+              <TableCell align="right">CI. Cliente</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow key={factura.nroFactura}>
+                              <TableCell component="th" scope="row">
+                                {factura.CodF}
+                              </TableCell>
+                              <TableCell align="right">{factura.Fecha}</TableCell>
+                              <TableCell align="right">{factura.Monto}</TableCell>
+                              <TableCell align="right">{factura.Descuento}</TableCell>
+                              <TableCell align="right">{factura.CodPago}</TableCell>
+                              <TableCell align="right">{factura.CIResponsable}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                      </Table>
+      </TableContainer>
+      
+      <Button variant="contained" onClick={handleCloseModal} sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }}>
+        Cerrar
+      </Button>
+                  </Box>
+  );
+};
+
+  return (
+
+
+    <Box sx={{ position: 'absolute', width: '80%', marginLeft: '15rem', marginTop: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+       <h1 className='h1Factura'>Lista de Facturas</h1>
+      {selectedFactura && (
+       <Button variant="contained"  onClick={handleOpenModal}  sx={{ backgroundColor: '#8DECB4', marginBottom:3, '&:hover': { backgroundColor: '#41B06E' } }}>
+        Ver Detalles de la Factura
+      </Button>
+    )}
+    <Modal
+      open={openModal}
+      onClose={handleCloseModal}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box>
+        {renderFacturaDetails()}
+      </Box>
+    </Modal>
+                
+    <TableContainer component={Paper} style={{ maxHeight: '600px', overflowY: 'auto',}} >
+  <Table aria-label="simple table" stickyHeader>
+    <TableHead>
+      <TableRow>
+        <TableCell padding="checkbox"></TableCell>
+        <TableCell>Nro</TableCell>
+        <TableCell align="right">Fecha</TableCell>
+        <TableCell align="right">Monto</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {facturas.map((factura) => {
+        const isSelected = selectedFactura === factura.CodF;
+        return (
+          <TableRow
+            key={factura.nroFactura}
+            hover
+            onClick={() => handleSelectFactura(factura.CodF)}
+            role="checkbox"
+            aria-checked={isSelected}
+            selected={isSelected}
+            sx={{
+              '&:hover': {
+                backgroundColor: '#8DECB4 !important' // Cambia el color de fondo al pasar el mouse
+              },
+              ...(isSelected && {
+                backgroundColor: '#41B06E !important', // Color verde más oscuro al seleccionar
+              }),
+            }}
+          >
+            <TableCell padding="checkbox">
+              <Checkbox checked={isSelected} sx={{
+    color: '#41B06E', // Color cuando el checkbox no está seleccionado
+    '&.Mui-checked': {
+      color: '#8DECB4', // Color cuando el checkbox está seleccionado
+    },
+  }}/>
+            </TableCell>
+            <TableCell component="th" scope="row">
+              {factura.CodF}
+            </TableCell>
+            <TableCell align="right">{factura.Fecha}</TableCell>
+            <TableCell align="right">{factura.Monto}</TableCell>
+          </TableRow>
+        );
+      })}
+    </TableBody>
+  </Table>
+</TableContainer>
+    </Box>
+  );
+}
+
+function ListaTienda({ opcion }) {
+  const renderfunction = (funcion) => {
+    switch (funcion) {
+      case 'Ventas de Productos':
+        return <Ventas />;
+      case 'Facturas':
+        return <Facturas />;
+      default:
+        return <div> fallo </div>;
+    }
+  };
+  return (
+    <Box>
+      {renderfunction(opcion)}
+    </Box>
+  );
+}
   
+ListaTienda.propTypes = {
+  opcion: PropTypes.string,
+  raiz: PropTypes.string
+};
   // Define las propiedades esperadas para el componente FormBox
   FormBox.propTypes = {
     children: PropTypes.node.isRequired, // 'children' puede ser cualquier elemento React y es requerido
