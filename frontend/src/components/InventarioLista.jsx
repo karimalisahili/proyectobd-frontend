@@ -1,5 +1,5 @@
 // Importación de componentes de Material UI, PropTypes y hooks de React.
-import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography, MenuItem } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import PersonIcon from '@mui/icons-material/Person';
@@ -211,6 +211,32 @@ function Productos({ data = null, isEditing = false }) {
     }
   };
 
+  const [lineasSeleccionados, setlineasSeleccionados] = useState([]);
+
+  // useEffect para cargar datos de empleados, lineas y vehículos al montar el componente
+  useEffect(() => {
+    // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
+    const obtenerDatos = async (endpoint, setter) => {
+      try {
+        console.log(`${SERVERNAME}/${endpoint}`)
+        // Realiza la petición fetch al servidor y espera la respuesta
+        const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
+        // Convierte la respuesta a formato JSON
+        const datos = await respuesta.json();
+        // Actualiza el estado correspondiente con los datos obtenidos
+        setter(datos);
+      } catch (error) {
+        // Captura y registra errores en la consola
+        console.error(`Error al obtener datos de ${endpoint}:`, error);
+      }
+    };
+
+
+    // Llama a obtenerDatos para cada tipo de dato necesario
+    obtenerDatos('lineas', setlineasSeleccionados);
+  }, []);
+
+
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
     <FormBox onSubmit={handleSubmit}>
@@ -223,45 +249,44 @@ function Productos({ data = null, isEditing = false }) {
             valor={formData.NombreP} cambio={handleChange} />
           {/* InputField para el Precio del empleado */}
           <InputField label="Precio" type='number' name='Precio' min={1} valor={formData.Precio} cambio={handleChange} />
+          <InputField label="Codigo-Producto" type='text' name='CodProd'
+            valor={formData.CodProd} cambio={handleChange} />
         </Box>
       </Box>
       {/* Repite la estructura anterior para otros campos del formulario */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Codigo-Producto" type='text' name='CodProd'
-            valor={formData.CodProd} cambio={handleChange} />
-          <select name="Ecologico" value={formData.Ecologico} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
-            <option value="N">¿Es Ecologico?</option>
-            <option value="S">Sí</option>
-            <option value="N">No</option>
-          </select>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}> 
+          <TextField select label="¿Es Ecologico?" type='text' name="Ecologico" sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Ecologico} onChange={handleChange}>
+              <MenuItem value="S">Si</MenuItem>
+              <MenuItem value="N">No</MenuItem>
+          </TextField>
+          <TextField select label="Tipo Producto" type='text' name="TipoPro" sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoPro} onChange={handleChange}>
+              <MenuItem value="Tienda">Tienda</MenuItem>
+              <MenuItem value="Servicio">Servicio</MenuItem>
+          </TextField>
+           <TextField select label="Linea" type='number' name='CodLinea' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodLinea} onChange={handleChange}>
+                {lineasSeleccionados.map((linea, index) => (
+                  <MenuItem key={index} value={linea.CodLineas}>
+                    {linea.Descripcion}
+                  </MenuItem>
+                ))}
+              </TextField>  
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
           <InputField label="Descripcion" type='text' name='Descripcion'
             valor={formData.Descripcion} cambio={handleChange} />
-          <InputField label="Codigo-Linea" type='number' name='CodLinea'
-            valor={formData.CodLinea} cambio={handleChange} />
+          <InputField label="Fabricante" type='text' name='Fabricante'
+            valor={formData.Fabricante} cambio={handleChange} />      
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Minimo" type='number' name='Minimo'
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>    
+            <InputField label="Minimo" type='number' name='Minimo'
             valor={formData.Minimo} cambio={handleChange} />
           <InputField label="Maximo" type='number' name='Maximo'
-            valor={formData.Maximo} cambio={handleChange} />
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Fabricante" type='text' name='Fabricante'
-            valor={formData.Fabricante} cambio={handleChange} />
-          <select name="TipoPro" value={formData.TipoPro} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
-            <option value="Tienda">Tipo Producto</option>
-            <option value="Servicio">Servicio</option>
-            <option value="Tienda">Tienda</option>
-          </select>
+            valor={formData.Maximo} cambio={handleChange} />      
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
