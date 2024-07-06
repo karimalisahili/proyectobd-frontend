@@ -81,7 +81,47 @@ async function sendData(endpoint, formData, method) {
 
   // Check if the response is OK and the content type is JSON
   if (response.status == 200) {
-    window.location.reload();
+
+    const estoyenproductos = SERVERNAME+'/productos'
+
+    if(endpoint === estoyenproductos){
+      const {CodProd, TipoPro} = formData;
+
+      if (TipoPro === 'Tienda') {
+        // Endpoint for 'Tienda' products
+        const tiendaEndpoint = `${SERVERNAME}/productos_tienda`;
+        // Perform the POST request
+        const tiendaResponse = await fetch(tiendaEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ CodProd }),
+        });
+
+        if (tiendaResponse.status === 500) {
+          throw new Error('Error al crear producto de tienda');
+        }
+        console.log('Producto de tienda creado con éxito');
+      } else if (TipoPro === 'Servicio') {
+        // Endpoint for 'Servicio' products
+        const servicioEndpoint = `${SERVERNAME}/productos_servicios`;
+        // Perform the POST request
+        const servicioResponse = await fetch(servicioEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ CodProd }),
+        });
+
+        if (servicioResponse.status === 500) {
+          throw new Error('Error al crear producto de servicio');
+        }
+        console.log('Producto de servicio creado con éxito');
+      }
+    }
+    //window.location.reload();
     return response.json();
   } else {
     // Handle non-JSON responses or errors
