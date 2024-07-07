@@ -1,5 +1,5 @@
 
-import { Box, Button, List, ListItem, ListItemText, Modal, TextField, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Stepper, Step, StepLabel, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox, Grid, Divider } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Modal, TextField, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Stepper, Step, StepLabel, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox } from '@mui/material';
 import PropTypes from 'prop-types';
 import React,{ useState, useEffect } from 'react';
 
@@ -274,7 +274,7 @@ function Ventas() {
     window.location.reload();
 };
 
-     const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({});
   const [quantity, setQuantity] = useState('');
 
@@ -305,9 +305,6 @@ function Ventas() {
     const [activeStep, setActiveStep] = React.useState(0);
     const [skipped, setSkipped] = React.useState(new Set());
 
-  const isStepSkipped = (step) => {
-    return skipped.has(step);
-  };
     
       const handleNext = () => {
     let newSkipped = skipped;

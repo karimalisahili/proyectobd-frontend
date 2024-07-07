@@ -100,7 +100,7 @@ function Navbar() {
                                     <p className='PNav'>Vehiculos </p>
                                 </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({  title1: 'Listas de Servicios', title2: 'Actividades', title3: 'Reservas', title4: 'Autorizados',title5: 'Ordenes de Servicios', title6:'Contrataciones', title7:'Facturas', padre:'servicios', listType:'listService'}, 'servicios'); }} sx={{ my: 2, ml:4,color: 'white', display: 'block', borderBottom: opcionActiva === 'servicios' ? '6px solid green' : 'none' }}>
+                            <Button onClick={() => { handleNbLateral({  title1: 'Listas de Servicios', title2: 'Actividades', title3: 'Ordenes de Servicios', title4: 'Contrataciones',title5: 'Reservas', title6:'Autorizados', title7:'Facturas', padre:'servicios', listType:'listService'}, 'servicios'); }} sx={{ my: 2, ml:4,color: 'white', display: 'block', borderBottom: opcionActiva === 'servicios' ? '6px solid green' : 'none' }}>
                                 <Link to="/Servicios" style={{ textDecoration: 'none', color: 'black' }}><p className='PNav'> Servicios </p> </Link>
                             </Button>
                             <Button onClick={() => { handleNbLateral({ title1: 'Ventas de Productos', title2: 'Facturas', title3: '', title4: '', title5: '', title6:'', padre:'tienda', listType:'listaTienda'}, 'tienda'); }} sx={{ my: 2, ml:4,color: 'white', display: 'block', borderBottom: opcionActiva === 'tienda' ? '6px solid green' : 'none' }}>
