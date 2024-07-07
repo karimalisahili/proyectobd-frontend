@@ -9,7 +9,7 @@ const steps = ['Seccion de Pago', 'Factura Preliminar'];
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 const userJson = localStorage.getItem('user');
-const user = userJson;
+const user = JSON.parse(userJson);
 
 const style = {
   py: 0,
@@ -135,26 +135,24 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 function Ventas() {
   const initialValues = {
     Fecha: new Date().toISOString().split('T')[0],
-    Monto:  0,
+    Monto: 0,
     TipoPago: '',
     TipoEfectivo: null,
     Referencia: null,
-    NroTelf:  null,
+    NroTelf: null,
     TipoTarjeta: null,
     Banco: null,
-    NumTarjeta:  null,
+    NumTarjeta: null,
     NumFacturaServicio: null,
     NumR: null
   };
-
-  console.log(initialValues)
 
   const initialValuesFacturas = {
     Fecha: null,
     Monto: 0,
     Descuento: 0,
     CodPago: 0,
-    CIResponsable:''
+    CIResponsable: ''
   };
 
 
@@ -162,77 +160,77 @@ function Ventas() {
   const [formData, handleChange, resetForm] = useForm(initialValues);
 
   const [formDataFactura, handleChange2, resetForm2] = useForm2(initialValuesFacturas);
-   const [facturaEmitida, setFacturaEmitida] = useState(false);
+  const [facturaEmitida, setFacturaEmitida] = useState(false);
 
   const handleSubmitFactura = async (e) => {
     e.preventDefault();
-  const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
+    const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
     }
     
     formDataFactura.Fecha = new Date().toISOString().split('T')[0];
     formDataFactura.Monto = total;
-    formDataFactura.Descuento = Descuento[0].PorcentajeDesc;
+    formDataFactura.Descuento = Descuento.Descuento;
     formDataFactura.CodPago = localStorage.getItem('codigoPago');
 
-  const endpoint = `${SERVERNAME}/facturas_tiendas`;
-  const method = 'POST';
+    const endpoint = `${SERVERNAME}/facturas_tiendas`;
+    const method = 'POST';
 
-  try {
-  await sendData(endpoint, formDataFactura, method);
-    alert('Operación realizada correctamente');
-    setFacturaEmitida(true);
-} catch (error) {
-  console.error('Error en la operación', error);
-  // Assuming error is an object with a message property
-  if (error.message.includes('500')) {
-    alert('Error interno del servidor. Por favor, intente nuevamente más tarde.');
-  } else if (error.message.includes('404')) {
-    alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-  } else {
-    alert('Error en la operación. Por favor, intente nuevamente.');
-  }
+    try {
+      await sendData(endpoint, formDataFactura, method);
+      alert('Operación realizada correctamente');
+      setFacturaEmitida(true);
+    } catch (error) {
+      console.error('Error en la operación', error);
+      // Assuming error is an object with a message property
+      if (error.message.includes('500')) {
+        alert('Error interno del servidor. Por favor, intente nuevamente más tarde.');
+      } else if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
+      }
     }
 
   };
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
+    const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
+    }
   
-  const endpoint = `${SERVERNAME}/pagos`;
-  const method = 'POST';
+    const endpoint = `${SERVERNAME}/pagos`;
+    const method = 'POST';
 
-  try {
-  await sendData(endpoint, formData, method);
-  alert('Operación realizada correctamente');
-} catch (error) {
-  console.error('Error en la operación', error);
-  // Assuming error is an object with a message property
-  if (error.message.includes('500')) {
-    alert('Error interno del servidor. Por favor, intente nuevamente más tarde.');
-  } else if (error.message.includes('404')) {
-    alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-  } else {
-    alert('Error en la operación. Por favor, intente nuevamente.');
-  }
-}
+    try {
+      await sendData(endpoint, formData, method);
+      alert('Operación realizada correctamente');
+    } catch (error) {
+      console.error('Error en la operación', error);
+      // Assuming error is an object with a message property
+      if (error.message.includes('500')) {
+        alert('Error interno del servidor. Por favor, intente nuevamente más tarde.');
+      } else if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
+      }
+    }
   };
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
-     // Estado para controlar la visibilidad del modal
+  // Estado para controlar la visibilidad del modal
   const [open2, setOpen2] = useState(false);
   const [productoSeleccionado, setProductoSeleccionado] = useState([]);
   const [Descuento, setDescuento] = useState([]);
   const [Pagos, setPagos] = useState([]);
   const [Clientes, setClientes] = useState([]);
 
-   // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
-   useEffect(() => {
+  // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
+  useEffect(() => {
     // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
     const obtenerDatos = async (endpoint, setter) => {
       try {
@@ -249,16 +247,17 @@ function Ventas() {
     };
 
     // Llama a obtenerDatos para cada tipo de dato necesario
-     obtenerDatos('productos', setProductoSeleccionado);
-     obtenerDatos(`descuentos/${user.RIFSuc}`, setDescuento);
-     obtenerDatos(`pagos`, setPagos);
-      obtenerDatos(`responsables`, setClientes);
-  }, []);
-  
-    if (Pagos && Pagos.length > 0) {
-  // Suponiendo que quieres guardar el código de pago del primer elemento de la lista
-  const codigoPago = Pagos[Pagos.length -1].CodPago; // Ajusta el índice según sea necesario
-  localStorage.setItem('codigoPago', Number(codigoPago)+1);
+    obtenerDatos('productos', setProductoSeleccionado);
+    obtenerDatos(`facturas_tiendas_descuento/${formDataFactura.CIResponsable}`, setDescuento);
+    obtenerDatos(`pagos`, setPagos);
+    obtenerDatos(`responsables`, setClientes);
+  }, [formDataFactura.CIResponsable]);
+
+
+  if (Pagos && Pagos.length > 0) {
+    // Suponiendo que quieres guardar el código de pago del primer elemento de la lista
+    const codigoPago = Pagos[Pagos.length - 1].CodPago; // Ajusta el índice según sea necesario
+    localStorage.setItem('codigoPago', Number(codigoPago) + 1);
   } else if (Pagos && Pagos.length == 0) {
     localStorage.setItem('codigoPago', 1);
   }
@@ -272,19 +271,19 @@ function Ventas() {
   const closeModal = () => {
     setOpen2(false);
     window.location.reload();
-};
+  };
 
   const [openDialog, setOpenDialog] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({});
   const [quantity, setQuantity] = useState('');
 
-   const handleSelectProduct = (product) => {
+  const handleSelectProduct = (product) => {
     setOpenDialog(true);
-     setCurrentProduct(product);
+    setCurrentProduct(product);
      
   };
     
-      // Estado inicial para la lista de productos seleccionados
+  // Estado inicial para la lista de productos seleccionados
   const [selectedProducts, setSelectedProducts] = useState([]);
 
   // Función para manejar el clic en un producto
@@ -302,14 +301,14 @@ function Ventas() {
     handleCloseDialog();
   };
 
-    const [activeStep, setActiveStep] = React.useState(0);
-    const [skipped, setSkipped] = React.useState(new Set());
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [skipped, setSkipped] = React.useState(new Set());
 
   const isStepSkipped = (step) => {
     return skipped.has(step);
   };
     
-      const handleNext = () => {
+  const handleNext = () => {
     let newSkipped = skipped;
     if (isStepSkipped(activeStep)) {
       newSkipped = new Set(newSkipped.values());
@@ -327,16 +326,17 @@ function Ventas() {
   const subtotal = selectedProducts.reduce((acc, product) => acc + product.total, 0);
 
 // Paso 2 y 3: Verificar si `descuento` tiene datos y calcular el total con descuento
-let total
-if (Descuento && Descuento.length > 0) {
+let total = 0;
+if (Descuento) {
   // Asegurarse de que Descuento no es undefined y tiene al menos un elemento
-  console.log(Descuento[0].PorcentajeDesc)
-  const montoDescuento = (subtotal * Descuento[0].PorcentajeDesc) / 100;
+  const montoDescuento = (subtotal * Descuento.Descuento) / 100;
   total = subtotal - montoDescuento;
+
 } else {
   // Si no hay descuento, el total es el subtotal
   total = subtotal;
   }
+  formDataFactura.Monto = total;
   return (
     <Box>
       <div className="vertical_line"></div>
@@ -364,6 +364,13 @@ if (Descuento && Descuento.length > 0) {
               <Button onClick={handleConfirmQuantity}>Confirmar</Button>
             </DialogActions>
           </Dialog>
+          <TextField select label="Cédula Cliente" name='CIResponsable' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataFactura.CIResponsable} onChange={handleChange2}>
+                          {Clientes.map((cliente, index) => (
+                            <MenuItem key={index} value={cliente.CIResponsable}>
+                              {cliente.CIResponsable}
+                            </MenuItem>
+                          ))}
+                        </TextField>
         </Box>
       </Box>
       <Box sx={{ position: 'absolute', ml: '50%', width: '50%', top: '30%', height: 'auto', alignItems:'center', display:'flex', flexDirection:'column'}}>
@@ -381,10 +388,12 @@ if (Descuento && Descuento.length > 0) {
           <ListItemText primary="SubTotal" />
           ${selectedProducts.reduce((acc, product) => acc + product.total, 0)}  
         </ListItem>
-        <ListItem sx={listStyle}>
-          <ListItemText primary="Descuento" />
-          {Descuento && Descuento.length > 0 ? `${Descuento[0].PorcentajeDesc}%` : 'No disponible'}
-        </ListItem>
+            {Descuento && (
+  <ListItem sx={listStyle}>
+    <ListItemText primary="Descuento" />
+    ${Descuento.Descuento}
+          </ListItem>
+)}
           <ListItem sx={listStyle}>
             <ListItemText primary="Total" />
             ${total}
@@ -454,7 +463,7 @@ if (Descuento && Descuento.length > 0) {
                         </Box>
                       )}
                       <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = selectedProducts.reduce((acc, product) => acc + product.total, 0)} onChange={handleChange} disabled ></TextField>
+                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = total} onChange={handleChange} disabled ></TextField>
                         <TextField select label="Cédula Cliente" name='CIResponsable' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataFactura.CIResponsable} onChange={handleChange2}>
                           {Clientes.map((cliente, index) => (
                             <MenuItem key={index} value={cliente.CIResponsable}>
