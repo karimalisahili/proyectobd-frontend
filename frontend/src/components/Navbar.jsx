@@ -62,7 +62,7 @@ function Navbar() {
                             <Button onClick={() => { handleNbLateral({ title1: 'Ventas de Productos', title2: 'Facturas', title3: '', title4: '', title5: '', title6:'', padre:'tienda', listType:'listaTienda'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
                                 <Link to="/Tienda" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'> Tienda </p> </Link>
                             </Button>
-                            <Button onClick={() => { handleNbLateral({ title1: 'Proveedores', title2: 'Orden de Compra', title3: 'Facturas', title4: 'Pagos', title5:'',title6:'' ,padre:'proveedores', listType:'ProveedoresLista'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
+                            <Button onClick={() => { handleNbLateral({ title1: 'Proveedores', title2:'REQUISICIONES DE COMPRAS',title3: 'ORDENES DE COMPRA', title4: 'Facturas', title5: '', title6:'' ,padre:'proveedores', listType:'ProveedoresLista'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>
                                 <Link to="/Proveedores" style={{ textDecoration: 'none', color: 'black' }}> <p className='PNav'> Proveedores </p></Link>
                             </Button>
                             <Button onClick={() => { handleNbLateral({ title1: 'Productos', title2: 'Lineas', title3: 'Inventario', title4: '', title5:'', title6:'', padre:'inventario', listType:'InventarioLista'}); }} sx={{ my: 2, mx: 4, color: 'white', display: 'block' }}>

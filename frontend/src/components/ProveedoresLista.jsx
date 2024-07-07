@@ -230,23 +230,16 @@ function Proveedores({ data = null, isEditing = false }) {
 
 
 // Define un componente funcional llamado linea
-function OrdenCompra({ data = null, isEditing = false }) {
+function REQUISICIONCOMPRA({ data = null, isEditing = false }) {
+
 
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para CodLineas y Descripcion
   const initialValues = {
-    CodMarcaV: data?.CodMarcaV || '',
-    CodConsec: data?.CodConsec || '',
-    Descripcion: data?.Descripcion || '',
-    CantPuestos: data?.CantPuestos || '',
-    Peso: data?.Peso || '',
-    TipoAceite: data?.TipoAceite || '',
-    AceiteCaja: data?.AceiteCaja || '',
-    TipoRefri: data?.TipoRefri || '',
-    Octanaje: data?.Octanaje || '',
-    TipoMant: data?.TipoMant || '',
-    TiempoUsoMant: data?.TiempoUsoMant || '',
-    KilometrajeMant: data?.KilometrajeMant || '',
-    CodTipoV: data?.CodTipoV || '',
+    RIFSuc: user.RIFSuc || '',
+    IdReq: data?.IdReq || '',
+    CodProd: data?.CodProd || '',
+    CantProd: data?.CantProd || '',
+    Fecha: data?.Fecha || '',
   };
 
   const [formData, handleChange] = useForm(initialValues);
@@ -255,7 +248,7 @@ function OrdenCompra({ data = null, isEditing = false }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = `${SERVERNAME}/OrdenCompravehiculos`;
+    const endpoint = `${SERVERNAME}/requisiciones_compra`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
@@ -278,7 +271,7 @@ function OrdenCompra({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/OrdenCompravehiculos`; // Asumiendo que CodMarcaVeh es el identificador único
+    const endpoint = `${SERVERNAME}/requisiciones_compra`; // Asumiendo que IdReqeh es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -290,50 +283,13 @@ function OrdenCompra({ data = null, isEditing = false }) {
   };
 
 
-  
+
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
     <FormBox onSubmit={handleSubmit}>
       {/* Box para agrupar los campos de entrada con estilo de flexbox */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        {/* Box para agrupar dos campos de entrada horizontalmente */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="CodMarcaV" type='number' name='CodMarcaV' valor={formData.CodMarcaV} cambio={handleChange} />
-          <InputField label="Descripcion-Modelo" type='text' name='Descripcion' valor={formData.Descripcion} cambio={handleChange} />
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="CantPuestos" type='number' name='CantPuestos' valor={formData.CantPuestos} cambio={handleChange} />
-          <InputField label="Peso" type='number' name='Peso' valor={formData.Peso} cambio={handleChange} />
-        </Box>
-
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="TipoAceite" type='text' name='TipoAceite' valor={formData.TipoAceite} cambio={handleChange} />
-          <InputField label="AceiteCaja" type='text' name='AceiteCaja' valor={formData.AceiteCaja} cambio={handleChange} />
-        </Box>
-
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="TipoRefri" type='text' name='TipoRefri' valor={formData.TipoRefri} cambio={handleChange} />
-          <select name="Octanaje" value={formData.Octanaje} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
-            <option value="91">Seleccione Octanaje</option>
-            <option value="91">91</option>
-            <option value="95">95</option>
-          </select>
-        </Box>
-
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="TipoMant" type='text' name='TipoMant' valor={formData.TipoMant} cambio={handleChange} />
-          <InputField label="TiempoUsoMant" type='number' name='TiempoUsoMant' valor={formData.TiempoUsoMant} cambio={handleChange} />
-        </Box>
-
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="KilometrajeMant" type='text' name='KilometrajeMant' valor={formData.KilometrajeMant} cambio={handleChange} />
-          <InputField label="CodTipoV" type='text' name='CodTipoV' valor={formData.CodTipoV} cambio={handleChange} />
-        </Box>
-
-
-      </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Button type='submit' variant="contained" sx={{
+        {!isEditing && (<Button type='submit' variant="contained" sx={{
           margin: '5px 0',
           color: '#000000',
           bgcolor: '#FFFFFF',
@@ -342,8 +298,10 @@ function OrdenCompra({ data = null, isEditing = false }) {
             color: '#FFFFFF'
           }
         }}>
-          {isEditing ? 'Actualizar Modelo Vehiculo' : 'Agregar Modelo Vehiculo'}
-        </Button>
+          {isEditing ? 'Actualizar Requisicion Compra' : 'Generar Requisicion Compra'}
+        </Button>)}
+
+
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
             Eliminar
@@ -355,7 +313,7 @@ function OrdenCompra({ data = null, isEditing = false }) {
 }
 
 // Define un componente funcional llamado Vehiculo
-function Tipos_Vehiculos({ data = null, isEditing = false }) {
+function ORDENCOMPRA({ data = null, isEditing = false }) {
 
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
   const initialValues = {
@@ -438,7 +396,89 @@ function Tipos_Vehiculos({ data = null, isEditing = false }) {
   );
 }
 
+// Define un componente funcional llamado Vehiculo
+function Facturas({ data = null, isEditing = false }) {
 
+  // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
+  const initialValues = {
+    CodTipoV: data?.CodTipoV || '',
+    Descripcion: data?.Descripcion || '',
+
+  };
+
+  const [formData, handleChange] = useForm(initialValues);
+
+  // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(formData)
+    const endpoint = `${SERVERNAME}/tiposvehiculos`;
+    const method = isEditing ? 'PUT' : 'POST';
+
+    try {
+      await sendData(endpoint, formData, method);
+      alert('Operación realizada correctamente');
+    } catch (error) {
+      console.error('Error en la operación', error);
+      if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
+      }
+    }
+  };
+
+  const handleDelete = async () => {
+    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
+    }
+    const endpoint = `${SERVERNAME}/tiposvehiculos`; // Asumiendo que CodTipoV es el identificador único
+    try {
+      await sendData(endpoint, formData, 'DELETE');
+      alert('Empleado eliminado correctamente');
+      // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+    } catch (error) {
+      console.error('Error al eliminar el empleado', error);
+      alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+    }
+  };
+
+  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
+  return (
+    <FormBox onSubmit={handleSubmit}>
+      {/* Box para agrupar los campos de entrada con estilo de flexbox */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+      </Box>
+      {/* Repite la estructura anterior para otros campos del formulario */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+          <InputField label="Descripcion" type='text' name='Descripcion'
+            valor={formData.Descripcion} cambio={handleChange} />
+        </Box>
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+        <Button type='submit' variant="contained" sx={{
+          margin: '5px 0',
+          color: '#000000',
+          bgcolor: '#FFFFFF',
+          '&:hover': {
+            bgcolor: '#41B06E',
+            color: '#FFFFFF'
+          }
+        }}>
+          {isEditing ? 'Actualizar Tipo Vehiculo' : 'Agregar Tipo Vehiculo'}
+        </Button>
+        {isEditing && (
+          <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+            Eliminar
+          </Button>
+        )}
+      </Box>
+    </FormBox>
+  );
+}
 
 // Define una función para renderizar una lista de elementos
 function renderList(items, textKey, secondaryKey, onSeleccionado) {
@@ -474,15 +514,12 @@ function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehic
     case 'Proveedores':
       // Renderiza y retorna una lista de empleados seleccionados
       return renderList(empleadosSeleccionados, 'Rif', 'RazonSocial', onSeleccionado);
-    case 'ORDEN DE COMPRA':
+    case 'REQUISICIONES DE COMPRAS':
       // Renderiza y retorna una lista de lineas seleccionados
-      return renderList(lineasSeleccionados, 'CodMarcaV', 'Descripcion', onSeleccionado);
-    case 'FACTURAS':
+      return renderList(lineasSeleccionados, 'IdReq', 'CodProd', onSeleccionado);
+    case 'ORDENES DE COMPRA':
       // Renderiza y retorna una lista de vehículos seleccionados
-      return renderList(vehiculosSeleccionados, 'CodTipoV', 'Descripcion', onSeleccionado);
-    case 'PAGOS':
-      // Renderiza y retorna una lista de vehículos seleccionados
-      return renderList(vehiculosSeleccionados, 'CodTipoV', 'Descripcion', onSeleccionado);
+      return renderList(vehiculosSeleccionados, 'CodOrden', 'CodRequiCom', onSeleccionado);
     default:
       // Retorna un párrafo indicando que se debe seleccionar una opción si ninguna coincide
       return <p>Seleccione una opción</p>;
@@ -526,8 +563,8 @@ function ProveedoresLista({ opcion }) {
 
     // Llama a obtenerDatos para cada tipo de dato necesario
     obtenerDatos(`proveedores`, setEmpleadosSeleccionados);
-    obtenerDatos('OrdenCompravehiculos', setlineasSeleccionados);
-    obtenerDatos(`tiposvehiculos`, setVehiculosSeleccionados);
+    obtenerDatos(`requisiciones_compra/${user.RIFSuc}`, setlineasSeleccionados);
+    obtenerDatos(`ordenescompras`, setVehiculosSeleccionados);
   }, []);
 
   // Función para manejar la apertura del modal y establecer el tipo de formulario
@@ -550,10 +587,12 @@ function ProveedoresLista({ opcion }) {
     switch (formType) {
       case 'Proveedores':
         return <Proveedores data={info} isEditing={editar} />;
-      case 'OrdenCompra':
-        return <OrdenCompra data={info} isEditing={editar} />;
-      case 'Tipos Vehiculos':
-        return <Tipos_Vehiculos data={info} isEditing={editar} />;
+      case 'REQUISICIONES DE COMPRAS':
+        return <REQUISICIONCOMPRA data={info} isEditing={editar} />;
+      case 'ORDENES DE COMPRA':
+        return <ORDENCOMPRA data={info} isEditing={editar} />;
+        case 'Facturas':
+          return <Facturas data={info} isEditing={editar} />;
       default:
         return <div> fallo </div>;
     }
@@ -608,7 +647,7 @@ function ProveedoresLista({ opcion }) {
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
           <List sx={style}>
-            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Rif' || entry[0] === 'Rif')).map(([key, value]) => (
+            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Rif' || entry[0] === 'IdReq')).map(([key, value]) => (
               <React.Fragment key={key}>
                 <ListItem>
                   <ListItemText primary={`${key}: `} />
@@ -623,6 +662,8 @@ function ProveedoresLista({ opcion }) {
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
             Modificar
           </Button>
+
+
 
 
           <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
@@ -662,12 +703,17 @@ Proveedores.propTypes = {
   isEditing: PropTypes.bool,
 }
 
-OrdenCompra.propTypes = {
+REQUISICIONCOMPRA.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
 
-Tipos_Vehiculos.propTypes = {
+ORDENCOMPRA.propTypes = {
+  data: PropTypes.object,
+  isEditing: PropTypes.bool,
+}
+
+Facturas.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
