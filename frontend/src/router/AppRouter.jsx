@@ -10,6 +10,8 @@ import Inventario from '../pages/Inventario'
 import Configuracion from '../pages/Configuracion'
 import Register from '../pages/register'
 import Marcas from '../pages/Marcas'
+import Marcas_servicio from '../pages/Marcas_servicio'
+import Personal_servicio from '../pages/Personal_servicio'
 
 export default function AppRouter() {
     return (
@@ -24,6 +26,8 @@ export default function AppRouter() {
                 <Route path="/Configuracion" element={<Configuracion />} />
                 <Route path="/Register" element={<Register />} />
                 <Route path="/Marcas" element={<Marcas/>} />
+                <Route path="/Marcas_servicio" element={<Marcas_servicio/>}/>
+                <Route path="/Personal_servicio" element={<Personal_servicio/>}/>
         </Routes>
     )
 }
