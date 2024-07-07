@@ -1,5 +1,5 @@
 // Importación de componentes de Material UI, PropTypes y hooks de React.
-import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography, MenuItem } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography, MenuItem, Snackbar } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import PersonIcon from '@mui/icons-material/Person';
@@ -11,7 +11,7 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
 const userJson = localStorage.getItem('user');
-const user = JSON.parse(userJson);
+const user = userJson;
 
 // Estilos para el componente Box. Se configura el padding vertical, ancho, color de borde,
 // color de fondo y color de texto. Estos estilos se aplican a un componente Box de Material UI.
@@ -47,6 +47,8 @@ const commonStyles = {
 // Define un estilo base para la lista y lo extiende con propiedades específicas para controlar su altura máxima y el desbordamiento vertical
 const listStyle = { ...style, maxHeight: '320px', overflowY: 'auto' };
 
+
+
 // Hook personalizado para manejar formularios
 function useForm(initialState) {
   // Inicializa el estado del formulario con el estado inicial proporcionado
@@ -69,7 +71,6 @@ function useForm(initialState) {
 
 // Define una función asíncrona llamada sendData
 async function sendData(endpoint, formData, method) {
-  console.log(formData, method, endpoint)
   const response = await fetch(endpoint, {
     method: method,
     headers: {
@@ -320,6 +321,16 @@ function Lineas({ data = null, isEditing = false }) {
     Descripcion: data?.Descripcion || '',
   };
 
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+const [snackbarMessage, setSnackbarMessage] = useState('');
+const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Puedes usar 'error', 'warning', 'info', 'success'
+const handleCloseSnackbar = (event, reason) => {
+  if (reason === 'clickaway') {
+    return;
+  }
+  setOpenSnackbar(false);
+};
+
   const [formData, handleChange] = useForm(initialValues);
 
   // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
@@ -331,13 +342,19 @@ function Lineas({ data = null, isEditing = false }) {
 
     try {
       await sendData(endpoint, formData, method);
-      alert('Operación realizada correctamente');
+       setSnackbarMessage('Línea Creada Exitosamente');
+    setSnackbarSeverity('success');
+    setOpenSnackbar(true);
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
-        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+        setSnackbarMessage('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+    setSnackbarSeverity('error');
+    setOpenSnackbar(true);
       } else {
-        alert('Error en la operación. Por favor, intente nuevamente.');
+        setSnackbarMessage('Error en la operación. Por favor, intente nuevamente.');
+    setSnackbarSeverity('error');
+    setOpenSnackbar(true);
       }
     }
   };
@@ -362,6 +379,7 @@ function Lineas({ data = null, isEditing = false }) {
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
+    <>
     <FormBox onSubmit={handleSubmit}>
       {/* Box para agrupar los campos de entrada con estilo de flexbox */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
@@ -390,7 +408,23 @@ function Lineas({ data = null, isEditing = false }) {
           </Button>
         )}
       </Box>
-    </FormBox>
+      </FormBox>
+      <Snackbar
+  open={openSnackbar}
+  autoHideDuration={6000}
+  onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+  sx={{ bgcolor: '#41B06E',}}
+  action={
+    <React.Fragment>
+      <Button color="secondary" size="medium" onClick={handleCloseSnackbar}>
+        CERRAR
+      </Button>
+    </React.Fragment>
+  }
+/>
+      </>
   );
 }
 
@@ -417,7 +451,7 @@ function Inventario({ data = null, isEditing = false }) {
 
     try {
       await sendData(endpoint, formData, method);
-      alert('Operación realizada correctamente');
+      
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -616,6 +650,7 @@ function InventarioLista({ opcion }) {
   // Renderiza el componente
   return (
     <Box>
+
       <div className="vertical_line"></div>
       <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>

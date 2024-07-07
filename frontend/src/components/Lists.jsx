@@ -1,5 +1,5 @@
 // Importación de componentes de Material UI, PropTypes y hooks de React.
-import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography, MenuItem } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography, MenuItem , Snackbar} from '@mui/material';
 import PropTypes from 'prop-types';
 import React,{ useState, useEffect } from 'react';
 import PersonIcon from '@mui/icons-material/Person';
@@ -8,10 +8,11 @@ import PersonIcon from '@mui/icons-material/Person';
 // Este valor se utiliza para configurar el nombre del servidor en la aplicación.
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
+ const userJson = localStorage.getItem('user');
+    const user = userJson ? JSON.parse(userJson) : {};
+
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
-const userJson = localStorage.getItem('user');
-const user = JSON.parse(userJson);
 
 // Estilos para el componente Box. Se configura el padding vertical, ancho, color de borde,
 // color de fondo y color de texto. Estos estilos se aplican a un componente Box de Material UI.
@@ -90,6 +91,15 @@ async function sendData(endpoint, formData, method) {
 
 function Formulario({ data, isEditing, endpointUrl, initialValues, children }) {
   const [formData, handleChange] = useForm(initialValues);
+   const [openSnackbar, setOpenSnackbar] = useState(false);
+const [snackbarMessage, setSnackbarMessage] = useState('');
+const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Puedes usar 'error', 'warning', 'info', 'success'
+const handleCloseSnackbar = (event, reason) => {
+  if (reason === 'clickaway') {
+    return;
+  }
+  setOpenSnackbar(false);
+    };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,11 +110,17 @@ function Formulario({ data, isEditing, endpointUrl, initialValues, children }) {
     const method = isEditing ? 'PUT' : 'POST';
     try {
       await sendData(endpointUrl, formData, method);
-      alert('Operación realizada correctamente');
-      window.location.reload();
+       setOpenSnackbar(true);
+            setSnackbarMessage('Inicio de sesión exitoso');
+      setSnackbarSeverity('success');
+      setTimeout(() => {
+                window.location.reload();
+        }, 3000);
     } catch (error) {
       console.error('Error en la operación', error);
-      alert('Error en la operación. Por favor, intente nuevamente.');
+      setSnackbarMessage('Error en la operación. Por favor, intente nuevamente.');
+    setSnackbarSeverity('error');
+    setOpenSnackbar(true);
     }
   };
 
@@ -124,6 +140,7 @@ function Formulario({ data, isEditing, endpointUrl, initialValues, children }) {
   };
 
   return (
+        <>
     <FormBox onSubmit={handleSubmit}>
       {children({ formData, handleChange })}
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -137,6 +154,22 @@ function Formulario({ data, isEditing, endpointUrl, initialValues, children }) {
         )}
       </Box>
     </FormBox>
+          <Snackbar
+  open={openSnackbar}
+  autoHideDuration={6000}
+  onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+  sx={{ bgcolor: '#41B06E',}}
+  action={
+    <React.Fragment>
+      <Button color="secondary" size="medium" onClick={handleCloseSnackbar}>
+        CERRAR
+      </Button>
+          </React.Fragment>
+  }
+/>
+    </>
   );
 }
 
@@ -293,11 +326,11 @@ function Vehiculo({ data = null, isEditing = false }) {
           <TextField select label="CEDULA-CLIENTE" name='ciResp' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.ciResp} onChange={handleChange}>
             {clientesSeleccionados.map((cliente, index) => (
               <MenuItem key={index} value={cliente.CIResponsable}>
-                {cliente.CIResponsable}
+                {cliente.NombreResponsable}
               </MenuItem>
             ))}
           </TextField>
-          <TextField select label="No-MODELO" name='NumModelo' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.NumModelo} onChange={handleChange}>
+          <TextField select label="No-MODELO" type='number' name='NumModelo' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.NumModelo} onChange={handleChange}>
             {modelosVehiculos.map((modelo, index) => (
               <MenuItem key={index} value={modelo.CodConsec}>
                 {modelo.CodConsec}
@@ -317,7 +350,7 @@ function Vehiculo({ data = null, isEditing = false }) {
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <TextField select label="COD-MARCA" name='CodMarca' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodMarca} onChange={handleChange}>
+          <TextField select label="COD-MARCA" type='number' name='CodMarca' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodMarca} onChange={handleChange}>
             {modelosVehiculos.map((modelo, index) => (
               <MenuItem key={index} value={modelo.CodMarcaV}>
                 {modelo.CodMarcaV}
@@ -388,6 +421,8 @@ function mostrarLista(opcion, empleadosSeleccionados, clientesSeleccionados, veh
 // Define el componente Lists que recibe una prop 'opcion'
 function Lists({ opcion }) {
 
+   const userJson = localStorage.getItem('user');
+    const user = userJson ? JSON.parse(userJson) : {};
   // Estado para controlar la visibilidad del modal
   const [open, setOpen] = useState(false);
   // Estado para determinar el tipo de formulario a mostrar en el modal
@@ -501,15 +536,15 @@ function Lists({ opcion }) {
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
           <List sx={style}>
-            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'NombreResponsable' || entry[0] === 'Direccion')).map(([key,value])=> (
-              <React.Fragment key={key}>
-                <ListItem>
+            {seleccionEnLists && Object.entries(seleccionEnLists).map(([key, value]) => (
+  <React.Fragment key={key}>
+    <ListItem>
                   <ListItemText primary={`${key}: `} />
-                    {value || 'No disponible'}
-                </ListItem>
-                <Divider component="li" />
-              </React.Fragment>
-            ))}
+                  {`${value || 'No disponible'}`}
+    </ListItem>
+    <Divider component="li" />
+  </React.Fragment>
+))}
           </List>
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
             Modificar

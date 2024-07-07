@@ -10,20 +10,21 @@ import Inventario from '../pages/Inventario'
 import Configuracion from '../pages/Configuracion'
 import Register from '../pages/register'
 import Marcas from '../pages/Marcas'
+import ProtectedRoute from './ProtectedRoute'
 
 export default function AppRouter() {
     return (
         <Routes>
-                <Route path="/" element={<Login />} />
-                <Route path="/Home" element={<Home />} />
-                <Route path="/Libreta" element={<Libreta />} />
-                <Route path="/Servicios" element={<Servicios />} />
-                <Route path="/Tienda" element={<Tienda />} />
-                <Route path="/Proveedores" element={<Proveedores />} />
-                <Route path="/Inventario" element={<Inventario />} />
-                <Route path="/Configuracion" element={<Configuracion />} />
-                <Route path="/Register" element={<Register />} />
-                <Route path="/Marcas" element={<Marcas/>} />
+            <Route path="/" element={<Login />} />
+            <Route path="/Home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/Libreta" element={<ProtectedRoute><Libreta /></ProtectedRoute>} />
+            <Route path="/Servicios" element={<ProtectedRoute><Servicios /></ProtectedRoute>} />
+            <Route path="/Tienda" element={<ProtectedRoute><Tienda /></ProtectedRoute>} />
+            <Route path="/Proveedores" element={<ProtectedRoute><Proveedores /></ProtectedRoute>} />
+            <Route path="/Inventario" element={<ProtectedRoute><Inventario /></ProtectedRoute>} />
+            <Route path="/Configuracion" element={<ProtectedRoute><Configuracion /></ProtectedRoute>} />
+            <Route path="/Register" element={<Register />} />
+            <Route path="/Marcas" element={<ProtectedRoute><Marcas /></ProtectedRoute>} />
         </Routes>
     )
 }

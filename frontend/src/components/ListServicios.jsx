@@ -35,7 +35,7 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
 const userJson = localStorage.getItem('user');
-const user = JSON.parse(userJson);
+const user = userJson;
 
 
 // Hook personalizado para manejar formularios

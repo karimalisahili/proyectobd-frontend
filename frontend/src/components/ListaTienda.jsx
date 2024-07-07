@@ -9,7 +9,7 @@ const steps = ['Seccion de Pago', 'Factura Preliminar'];
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 const userJson = localStorage.getItem('user');
-const user = JSON.parse(userJson);
+const user = userJson;
 
 const style = {
   py: 0,
@@ -305,6 +305,9 @@ function Ventas() {
     const [activeStep, setActiveStep] = React.useState(0);
     const [skipped, setSkipped] = React.useState(new Set());
 
+  const isStepSkipped = (step) => {
+    return skipped.has(step);
+  };
     
       const handleNext = () => {
     let newSkipped = skipped;
