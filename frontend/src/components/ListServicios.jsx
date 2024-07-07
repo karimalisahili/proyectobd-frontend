@@ -230,7 +230,7 @@ function Actividades({ data = null, isEditing = false }){
     Descripcion: data?.Descripcion || '',
     Monto: data?.Monto || '',
     AntelacionReserva: data?.AntelacionReserva || '',
-    rifSucursal: data?.rifSucursal || '',
+    rifSucursal: user.RIFSuc,
     capacidad: data?.capacidad || ''
   };
 
@@ -272,16 +272,42 @@ function Actividades({ data = null, isEditing = false }){
     alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
   }
 };
+
+  const [Servicios, setServicios] = useState([]);
+
+    // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
+  useEffect(() => {
+    // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
+    const obtenerDatos = async (endpoint, setter) => {
+      try {
+        // Realiza la petición fetch al servidor y espera la respuesta
+        const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
+        // Convierte la respuesta a formato JSON
+        const datos = await respuesta.json();
+        // Actualiza el estado correspondiente con los datos obtenidos
+        setter(datos);
+      } catch (error) {
+        // Captura y registra errores en la consola
+        console.error(`Error al obtener datos de ${endpoint}:`, error);
+      }
+    };
+
+    // Llama a obtenerDatos para cada tipo de dato necesario
+    obtenerDatos(`servicios`, setServicios);    
+  }, []);
   return(
     <FormBox onSubmit={handleSubmit}> 
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="CODIGO-SERVICIO" 
+           <TextField select label="SERVICIO" 
           type='text'
-          name='CodServicio'
-          valor = {formData.CodServicio}
-          cambio = {handleChange}
-          sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
+          name='CodServicio' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodServicio} onChange={handleChange}>
+                {Servicios.map((servicio, index) => (
+                  <MenuItem key={index} value={servicio.CodigoServ}>
+                    {servicio.Descripcion}
+                  </MenuItem>
+                ))}
+              </TextField> 
           <InputField label="DESCRIPCION" 
           type='text'
           name='Descripcion'
@@ -304,12 +330,6 @@ function Actividades({ data = null, isEditing = false }){
           sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="RIF-SUCURSAL"
-          type='text'
-          name='rifSucursal'
-          valor = {formData.rifSucursal}
-          cambio = {handleChange}
-          sx={{ bgcolor: '#FFFFFF', width : '30%', margin: '10px', borderRadius: '10px' }}/>
           <InputField label="CAPACIDAD"
           type='text'
           name='capacidad'
@@ -342,12 +362,39 @@ function Reservas({ data = null, isEditing = false }){
   
   const initialValues = {
     NroR: data?.NroR || '',
-    FechaR: data?.FechaR || new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
+    FechaR: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0],
     Abono: data?.Abono || '',
     CodVehiculo: data?.CodVehiculo || ''
   };
 
+  const [Pagos, setPagos] = useState([]);
   const [formData, handleChange] = useForm(initialValues);
+
+     const handleSubmitPagos = async (e) => {
+    e.preventDefault();
+  const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  
+  const endpoint = `${SERVERNAME}/pagos`;
+  const method = 'POST';
+
+  try {
+  await sendData(endpoint, formData, method);
+  alert('Operación realizada correctamente');
+} catch (error) {
+  console.error('Error en la operación', error);
+  // Assuming error is an object with a message property
+  if (error.message.includes('500')) {
+    alert('Error interno del servidor. Por favor, intente nuevamente más tarde.');
+  } else if (error.message.includes('404')) {
+    alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+  } else {
+    alert('Error en la operación. Por favor, intente nuevamente.');
+  }
+}
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -390,22 +437,12 @@ function Reservas({ data = null, isEditing = false }){
           <FormBox onSubmit={handleSubmit}> 
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                   <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                      <InputField label="FECHA-DE-RESERVA" 
-                      type='text'
-                      name='FechaR'
-                      valor = {formData.FechaR}
-                      cambio = {handleChange}
-                      sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
-                  </Box>  
-                  <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
                       <InputField label="ABONO" 
                       type='text'
                       name='Abono'
                       valor = {formData.Abono}
                       cambio = {handleChange}
                       sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
                       <InputField label="CODIGO_VEHICULO"
                       type='text'
                       name='CodVehiculo'
@@ -779,39 +816,80 @@ function Reservas({ data = null, isEditing = false }){
   }
 };
 
+        
+      const [Trabajadores, setTrabajadores] = useState([]);
+      const [Vehiculos, setVehiculos] = useState([]);
+      const [Autorizados, setAutorizados] = useState([]);
+
+    // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
+  useEffect(() => {
+    // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
+    const obtenerDatos = async (endpoint, setter) => {
+      try {
+        // Realiza la petición fetch al servidor y espera la respuesta
+        const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
+        // Convierte la respuesta a formato JSON
+        const datos = await respuesta.json();
+        // Actualiza el estado correspondiente con los datos obtenidos
+        setter(datos);
+      } catch (error) {
+        // Captura y registra errores en la consola
+        console.error(`Error al obtener datos de ${endpoint}:`, error);
+      }
+    };
+
+    // Llama a obtenerDatos para cada tipo de dato necesario
+    obtenerDatos(`trabajadores/${user.RIFSuc}`, setTrabajadores);
+    obtenerDatos(`vehiculos`, setVehiculos);
+    obtenerDatos(`autorizados`, setAutorizados);
+  }, []);
       return(
         <FormBox onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-              <InputField label="FECHA-HORA-E"
+              <InputField label="FECHA-HORA-ENTRADA"
               type='text'
               name='FechaHoraE'
               valor = {formData.FechaHoraE}
               cambio = {handleChange}/>
-              <InputField label="FECHA-SALIDA-ESTIMADA"
+              <InputField label="FECHA-HORA-SALIDA-ESTIMADA"
               type='text'
               name='FechaHoraSEstimada'
               valor = {formData.FechaHoraSEstimada}
               cambio = {handleChange}/>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-              <InputField label="CI-AUTORIZADO"
+               <TextField select label="CI-AUTORIZADO"
               type='text'
               name='CIAutorizado'
-              valor = {formData.CIAutorizado}
-              cambio = {handleChange}/>
-              <InputField label="CODIGO-VEHICULO"
-              type='number'
-              name='CodVehiculo'
-              valor = {formData.CodVehiculo}
-              cambio = {handleChange}/>
+ sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CIAutorizado} onChange={handleChange}>
+                {Autorizados.map((autorizado, index) => (
+                  <MenuItem key={index} value={autorizado.CIAutorizado}>
+                    {autorizado.NombreAutorizado}
+                  </MenuItem>
+                ))}
+              </TextField> 
+              <TextField select label="PLACA-VEHICULO"
+                  type='number'
+              name='CodVehiculo' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodVehiculo} onChange={handleChange}>
+                {Vehiculos.map((vehiculo, index) => (
+                  <MenuItem key={index} value={vehiculo.CodVehiculo}>
+                    {vehiculo.Placa}
+                  </MenuItem>
+                ))}
+              </TextField> 
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}> 
-              <InputField label="CI-EMPLEADO"
-              type='text'
-              name='CIEmpleado'
-              valor = {formData.CIEmpleado}
-              cambio = {handleChange}/>
+              <TextField select label="COORDINADOR"
+                  type='text'
+                  name='CIEmpleado'
+ sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CIEmpleado} onChange={handleChange}>
+                {Trabajadores.map((trabajador, index) => (
+                  <MenuItem key={index} value={trabajador.Cedula}>
+                    {trabajador.Nombre}
+                  </MenuItem>
+                ))}
+              </TextField> 
             </Box>
           </Box>
           <Button type='submit'  variant="contained" sx={{
@@ -1283,15 +1361,15 @@ const renderContenido = () => {
         <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
           <List sx={style}>
-            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'NombreResponsable' || entry[0] === 'Direccion')).map(([key,value])=> (
-              <React.Fragment key={key}>
-                <ListItem>
-                  <ListItemText primary={`${key}: `} />
-                    {value || 'No disponible'}
-                </ListItem>
-                <Divider component="li" />
-              </React.Fragment>
-            ))}
+           {seleccionEnLists && Object.entries(seleccionEnLists).map(([key, value]) => (
+  <React.Fragment key={key}>
+    <ListItem>
+                 <ListItemText primary={`${key}:`} />
+                 {`${value || 'No disponible'}`} 
+    </ListItem>
+    <Divider component="li" />
+  </React.Fragment>
+))}
           </List>
           {/* Botón para modificar, aún no implementado completamente */}
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
