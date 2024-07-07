@@ -1,4 +1,4 @@
-import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, MenuItem ,Typography } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, MenuItem ,Typography, TableContainer, TableHead, TableCell, TableRow, Table, TableBody, Paper, Checkbox } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
@@ -35,7 +35,7 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
 const userJson = localStorage.getItem('user');
-const user = userJson;
+const user = JSON.parse(userJson);
 
 
 // Hook personalizado para manejar formularios
@@ -927,27 +927,24 @@ function Reservas({ data = null, isEditing = false }){
       const [formData, handleChange] = useForm(initialValues);
 
       const handleSubmit = async (e) => {
-  e.preventDefault();
-  const endpoint = `${SERVERNAME}/contratan_act_ordens_prod_serv`;
-  const method = isEditing ? 'PUT' : 'POST';
-
-  for (let i = 0; i < n; i++) {
-    try {
-      await sendData(endpoint, formData, method);
-      alert('Operación realizada correctamente');
-    } catch (error) {
-      console.error('Error en la operación', error);
-      if (error.message.includes('404')) {
-        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-      } else {
-        alert('Error en la operación. Por favor, intente nuevamente.');
+        e.preventDefault();
+        
+        const endpoint = `${SERVERNAME}/contratan_act_ordens_prod_serv`;
+        const method = isEditing ? 'PUT' : 'POST';
+    
+        try {
+          await sendData(endpoint, formData, method);
+          alert('Operación realizada correctamente');
+          window.location.reload();
+        } catch (error) {
+          console.error('Error en la operación', error);
+          if (error.message.includes('404')) {
+            alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+          } else {
+            alert('Error en la operación. Por favor, intente nuevamente.');
+          }
+        }
       }
-      break; // Salir del ciclo si hay un error
-    }
-  }
-
-  window.location.reload(); // Se ejecuta solo después de completar el ciclo for
-}
 
       const handleDelete = async () => {
   const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
@@ -1023,117 +1020,169 @@ return(
 
     }
 
-    function Facturas({ data = null, isEditing = false}) {
-      // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados
-      const initialValues = {
-          Fecha: data?.Fecha || '',
-          Monto: data?.Monto || '',
-          Descuento: data?.Descuento || '',
-      };
-  
-      const [formData, handleChange] = useForm(initialValues);
-  
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        const endpoint = `${SERVERNAME}/FACTURAS_SERVICIOS`;
-        const method =  'POST';
-    
-        try {
-          await sendData(endpoint, formData, method);
-          alert('Operación realizada correctamente');
-          window.location.reload();
-        } catch (error) {
-          console.error('Error en la operación', error);
-          if (error.message.includes('404')) {
-            alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-          } else {
-            alert('Error en la operación. Por favor, intente nuevamente.');
-          }
-        }
-      };
+    function Facturas({ data = null}) {
 
-      const handleDelete = async () => {
-  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
-  if (!isConfirmed) {
-    return; // Si el usuario no confirma, detiene la función aquí
-  }
-  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
-  try {
-    await sendData(endpoint, formData.CodigoServ, 'DELETE');
-    alert('Empleado eliminado correctamente');
-    window.location.reload();
-    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
-  } catch (error) {
-    console.error('Error al eliminar el empleado', error);
-    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
-  }
+      const initialValues = {
+        CodF: data?.CodF || '',
+        CodOrd: data?.CodOrd || '',
+        Fecha: data?.Fecha || '',
+        Monto: data?.Monto || '',
+        Descuento: data?.Descuento || '',
+      }
+      const [formData, handleChange] = useForm(initialValues);
+
+      const [facturas, setFacturas] = useState([]);
+      const [selectedFactura, setSelectedFactura] = useState(null);
+
+      useEffect(() => {
+        const fetchFacturas = async () => {
+          try {
+          const response = await fetch(`${SERVERNAME}/facturas_servicios`);
+          const data = await response.json();
+          setFacturas(data);
+        } catch (error) {
+          console.error('Error fetching facturas:', error);
+        }
+    };
+
+    fetchFacturas();
+    }, []);
+
+    const handleSelectFactura = (nroFactura) => {
+      setSelectedFactura(nroFactura);
+    };
+
+  const [openModal, setOpenModal] = useState(false);
+  // const [closeModal, setCloseModal] = useState(false);
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
+// Función para renderizar los detalles de la factura seleccionada
+const renderFacturaDetails = () => {
+  const factura = facturas.find(f => f.CodF === selectedFactura);
+  if (!factura) return <p>No se encontró la factura</p>;
+
+  return (
+    <Box sx={{  display: 'flex', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  width: '100vw', // Ancho de la vista completa
+  height: '100vh', // Altura de la vista completa
+  flexDirection: 'column',
+  top: 0, // Alineado al top de la pantalla
+  left: 0, // Alineado al lado izquierdo de la pantalla
+  overflowY: 'auto', // Permite desplazamiento vertical si el contenido es más alto que la pantalla
+  zIndex: 1000, }}>
+                    <TableContainer component={Paper} sx={{ maxWidth: '75%' }}>
+                      <h1 style={{color:'black'}}>M&M</h1>
+                      <p className='p_factura'>RIF: {user.RIFSuc}</p>
+                      <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
+                      <Table aria-label="simple table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Nro. Factura</TableCell>
+                            <TableCell align="right">Fecha Emision</TableCell>
+                            <TableCell align="right">Monto</TableCell>
+                            <TableCell align="right">Descuento</TableCell>
+              <TableCell align="right">Cod. Pago</TableCell>
+              <TableCell align="right">CI. Cliente</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow key={factura.nroFactura}>
+                              <TableCell component="th" scope="row">
+                                {factura.CodF}
+                              </TableCell>
+                              <TableCell align="right">{factura.Fecha}</TableCell>
+                              <TableCell align="right">{factura.Monto}</TableCell>
+                              <TableCell align="right">{factura.Descuento}</TableCell>
+                              <TableCell align="right">{factura.CodPago}</TableCell>
+                              <TableCell align="right">{factura.CIResponsable}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                      </Table>
+      </TableContainer>
+      
+      <Button variant="contained" onClick={handleCloseModal} sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }}>
+        Cerrar
+      </Button>
+                  </Box>
+  );
 };
-  
-      return(
-        <FormBox onSubmit={handleSubmit}> 
-        <Box component="form" sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              display: 'flex',
-              flexDirection: 'column',
-              bgcolor: '#41B06E',
-              borderRadius: '10px',
-              width: '700px',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: 'auto',
-              border: '2px solid #ffffff',
-              boxShadow: 24,
-              p: 4,
-            }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                    <TextField label="FECHA" 
-                    type='date'
-                    name='Fecha'
-                    valor = {formData.Fecha}
-                    cambio = {handleChange}
-                    sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
-                </Box>  
-                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                    <TextField label="MONTO" 
-                    type='text'
-                    name='Monto'
-                    valor = {formData.Monto}
-                    cambio = {handleChange}
-                    sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                    <TextField label="DESCUENTO"
-                    type='text'
-                    name='Descuento'
-                    valor = {formData.Descuento}
-                    cambio = {handleChange}
-                    sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }}/>
-                </Box>
-            </Box>
-            <Button type='submit'  variant="contained" sx={{
-              margin: '5px 20px',
-              color: '#000000',
-              bgcolor: '#FFFFFF',
+
+  return (
+
+
+    <Box sx={{ position: 'absolute', width: '80%', marginLeft: '15rem', marginTop: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+       <h1 className='h1Factura'>Lista de Facturas</h1>
+      {selectedFactura && (
+       <Button variant="contained"  onClick={handleOpenModal}  sx={{ backgroundColor: '#8DECB4', marginBottom:3, '&:hover': { backgroundColor: '#41B06E' } }}>
+        Ver Detalles de la Factura
+      </Button>
+    )}
+    <Modal
+      open={openModal}
+      onClose={handleCloseModal}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box>
+        {renderFacturaDetails()}
+      </Box>
+    </Modal>
+                
+    <TableContainer component={Paper} style={{ maxHeight: '600px', overflowY: 'auto',}} >
+  <Table aria-label="simple table" stickyHeader>
+    <TableHead>
+      <TableRow>
+        <TableCell padding="checkbox"></TableCell>
+        <TableCell>Nro</TableCell>
+        <TableCell align="right">Fecha</TableCell>
+        <TableCell align="right">Monto</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {facturas.map((factura) => {
+        const isSelected = selectedFactura === factura.CodF;
+        return (
+          <TableRow
+            key={factura.nroFactura}
+            hover
+            onClick={() => handleSelectFactura(factura.CodF)}
+            role="checkbox"
+            aria-checked={isSelected}
+            selected={isSelected}
+            sx={{
               '&:hover': {
-                bgcolor: '#41B06E',
-                color: '#FFFFFF'
-              }
-            }}>
-              {isEditing ? '' : 'Agregar Factura'}
-            </Button>
-            {isEditing && (
-                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
-                  Eliminar
-                </Button>
-              )}
-            </Box>
-        </FormBox>
-    );
+                backgroundColor: '#8DECB4 !important' // Cambia el color de fondo al pasar el mouse
+              },
+              ...(isSelected && {
+                backgroundColor: '#41B06E !important', // Color verde más oscuro al seleccionar
+              }),
+            }}
+          >
+            <TableCell padding="checkbox">
+              <Checkbox checked={isSelected} sx={{
+    color: '#41B06E', // Color cuando el checkbox no está seleccionado
+    '&.Mui-checked': {
+      color: '#8DECB4', // Color cuando el checkbox está seleccionado
+    },
+  }}/>
+            </TableCell>
+            <TableCell component="th" scope="row">
+              {factura.CodF}
+            </TableCell>
+            <TableCell align="right">{factura.Fecha}</TableCell>
+            <TableCell align="right">{factura.Monto}</TableCell>
+          </TableRow>
+        );
+      })}
+    </TableBody>
+  </Table>
+</TableContainer>
+    </Box>
+  );
   }
   
 // Define una función para renderizar una lista de elementos
