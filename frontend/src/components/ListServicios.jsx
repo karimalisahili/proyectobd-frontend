@@ -999,11 +999,6 @@ return(
               name='CantProd'
               valor = {formData.CantProd}
               cambio = {handleChange}/>
-              <InputField label="PRECIO"
-              type='number'
-              name='Precio'
-              valor = {formData.Precio}
-              cambio = {handleChange}/>
             </Box>
           </Box>
 
