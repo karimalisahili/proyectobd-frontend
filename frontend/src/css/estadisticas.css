@@ -13,6 +13,33 @@ h1 {
     justify-content: center; /* Centra horizontalmente */
     padding: 50px; /* Agrega un padding alrededor del contenedor */
   }
-  
 
-  
+
+  .container-empleado-g {
+    position:relative;
+     margin: 5% 40%;
+  }
+
+  .container-empleado-g button {
+    margin-top: 25px;
+    background-color: #8DECB4;
+    margin-left: 20%;
+    margin-bottom: 50px;
+  }
+
+
+  .container-empleado-g label {
+    font-size: 25px;
+    font-weight: bold;
+    margin-right: 10px;
+    color:black;
+  }
+
+  .container-answers h2 {
+   color:#00a152
+   }
+  .container-answers p{
+     font-size: 20px;
+     margin: 10px;
+  }
+
