@@ -35,7 +35,7 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
 const userJson = localStorage.getItem('user');
-const user = JSON.parse(userJson);
+const user = userJson;
 
 
 // Hook personalizado para manejar formularios
@@ -927,24 +927,27 @@ function Reservas({ data = null, isEditing = false }){
       const [formData, handleChange] = useForm(initialValues);
 
       const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        const endpoint = `${SERVERNAME}/contratan_act_ordens_prod_serv`;
-        const method = isEditing ? 'PUT' : 'POST';
-    
-        try {
-          await sendData(endpoint, formData, method);
-          alert('Operación realizada correctamente');
-          window.location.reload();
-        } catch (error) {
-          console.error('Error en la operación', error);
-          if (error.message.includes('404')) {
-            alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-          } else {
-            alert('Error en la operación. Por favor, intente nuevamente.');
-          }
-        }
+  e.preventDefault();
+  const endpoint = `${SERVERNAME}/contratan_act_ordens_prod_serv`;
+  const method = isEditing ? 'PUT' : 'POST';
+
+  for (let i = 0; i < n; i++) {
+    try {
+      await sendData(endpoint, formData, method);
+      alert('Operación realizada correctamente');
+    } catch (error) {
+      console.error('Error en la operación', error);
+      if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
       }
+      break; // Salir del ciclo si hay un error
+    }
+  }
+
+  window.location.reload(); // Se ejecuta solo después de completar el ciclo for
+}
 
       const handleDelete = async () => {
   const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');

@@ -1,18 +1,17 @@
-import { Button, Container, Box, TextField } from '@mui/material';
+import { Button, Container, Box, TextField, Snackbar } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Logo from '../assets/Logo.png';
 import Fondo from '../assets/Fondoinicio.png';
 import '../css/Login.css';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React,{ useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../router/AuthContext';
 
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 export default function Login() {
     
-
-    const { setEncargado } = useAuth();
+    const { login } = useAuth();
 
     const navigate = useNavigate(); // Step 2
 
@@ -29,43 +28,60 @@ export default function Login() {
     }));
     };
 
-    const handleLogin = async (event) => {
-    event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+      const [openSnackbar, setOpenSnackbar] = useState(false);
+const [snackbarMessage, setSnackbarMessage] = useState('');
+const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Puedes usar 'error', 'warning', 'info', 'success'
+const handleCloseSnackbar = (event, reason) => {
+  if (reason === 'clickaway') {
+    return;
+  }
+  setOpenSnackbar(false);
+    };
+    
 
-    // Desestructurar formData para obtener rif_sucursal y cedula_encargado
+ const handleLogin = async (event) => {
+    event.preventDefault();
     const { rif_sucursal, cedula_encargado } = formData;
-
     try {
-        const response = await fetch(`${SERVERNAME}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                rif_sucursal,
-                cedula_encargado,
-            }),
-        });
-
-        const data = await response.json(); // Parsea la respuesta como JSON
-        if (!response.ok) {
-            throw new Error(data.message || 'Error en la solicitud de inicio de sesión');
+        const user = await login(rif_sucursal, cedula_encargado, `${SERVERNAME}/sucursal`);
+        if (user) {
+            setOpenSnackbar(true);
+            setSnackbarMessage('Inicio de sesión exitoso');
+            setSnackbarSeverity('success');
+            setTimeout(() => {
+                navigate('/Home');
+        }, 2000);
+        } else {
+            setSnackbarMessage('Inicio de sesión fallido');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
         }
-
-        // Aquí puedes redirigir al usuario o hacer algo con los datos de la sesión
-        // Por ejemplo, guardar el usuario en el almacenamiento local
-        localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/Home');
-        window.location.reload();
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
-        alert(error.message || 'Error al iniciar sesión');
+         setSnackbarMessage('Error en la operación. Por favor, intente nuevamente.');
+    setSnackbarSeverity('error');
+    setOpenSnackbar(true);
     }
 };
         
     return (
         <div>
             <img src={Fondo} alt="Fondo" className='fondo' />
+                  <Snackbar
+  open={openSnackbar}
+  autoHideDuration={6000}
+  onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+  sx={{ bgcolor: '#41B06E',}}
+  action={
+    <React.Fragment>
+      <Button color="secondary" size="medium" onClick={handleCloseSnackbar}>
+        CERRAR
+      </Button>
+    </React.Fragment>
+  }
+/>
 
             <Container sx={{
                 display: 'flex',
@@ -92,7 +108,7 @@ export default function Login() {
                     onSubmit={handleLogin}
                 >
         
-                    <h1>WELCOME</h1>
+                    <h1>Ingrese sus Credenciales</h1>
 
                     <TextField label="RIF-SUCURSAL" sx={{ bgcolor: '#FFFFFF', width: '100%', margin: '10px 0', borderRadius: '10px' }}
                         name="rif_sucursal"
