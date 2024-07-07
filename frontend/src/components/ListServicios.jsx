@@ -918,9 +918,9 @@ function Reservas({ data = null, isEditing = false }){
       const initialValues = {
         CodServicio: data?.CodServicio || '',
         NroActividad: data?.NroActividad || '',
-        NroOrdenServ: data?.NroOrdenServ || '',
+        NroOrenServ: data?.NroOrenServ || '',
         CodProductoServ: data?.CodProductoServ || '',
-        Cantprod: data?.Cantprod || '',
+        CantProd: data?.CantProd || '',
         Precio: data?.Precio || '',
       }
 
@@ -981,16 +981,21 @@ return(
             <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
               <InputField label="NRO-ORDEN-SERVICIO"
               type='number'
-              name='NroOrdenServ'
-              valor = {formData.NroOrdenServ}
+              name='NroOrenServ'
+              valor = {formData.NroOrenServ}
               cambio = {handleChange}/>
-              <InputField label="CANTIDAD-PRODUCTO"
+              <InputField label="CODIGO-PRODUCTO"
               type='number'
-              name='Cantprod'
-              valor = {formData.Cantprod}
+              name='CodProductoServ'
+              valor = {formData.CodProductoServ}
               cambio = {handleChange}/>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}> 
+              <InputField label="CANTIDAD-PRODUCTO"
+              type='number'
+              name='CantProd'
+              valor = {formData.CantProd}
+              cambio = {handleChange}/>
               <InputField label="PRECIO"
               type='number'
               name='Precio'
@@ -998,6 +1003,7 @@ return(
               cambio = {handleChange}/>
             </Box>
           </Box>
+
           <Button type='submit'  variant="contained" sx={{
             margin: '5px 20px',
             color: '#000000',
@@ -1179,7 +1185,7 @@ function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados
       // Renderiza y retorna una lista de pagos seleccionados
       return renderList(ordenesServiciosSeleccionados, 'Nro', 'CIAutorizado', onSeleccionado);
     case 'Contrataciones':
-      return renderList(contratacionesSeleccionados, 'NroOrdenServ','Precio', onSeleccionado )
+      return renderList(contratacionesSeleccionados, 'NroOrenServ','Precio', onSeleccionado )
     
     case 'Pagos':
       return renderList(pagosSeleccionados, 'Fecha', 'Monto')
