@@ -11,6 +11,8 @@ import Configuracion from '../pages/Configuracion'
 import Register from '../pages/register'
 import Marcas from '../pages/Marcas'
 import ProtectedRoute from './ProtectedRoute'
+import Marcas_servicio from '../pages/Marcas_servicio'
+import Personal_servicio from '../pages/Personal_servicio'
 
 export default function AppRouter() {
     return (
@@ -25,6 +27,8 @@ export default function AppRouter() {
             <Route path="/Configuracion" element={<ProtectedRoute><Configuracion /></ProtectedRoute>} />
             <Route path="/Register" element={<Register />} />
             <Route path="/Marcas" element={<ProtectedRoute><Marcas /></ProtectedRoute>} />
+            <Route path="/Marcas_servicio" element={<ProtectedRoute><Marcas_servicio/></ProtectedRoute>} />
+            <Route path="/Personal_servicio" element={<ProtectedRoute><Personal_servicio/></ProtectedRoute>} />
         </Routes>
     )
 }
