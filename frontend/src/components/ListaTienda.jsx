@@ -147,6 +147,10 @@ function Ventas() {
     NumR: null
   };
 
+  const isStepSkipped = (step) => {
+    return skipped.has(step);
+  };
+
   console.log(initialValues)
 
   const initialValuesFacturas = {

@@ -49,7 +49,7 @@ export default function Tabla({ rows, onSelect }) {
                 </TableCell>
                 <TableCell align="right">{row.limiteInfe}</TableCell>
                 <TableCell align="right">{row.limiteSup}</TableCell>
-                <TableCell align="right">{(row.porcentajeDesc * 100).toFixed(2)}</TableCell>
+                <TableCell align="right">{(row.porcentajeDesc).toFixed(2)}</TableCell>
               </TableRow>
             );
           })}
