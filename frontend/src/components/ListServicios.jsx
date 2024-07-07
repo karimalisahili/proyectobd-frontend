@@ -767,7 +767,7 @@ function Reservas({ data = null, isEditing = false }){
   if (!isConfirmed) {
     return; // Si el usuario no confirma, detiene la función aquí
   }
-  const endpoint = `${SERVERNAME}/reservas`; // Asumiendo que Cedula es el identificador único
+  const endpoint = `${SERVERNAME}/ordenes_servicios`; // Asumiendo que Cedula es el identificador único
   try {
     await sendData(endpoint, formData.CodigoServ, 'DELETE');
     alert('Empleado eliminado correctamente');
@@ -824,6 +824,112 @@ function Reservas({ data = null, isEditing = false }){
             }
           }}>
             {isEditing ? 'Actualizar Orden de Servicio' : 'Agregar Orden de Servicio'}
+          </Button>
+          {isEditing && (
+                <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+                  Eliminar
+                </Button>
+              )}
+        </FormBox>
+      );
+
+    }
+
+    function Contrataciones({data = null, isEditing = false}){
+
+      const initialValues = {
+        CodServicio: data?.CodServicio || '',
+        NroActividad: data?.NroActividad || '',
+        NroOrdenServ: data?.NroOrdenServ || '',
+        CodProductoServ: data?.CodProductoServ || '',
+        Cantprod: data?.Cantprod || '',
+        Precio: data?.Precio || '',
+      }
+
+      const [formData, handleChange] = useForm(initialValues);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const endpoint = `${SERVERNAME}/contratan_act_ordens_prod_serv`;
+        const method = isEditing ? 'PUT' : 'POST';
+    
+        try {
+          await sendData(endpoint, formData, method);
+          alert('Operación realizada correctamente');
+          window.location.reload();
+        } catch (error) {
+          console.error('Error en la operación', error);
+          if (error.message.includes('404')) {
+            alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+          } else {
+            alert('Error en la operación. Por favor, intente nuevamente.');
+          }
+        }
+      }
+
+      const handleDelete = async () => {
+  const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+  if (!isConfirmed) {
+    return; // Si el usuario no confirma, detiene la función aquí
+  }
+  const endpoint = `${SERVERNAME}/contratan_act_ordens_prod_serv`; // Asumiendo que Cedula es el identificador único
+  try {
+    await sendData(endpoint, formData.CodigoServ, 'DELETE');
+    alert('Empleado eliminado correctamente');
+    window.location.reload();
+    // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+  } catch (error) {
+    console.error('Error al eliminar el empleado', error);
+    alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+  }
+};
+
+return(
+        <FormBox onSubmit={handleSubmit}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+              <InputField label="CODIGO-SERVICIO"
+              type='number'
+              name='CodServicio'
+              valor = {formData.CodServicio}
+              cambio = {handleChange}/>
+              <InputField label="CODIGO-ACTIVIDAD"
+              type='number'
+              name='NroActividad'
+              valor = {formData.NroActividad}
+              cambio = {handleChange}/>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+              <InputField label="NRO-ORDEN-SERVICIO"
+              type='number'
+              name='NroOrdenServ'
+              valor = {formData.NroOrdenServ}
+              cambio = {handleChange}/>
+              <InputField label="CANTIDAD-PRODUCTO"
+              type='number'
+              name='Cantprod'
+              valor = {formData.Cantprod}
+              cambio = {handleChange}/>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}> 
+              <InputField label="PRECIO"
+              type='number'
+              name='Precio'
+              valor = {formData.Precio}
+              cambio = {handleChange}/>
+            </Box>
+          </Box>
+          <Button type='submit'  variant="contained" sx={{
+            margin: '5px 20px',
+            color: '#000000',
+            bgcolor: '#FFFFFF',
+            '&:hover': {
+              bgcolor: '#41B06E',
+              color: '#FFFFFF'
+            }
+          }}>
+            {isEditing ? 'Actualizar Contrataciones' : 'Agregar Contrataciones'}
           </Button>
           {isEditing && (
                 <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
@@ -974,7 +1080,7 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
   );
 }
 
-function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados, pagosSeleccionados, facturasSeleccionados, onSeleccionado) {
+function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados, contratacionesSeleccionados,pagosSeleccionados, facturasSeleccionados, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
     case 'Listas de Servicios':
@@ -994,6 +1100,8 @@ function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados
     case 'Ordenes de Servicios':
       // Renderiza y retorna una lista de pagos seleccionados
       return renderList(ordenesServiciosSeleccionados, 'Nro', 'CIAutorizado', onSeleccionado);
+    case 'Contrataciones':
+      return renderList(contratacionesSeleccionados, 'NroOrdenServ','Precio', onSeleccionado )
     
     case 'Pagos':
       return renderList(pagosSeleccionados, 'Fecha', 'Monto')
@@ -1023,6 +1131,7 @@ function ListServicios({opcion}){
     const [actividadesSeleccionadas, setActividadesSeleccionadas] = useState([]);
     const [ordenesServiciosSeleccionados, setOrdenesServiciosSeleccionados] = useState([]);
     const [autorizadosSeleccionados, setAutorizadosSeleccionados] = useState([]);
+    const [contratacionesSeleccionados,setContratacionesSeleccionados] = useState([]);
 
     // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
   useEffect(() => {
@@ -1047,6 +1156,7 @@ function ListServicios({opcion}){
     obtenerDatos('RESERVAS', setReservasSeleccionados);
     obtenerDatos('AUTORIZADOS', setAutorizadosSeleccionados);
     obtenerDatos('ORDENES_SERVICIOS', setOrdenesServiciosSeleccionados);
+    obtenerDatos('CONTRATAN_ACT_ORDENS_PROD_SERV', setContratacionesSeleccionados)
     obtenerDatos('PAGOS', setPagosSeleccionados);
     obtenerDatos('FACTURAS_SERVICIOS', setFacturasSeleccionados); //REVISAR: endpoint de facturaservicio no existe ES FACTURAS_SERVICIOS
     
@@ -1079,6 +1189,8 @@ const renderForm = (info, editar) => {
       return <Autorizados data={info} isEditing={editar}/>;
     case 'Ordenes de Servicios':
       return <OrdenesServicios data={info} isEditing={editar}/>;
+    case 'Contrataciones':
+      return <Contrataciones data={info} isEditing={editar}/>
     case 'Pagos':
       return <Pagos data={info} isEditing={editar}/>;
     case 'Facturas':
@@ -1127,6 +1239,12 @@ const renderContenido = () => {
         <h2 className='h2Libreta'>ORDENES DE SERVICIOS</h2>
       </Box>
     )
+  }else if(seleccionEnLists && opcion === 'Contrataciones'){
+    return(
+      <Box sx={{width:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        <h2 className='h2Libreta'>CONTRATACIONES</h2>
+      </Box>
+    )
   }else{
     return (
       <Typography textAlign={'center'}>No se ha seleccionado ningún {opcion}</Typography>
@@ -1142,7 +1260,7 @@ const renderContenido = () => {
       <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <h1 className='h1Libreta'>Lista de {opcion}</h1>
         {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
-        {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados,pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
+        {mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados, actividadesSeleccionadas, autorizadosSeleccionados, ordenesServiciosSeleccionados, contratacionesSeleccionados,pagosSeleccionados, facturasSeleccionados, manejarSeleccionEnLists)}
         {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
         <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
           Agregar {opcion}
@@ -1225,6 +1343,11 @@ Autorizados.propTypes={
 }
 
 OrdenesServicios.propTypes={
+  data: PropTypes.object,
+  isEditing: PropTypes.bool,
+}
+
+Contrataciones.propTypes={
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }

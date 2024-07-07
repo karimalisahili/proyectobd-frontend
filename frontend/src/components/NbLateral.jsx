@@ -10,7 +10,7 @@ import { useAuth } from '../router/AuthContext';
 import ProveedoresLista from './ProveedoresLista';
 import MarcasLista from './MarcasListas';
 
-function NbLateral({ title1, title2, title3, title4, title5,title6, padre, listType}) {
+function NbLateral({ title1, title2, title3, title4, title5,title6, title7, padre, listType}) {
     const [showLists, setShowLists] = useState(false);
     const { authData } = useAuth(); // Accede a los datos de autenticación
     const [selectedOption, setSelectedOption] = useState('');
@@ -21,7 +21,8 @@ function NbLateral({ title1, title2, title3, title4, title5,title6, padre, listT
         { title: title3, raiz: padre },
         { title: title4, raiz: padre },
         { title: title5, raiz: padre},
-        { title: title6, raiz: padre}
+        { title: title6, raiz: padre},
+        { title: title7, raiz: padre}
     ];
 
     const [listsProps, setlistsProps] = useState({ opcion: '', raiz: '' });
@@ -80,6 +81,7 @@ NbLateral.propTypes = {
     title4: PropTypes.string,
     title5: PropTypes.string,
     title6:PropTypes.string,
+    title7: PropTypes.string,
     padre: PropTypes.string,
     listType: PropTypes.string,
 };
