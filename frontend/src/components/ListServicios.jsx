@@ -2,9 +2,6 @@ import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, M
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
-
-
-
 const style = {
     py: 0,
     width: '80%',
@@ -156,7 +153,30 @@ function ListaDeServicios({ data = null, isEditing = false }){
     alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
   }
 };
-    // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
+  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
+  
+      const [Trabajadores, setTrabajadores] = useState([]);
+
+    // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
+  useEffect(() => {
+    // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
+    const obtenerDatos = async (endpoint, setter) => {
+      try {
+        // Realiza la petición fetch al servidor y espera la respuesta
+        const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
+        // Convierte la respuesta a formato JSON
+        const datos = await respuesta.json();
+        // Actualiza el estado correspondiente con los datos obtenidos
+        setter(datos);
+      } catch (error) {
+        // Captura y registra errores en la consola
+        console.error(`Error al obtener datos de ${endpoint}:`, error);
+      }
+    };
+
+    // Llama a obtenerDatos para cada tipo de dato necesario
+    obtenerDatos(`trabajadores/${user.RIFSuc}`, setTrabajadores);    
+  }, []);
   return (
     <FormBox onSubmit={handleSubmit}> 
       {/* Box para agrupar los campos de entrada con estilo de flexbox */}
@@ -169,11 +189,15 @@ function ListaDeServicios({ data = null, isEditing = false }){
                   valor = {formData.Descripcion}
                   cambio = {handleChange}/>
           {/* InputField para el salario del empleado */}
-          <InputField  label="CEDULA-COORDINADOR"
+          <TextField select label="COORDINADOR"
                   type='text'
-                  name='CI_Coord'
-                  valor = {formData.CI_Coord}
-                  cambio = {handleChange}/>
+                  name='CI_Coord' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CI_Coord} onChange={handleChange}>
+                {Trabajadores.map((trabajador, index) => (
+                  <MenuItem key={index} value={trabajador.Cedula}>
+                    {trabajador.Nombre}
+                  </MenuItem>
+                ))}
+              </TextField> 
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>

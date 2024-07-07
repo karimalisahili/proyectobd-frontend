@@ -10,6 +10,7 @@ import { useAuth } from '../router/AuthContext';
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 export default function Login() {
+    
 
     const { setEncargado } = useAuth();
 
@@ -55,6 +56,7 @@ export default function Login() {
         // Por ejemplo, guardar el usuario en el almacenamiento local
         localStorage.setItem('user', JSON.stringify(data.user));
         navigate('/Home');
+        window.location.reload();
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
         alert(error.message || 'Error al iniciar sesión');

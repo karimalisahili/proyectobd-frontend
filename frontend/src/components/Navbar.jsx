@@ -63,6 +63,7 @@ function Navbar() {
         if (confirmLogout) {
             // Aquí puedes agregar lógica adicional para manejar el cierre de sesión, como limpiar el estado global o localStorage
             navigate('/'); // Redirige al usuario al login
+            window.location.reload();
         }
     };
 
