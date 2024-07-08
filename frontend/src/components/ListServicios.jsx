@@ -1177,6 +1177,15 @@ function Facturas({ data = null }) {
   const [Servicios, setServicios] = useState([]);
   const [Actividades, setActividades] = useState([]);
   const [Clientes, setClientes] = useState([]);
+
+  console.log('Descuento: ',Descuento);
+  console.log('Productos: ',Productos);
+  console.log('Orden de Servicio: ',ordenServicio);
+  console.log('Datos Orden de Servicio: ',datosOrdenServicio);
+  console.log('Servicios: ',Servicios);
+  console.log('Actividades: ',Actividades);
+  console.log('Clientes: ',Clientes);
+
   // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
   useEffect(() => {
     // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
@@ -1470,7 +1479,7 @@ const renderFacturaDetails = () => {
                   </FormBox>
                 )}
                 {activeStep === 1 && (
-                  <Box sx={{maxHeight:500, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', overflow:'auto' }}>
+                  <Box sx={{maxHeight:500, width:'1020px', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', overflow:'auto' }}>
                     <TableContainer component={Paper}>
                       <h1 style={{ color: 'black' }}>M&M</h1>
                       <p className='p_factura'>RIF: {user.RIFSuc}</p>
@@ -1483,15 +1492,15 @@ const renderFacturaDetails = () => {
                           </TableRow>
                           <TableRow>
                             <TableCell>Codigo de Vehiculo</TableCell>
-                            <TableCell align="right">{datosOrdenServicio.CodVehiculo}</TableCell>
+                            <TableCell align="right">{datosOrdenServicio.CODIGO_DE_VEHICULO}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell>Nombre de Cliente</TableCell>
-                            <TableCell align="right">{datosOrdenServicio.NombreResponsable}</TableCell>
+                            <TableCell align="right">{datosOrdenServicio.Nombre_Responsable}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell>Cedula Responsable</TableCell>
-                            <TableCell align="right">{datosOrdenServicio.CIResponsable}</TableCell>
+                            <TableCell align="right">{datosOrdenServicio.CI_Responsable}</TableCell>
                           </TableRow>
                           <TableRow>
       <TableCell>Cod Serv</TableCell>
@@ -1502,8 +1511,8 @@ const renderFacturaDetails = () => {
 
   {Array.isArray(Servicios) && Servicios.map((servicio, index) => (
     <TableRow key={index}>
-      <TableCell >{servicio.CodServicio}</TableCell>
-      <TableCell align="right">{servicio.Descripcion}</TableCell>
+      <TableCell >{servicio.COD}</TableCell>
+      <TableCell align="right">{servicio.DESCRIPCION}</TableCell>
       {/* Agrega más celdas según los datos de tu objeto servicio */}
     </TableRow>
   ))}
@@ -1516,9 +1525,9 @@ const renderFacturaDetails = () => {
                          {Array.isArray(Actividades) && Actividades.map((actividad, index) => (
     <TableRow key={index}>
       <TableCell>{actividad.CodServicio}</TableCell>
-      <TableCell align="right">{actividad.NroActividad}</TableCell>
-      <TableCell align="right">{actividad.NroActividad}</TableCell>
-      <TableCell align="right">{actividad.Monto}</TableCell>
+      <TableCell align="right">{actividad.COD}</TableCell>
+      <TableCell align="right">{actividad.COD_ACTIVIDAD}</TableCell>
+      <TableCell align="right">{actividad.MONTO}</TableCell>
     </TableRow>
   ))
                           }
@@ -1527,7 +1536,7 @@ const renderFacturaDetails = () => {
     </TableRow>
                                              {Array.isArray(Productos) && Productos.map((producto, index) => (
     <TableRow key={index}>
-      <TableCell>{producto.NombreP}</TableCell>
+      <TableCell>{producto.Producto}</TableCell>
     </TableRow>
   ))
                           }
