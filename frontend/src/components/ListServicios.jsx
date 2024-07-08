@@ -73,7 +73,6 @@ async function sendData(endpoint, formData, method) {
 
   // Check if the response is OK and the content type is JSON
   if (response.status == 200) {
-    window.location.reload();
     return response.json();
   } else {
     // Handle non-JSON responses or errors
@@ -1114,9 +1113,12 @@ function Facturas({ data = null }) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
     
+    
     formDataFactura.Fecha = new Date().toISOString().split('T')[0];
-    formDataFactura.Monto = total;
-    formDataFactura.Descuento = Descuento.Descuento;
+    formDataFactura.Monto = montoFinal
+    formDataFactura.Descuento = Descuento[0].Descuento;
+
+    console.log(formDataFactura);
 
     const endpoint = `${SERVERNAME}/facturas_servicios`;
     const method = 'POST';
@@ -1165,11 +1167,10 @@ function Facturas({ data = null }) {
       }
     }
   };
-
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   // Estado para controlar la visibilidad del modal
   const [open2, setOpen2] = useState(false);
-  const [Descuento, setDescuento] = useState([]);
+  const [Descuento, setDescuento] = useState(0);
   const [Pagos, setPagos] = useState([]);
   const [Productos, setProductos] = useState([]);
   const [ordenServicio, setOrdenServicio] = useState([]);
@@ -1177,6 +1178,7 @@ function Facturas({ data = null }) {
   const [Servicios, setServicios] = useState([]);
   const [Actividades, setActividades] = useState([]);
   const [Clientes, setClientes] = useState([]);
+  const [subtotal, setSubtotal] = useState(0);
   // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
   useEffect(() => {
     // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
@@ -1202,6 +1204,7 @@ function Facturas({ data = null }) {
     obtenerDatos(`datosOrdenServicio/${formDataFactura.CodOrd}`, setDatosOrdenServicio);
     obtenerDatos(`datosServicios/${formDataFactura.CodOrd}`, setServicios);
     obtenerDatos(`datosActividades/${formDataFactura.CodOrd}`, setActividades);
+    obtenerDatos(`datoMontoTotal/${formDataFactura.CodOrd}`, setSubtotal);
   }, [formDataFactura.CodOrd]);
 
   useEffect(() => {
@@ -1286,22 +1289,26 @@ function Facturas({ data = null }) {
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
-
-  const subtotal = selectedProducts.reduce((acc, product) => acc + product.total, 0);
-
-// Paso 2 y 3: Verificar si `descuento` tiene datos y calcular el total con descuento
-let total = 0;
-if (Descuento) {
-  // Asegurarse de que Descuento no es undefined y tiene al menos un elemento
-  const montoDescuento = (subtotal * Descuento.Descuento) / 100;
-  total = subtotal - montoDescuento;
-
-} else {
-  // Si no hay descuento, el total es el subtotal
-  total = subtotal;
+let sub=0;
+  if (subtotal) {
+     sub = subtotal[0].TotalPagar;
   }
-  formDataFactura.Monto = total;
+// Paso 2 y 3: Verificar si `descuento` tiene datos y calcular el total con descuento
 
+// Paso 2: Verificar si `Descuento` tiene datos y calcular el total con descuento
+let montoFinal = 0;
+if (Descuento.length >= 0) {
+  // Asumiendo que todos los elementos en Descuento aplican el mismo porcentaje y usamos el primero
+  const montoDescuento = (sub * Descuento[0].Descuento) / 100;
+  montoFinal = sub - montoDescuento;
+} else {
+  // Si no hay descuento, el monto final es el total de subtotal
+  montoFinal = sub;
+}
+
+  formDataFactura.Monto = montoFinal;
+
+  
       useEffect(() => {
         const fetchFacturas = async () => {
           try {
@@ -1314,7 +1321,9 @@ if (Descuento) {
     };
 
     fetchFacturas();
-    }, []);
+      }, []);
+  
+  console.log(facturas);
 
     const handleSelectFactura = (nroFactura) => {
       setSelectedFactura(nroFactura);
@@ -1326,10 +1335,11 @@ if (Descuento) {
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
-// Función para renderizar los detalles de la factura seleccionada
-const renderFacturaDetails = () => {
-  const factura= Array.isArray(facturas) ? facturas.find(f => f.CodF === selectedFactura) : null;
-  if (!factura) return <p>No se encontró la factura</p>;
+  
+  // Función para renderizar los detalles de la factura seleccionada
+  const renderFacturaDetails = () => {
+    const factura= Array.isArray(facturas) ? facturas.find(f => f.CodF === selectedFactura) : null;
+    if (!factura) return <p>No se encontró la factura</p>;
 
   return (
     <Box sx={{  display: 'flex', 
@@ -1342,31 +1352,27 @@ const renderFacturaDetails = () => {
   left: 0, // Alineado al lado izquierdo de la pantalla
   overflowY: 'auto', // Permite desplazamiento vertical si el contenido es más alto que la pantalla
   zIndex: 1000, }}>
-                    <TableContainer component={Paper} sx={{ maxWidth: '75%' }}>
-                      <h1 style={{color:'black'}}>M&M</h1>
+                  <TableContainer component={Paper} sx={{ width:'500px', alignContent:'center', display:'flex', flexDirection:'column', justifyContent:'center'}}>
+                      <h1 style={{ color: 'black', marginBottom: '0' }}>M&M</h1>
+                      <h3 style={{alignSelf:'center'}}>M&M al servicio del planeta</h3>
                       <p className='p_factura'>RIF: {user.RIFSuc}</p>
-                      <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
                       <Table aria-label="simple table">
                         <TableHead>
                           <TableRow>
-                            <TableCell>Nro. Factura</TableCell>
-                            <TableCell align="right">Fecha Emision</TableCell>
-                            <TableCell align="right">Monto</TableCell>
-                            <TableCell align="right">Descuento</TableCell>
-              <TableCell align="right">Cod. Pago</TableCell>
-              <TableCell align="right">CI. Cliente</TableCell>
+                            <TableCell align="Center">Nro. Factura</TableCell>
+                            <TableCell align="Center">Fecha Emision</TableCell>
+                            <TableCell align="Center">Monto</TableCell>
+                            <TableCell align="Center">Descuento</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                             <TableRow key={factura.nroFactura}>
-                              <TableCell component="th" scope="row">
+                              <TableCell align="Center">
                                 {factura.CodF}
                               </TableCell>
-                              <TableCell align="right">{factura.Fecha}</TableCell>
-                              <TableCell align="right">{factura.Monto}</TableCell>
-                              <TableCell align="right">{factura.Descuento}</TableCell>
-                              <TableCell align="right">{factura.CodPago}</TableCell>
-                              <TableCell align="right">{factura.CIResponsable}</TableCell>
+                              <TableCell align="Center">{factura.Fecha}</TableCell>
+                              <TableCell align="Center">{factura.Monto}</TableCell>
+                              <TableCell align="Center">{factura.Descuento}</TableCell>
                             </TableRow>
                         </TableBody>
                       </Table>
@@ -1378,9 +1384,11 @@ const renderFacturaDetails = () => {
                   </Box>
   );
   };
+
+  
   return (
     <Box sx={{ position: 'absolute', width: '80%', marginLeft: '15rem', marginTop: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-       <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2()}>
+       <Button variant="contained" sx={{ backgroundColor: '#8DECB4', mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2()}>
             Emitir Factura
           </Button>
           <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
@@ -1454,7 +1462,7 @@ const renderFacturaDetails = () => {
                         </Box>
                       )}
                       <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = total} onChange={handleChange} disabled ></TextField>
+                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = montoFinal} onChange={handleChange} disabled ></TextField>
                         <TextField select label="Cédula Cliente" name='CIResponsable' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataFactura.CIResponsable} onChange={handleChange2}>
                           {Clientes.map((cliente, index) => (
                             <MenuItem key={index} value={cliente.CIResponsable}>
@@ -1471,75 +1479,96 @@ const renderFacturaDetails = () => {
                 )}
                 {activeStep === 1 && (
                   <Box sx={{maxHeight:500, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', overflow:'auto' }}>
-                    <TableContainer component={Paper}>
-                      <h1 style={{ color: 'black' }}>M&M</h1>
+                    <TableContainer  component={Paper} sx={{paddingTop:45, width:'500px', alignContent:'center', display:'flex', flexDirection:'column', justifyContent:'center'}}>
+                      <h1 style={{ color: 'black', marginBottom: '0' }}>M&M</h1>
+                      <h3 style={{alignSelf:'center'}}>M&M al servicio del planeta</h3>
                       <p className='p_factura'>RIF: {user.RIFSuc}</p>
                       <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
-                      <Table aria-label="simple table">
+                      <Table aria-label="simple table" sx={{ display:'flex', justifyContent:'center'}}>
                         <TableBody>
-                          <TableRow>
-                            <TableCell>Orden de Servicio:</TableCell>
-                            <TableCell align="right">{formDataFactura.CodOrd}</TableCell>
+                          {datosOrdenServicio &&  (
+                            <div >
+                          <TableRow sx={{display:'flex', justifyContent:'center'}}>
+                            <TableCell align="center" style={{ verticalAlign: 'middle' }}>Orden de Servicio:</TableCell>
+                            <TableCell align="center">{formDataFactura.CodOrd}</TableCell>
                           </TableRow>
-                          <TableRow>
-                            <TableCell>Codigo de Vehiculo</TableCell>
-                            <TableCell align="right">{datosOrdenServicio.CodVehiculo}</TableCell>
+                          <TableRow sx={{display:'flex', justifyContent:'center'}}>
+                            <TableCell>Codigo de Vehiculo:</TableCell>
+                            <TableCell align="center">{datosOrdenServicio[0].CODIGODEVEHICULO}</TableCell>
                           </TableRow>
-                          <TableRow>
-                            <TableCell>Nombre de Cliente</TableCell>
-                            <TableCell align="right">{datosOrdenServicio.NombreResponsable}</TableCell>
+                          <TableRow sx={{display:'flex', justifyContent:'center'}}>
+                            <TableCell>Nombre de Cliente:</TableCell>
+                            <TableCell align="center">{datosOrdenServicio[0].NombreResponsable}</TableCell>
                           </TableRow>
-                          <TableRow>
-                            <TableCell>Cedula Responsable</TableCell>
-                            <TableCell align="right">{datosOrdenServicio.CIResponsable}</TableCell>
+                          <TableRow sx={{display:'flex', justifyContent:'center'}}>
+                            <TableCell>Cedula Responsable:</TableCell>
+                            <TableCell align="center">{datosOrdenServicio[0].CIResponsable}</TableCell>
                           </TableRow>
-                          <TableRow>
-      <TableCell>Cod Serv</TableCell>
-      <TableCell align="right">Descr</TableCell>
-      <TableCell align="right">Descr</TableCell>
-      <TableCell align="right">Monto</TableCell>
+                          </div>
+                          )}
+                          <div style={{display:'flex', justifyContent:'center'}}>
+                            <h2>Servicios</h2>
+                          </div>
+                          <TableRow sx={{display:'flex', justifyContent:'center'}}>
+      <TableCell align='center'>Cod Serv</TableCell>
+      <TableCell align="center">Descr</TableCell>
     </TableRow>
-
   {Array.isArray(Servicios) && Servicios.map((servicio, index) => (
-    <TableRow key={index}>
-      <TableCell >{servicio.CodServicio}</TableCell>
-      <TableCell align="right">{servicio.Descripcion}</TableCell>
-      {/* Agrega más celdas según los datos de tu objeto servicio */}
+    <TableRow key={index} sx={{display:'flex', justifyContent:'center'}}>
+      <TableCell sx={{mx:3}} align='center'>{servicio.COD}</TableCell>
+      <TableCell sx={{mx:1}} align="center">{servicio.DESCRIPCION}</TableCell>
     </TableRow>
   ))}
+                          <div style={{display:'flex', justifyContent:'center'}}>
+                            <h2>Actividades</h2>
+                          </div>
     <TableRow>
-      <TableCell>Cod Serv</TableCell>
-      <TableCell align="right">Nro Act</TableCell>
-      <TableCell align="right">Descr</TableCell>
-      <TableCell align="right">Monto</TableCell>
+      <TableCell align="center">Cod Serv</TableCell>
+      <TableCell align="center">Nro Act</TableCell>
+      <TableCell align="center">Descr</TableCell>
+      <TableCell align="center">Monto</TableCell>
     </TableRow>
-                         {Array.isArray(Actividades) && Actividades.map((actividad, index) => (
-    <TableRow key={index}>
-      <TableCell>{actividad.CodServicio}</TableCell>
-      <TableCell align="right">{actividad.NroActividad}</TableCell>
-      <TableCell align="right">{actividad.NroActividad}</TableCell>
-      <TableCell align="right">{actividad.Monto}</TableCell>
+                      {Array.isArray(Actividades) && Actividades.map((actividad, index) => (
+    <TableRow key={index} >
+      <TableCell align="center">{actividad.COD}</TableCell>
+      <TableCell align="center">{actividad.CODACTIVIDAD}</TableCell>
+      <TableCell align="center">{actividad.DESCRIPCION}</TableCell>
+      <TableCell align="center">${actividad.MONTO}</TableCell>
     </TableRow>
   ))
                           }
-                           <TableRow>
+                          <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <h2>Productos</h2>
+                          </div>
+                           <TableRow sx={{display:'flex', justifyContent:'center'}}>
       <TableCell>Producto</TableCell>
-    </TableRow>
+                          </TableRow>
                                              {Array.isArray(Productos) && Productos.map((producto, index) => (
-    <TableRow key={index}>
-      <TableCell>{producto.NombreP}</TableCell>
+    <TableRow key={index} sx={{display:'flex', justifyContent:'center'}}>
+      <TableCell>{producto.Productos}</TableCell>
     </TableRow>
   ))
                           }
-                                                     <TableRow>
-                            <TableCell>Descuento</TableCell>
-                            <TableCell>{Descuento.Descuento}</TableCell>
-    </TableRow>
-                          <TableRow>
-                            <TableCell rowSpan={3} />
-                            <TableCell colSpan={2}>Total</TableCell>
-                            <TableCell align="right">${total}</TableCell>
+                          
+                                             <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <h2>Productos</h2>
+                          </div>       
+                          <TableRow sx={{display:'flex', justifyContent:'center'}}>
+                            <TableCell align='center'>Subtotal</TableCell>
+                            <TableCell align='center'>Descuento</TableCell>
+                            <TableCell align='center'>Total</TableCell>
                           </TableRow>
+                          <TableRow sx={{ display: 'flex', justifyContent: 'center' }}>
+                            
+  {subtotal && (
+                              <TableCell sx={{ mx:2}} align='center'>${subtotal[0].TotalPagar}</TableCell>
+  )}
+  {Descuento && (
+    <TableCell sx={{ mx:2}}   align='center'>%{Descuento[0].Descuento}</TableCell>
+  )}
+                            <TableCell sx={{ mx:2}}  align='center'>${montoFinal}</TableCell>
+                            
+                            </TableRow>
                         </TableBody>
                       </Table>
                     </TableContainer>
@@ -1586,7 +1615,7 @@ const renderFacturaDetails = () => {
       </Box>
     </Modal>
                 
-    <TableContainer component={Paper} style={{ maxHeight: '600px', overflowY: 'auto',}} >
+    <TableContainer component={Paper} style={{ maxHeight: '250px', overflowY: 'auto'}} >
   <Table aria-label="simple table" stickyHeader>
     <TableHead>
       <TableRow>
@@ -1598,7 +1627,7 @@ const renderFacturaDetails = () => {
     </TableHead>
     <TableBody>
     {
-  Array.isArray(facturas) && // Corrected this line
+  Array.isArray(facturas) &&
     facturas.map(factura => {
       const isSelected = selectedFactura === factura.CodF;
       return (

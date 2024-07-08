@@ -585,31 +585,31 @@ const renderFacturaDetails = () => {
   left: 0, // Alineado al lado izquierdo de la pantalla
   overflowY: 'auto', // Permite desplazamiento vertical si el contenido es más alto que la pantalla
   zIndex: 1000, }}>
-                    <TableContainer component={Paper} sx={{ maxWidth: '75%' }}>
-                      <h1 style={{color:'black'}}>M&M</h1>
+                     <TableContainer component={Paper} sx={{ width:'600px', alignContent:'center', display:'flex', flexDirection:'column', justifyContent:'center'}}>
+                      <h1 style={{ color: 'black', marginBottom: '0' }}>M&M</h1>
+                      <h3 style={{alignSelf:'center'}}>M&M al servicio del planeta</h3>
                       <p className='p_factura'>RIF: {user.RIFSuc}</p>
-                      <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
                       <Table aria-label="simple table">
                         <TableHead>
                           <TableRow>
-                            <TableCell>Nro. Factura</TableCell>
-                            <TableCell align="right">Fecha Emision</TableCell>
-                            <TableCell align="right">Monto</TableCell>
-                            <TableCell align="right">Descuento</TableCell>
-              <TableCell align="right">Cod. Pago</TableCell>
-              <TableCell align="right">CI. Cliente</TableCell>
+                            <TableCell align="center">Nro. Factura</TableCell>
+                            <TableCell align="center">Fecha Emision</TableCell>
+                            <TableCell align="center">Monto</TableCell>
+                            <TableCell align="center">Descuento</TableCell>
+              <TableCell align="center">Cod. Pago</TableCell>
+              <TableCell align="center">CI. Cliente</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                             <TableRow key={factura.nroFactura}>
-                              <TableCell component="th" scope="row">
+                              <TableCell align="center">
                                 {factura.CodF}
                               </TableCell>
-                              <TableCell align="right">{factura.Fecha}</TableCell>
-                              <TableCell align="right">{factura.Monto}</TableCell>
-                              <TableCell align="right">{factura.Descuento}</TableCell>
-                              <TableCell align="right">{factura.CodPago}</TableCell>
-                              <TableCell align="right">{factura.CIResponsable}</TableCell>
+                              <TableCell align="center">{factura.Fecha}</TableCell>
+                              <TableCell align="center">{factura.Monto}</TableCell>
+                              <TableCell align="center">{factura.Descuento}</TableCell>
+                              <TableCell align="center">{factura.CodPago}</TableCell>
+                              <TableCell align="center">{factura.CIResponsable}</TableCell>
                             </TableRow>
                         </TableBody>
                       </Table>
