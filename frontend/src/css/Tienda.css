@@ -1,7 +1,8 @@
 .p_factura {
     font-size: medium;
-    margin-left: 10px;
-    color: black
+    color: black;
+    align-content: center;
+    align-self: center;
 }
 
 .h1Tienda {
@@ -11,7 +12,7 @@
     text-decoration-color: #8DECB4;
     color: #41B06E;
     text-underline-offset: 20px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .h1Factura {
