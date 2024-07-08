@@ -1,5 +1,5 @@
 
-import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, MenuItem ,Typography, TableContainer, TableHead, TableCell, TableRow, Table, TableBody, Paper, Checkbox } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, MenuItem ,Typography, TableContainer, TableHead, TableCell, TableRow, Table, TableBody, Paper, Checkbox, Step, StepLabel, Stepper } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
@@ -1045,7 +1045,30 @@ function useForm2(initialState) {
 }
 
     function Ventas() {
-  const initialValues = {
+  
+
+  
+
+
+
+  
+
+  
+
+
+  
+  return (
+    <Box>
+      <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
+         
+    </Box>
+  </Box>
+);
+}
+
+function Facturas({ data = null }) {
+      
+  const initialValuesPagos = {
     Fecha: new Date().toISOString().split('T')[0],
     Monto: 0,
     TipoPago: '',
@@ -1059,21 +1082,31 @@ function useForm2(initialState) {
     NumR: null
   };
 
+      const initialValues = {
+        CodF: data?.CodF || '',
+        CodOrd: data?.CodOrd || '',
+        Fecha: data?.Fecha || '',
+        Monto: data?.Monto || '',
+        Descuento: data?.Descuento || '',
+  }
   
-
-  const initialValuesFacturas = {
+    const initialValuesFacturas = {
     CodOrd: 0,
     Fecha: null,
     Monto: 0,
     Descuento: 0,
   };
 
-  const [formData, handleChange, resetForm] = useForm(initialValues);
+  const [formDataPagos, handleChangePagos, resetForm] = useForm(initialValuesPagos);
 
   const [formDataFactura, handleChange2, resetForm2] = useForm2(initialValuesFacturas);
       
   const [facturaEmitida, setFacturaEmitida] = useState(false);
+  const [formData, handleChange] = useForm(initialValues);
 
+    const [facturas, setFacturas] = useState([]);
+  const [selectedFactura, setSelectedFactura] = useState(null);
+  
   const handleSubmitFactura = async (e) => {
     e.preventDefault();
     const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
@@ -1106,6 +1139,7 @@ function useForm2(initialState) {
 
   };
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
@@ -1139,9 +1173,10 @@ function useForm2(initialState) {
   const [Pagos, setPagos] = useState([]);
   const [Productos, setProductos] = useState([]);
   const [ordenServicio, setOrdenServicio] = useState([]);
+  const [datosOrdenServicio, setDatosOrdenServicio] = useState([]);
   const [Servicios, setServicios] = useState([]);
   const [Actividades, setActividades] = useState([]);
-
+  const [Clientes, setClientes] = useState([]);
   // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
   useEffect(() => {
     // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
@@ -1161,12 +1196,34 @@ function useForm2(initialState) {
 
     // Llama a obtenerDatos para cada tipo de dato necesario
     obtenerDatos(`pagos`, setPagos);
-    obtenerDatos(`datosDescuento/:nroOrden`, setDescuento);
-    obtenerDatos(`datosProductos/:nroOrden`, setProductos);
-    obtenerDatos(`datosOrdenServicio/:nroOrden`, setOrdenServicio);
-    obtenerDatos(`datosServicios/:nroOrden`, setServicios);
-    obtenerDatos(`datosActividades/:nroOrden`, setActividades);
+    obtenerDatos('ordenes_servicios', setOrdenServicio);
+    obtenerDatos(`datosDescuento/${formDataFactura.CodOrd}`, setDescuento);
+    obtenerDatos(`datosProductos/${formDataFactura.CodOrd}`, setProductos);
+    obtenerDatos(`datosOrdenServicio/${formDataFactura.CodOrd}`, setDatosOrdenServicio);
+    obtenerDatos(`datosServicios/${formDataFactura.CodOrd}`, setServicios);
+    obtenerDatos(`datosActividades/${formDataFactura.CodOrd}`, setActividades);
+  }, [formDataFactura.CodOrd]);
 
+  useEffect(() => {
+    // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
+    const obtenerDatos = async (endpoint, setter) => {
+      try {
+        // Realiza la petición fetch al servidor y espera la respuesta
+        const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
+        // Convierte la respuesta a formato JSON
+        const datos = await respuesta.json();
+        // Actualiza el estado correspondiente con los datos obtenidos
+        setter(datos);
+      } catch (error) {
+        // Captura y registra errores en la consola
+        console.error(`Error al obtener datos de ${endpoint}:`, error);
+      }
+    };
+
+    // Llama a obtenerDatos para cada tipo de dato necesario
+    obtenerDatos(`pagos`, setPagos);
+    obtenerDatos('ordenes_servicios', setOrdenServicio);
+    obtenerDatos(`responsables`, setClientes);
   }, []);
 
   const handleOpen2 = () => {
@@ -1244,161 +1301,6 @@ if (Descuento) {
   total = subtotal;
   }
   formDataFactura.Monto = total;
-  return (
-    <Box>
-
-      <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2()}>
-            Emitir Factura
-          </Button>
-          <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
-            <Box sx={{ width: '100%', alignItems: 'center', display: 'flex', flexDirection: 'column', }} mt={5}>
-              <Stepper activeStep={activeStep} sx={{'.MuiStepLabel-label': { color: 'white' }, marginBottom:'10px'}}>
-                {steps.map((label) => {
-                  return (
-                    <Step key={label} >
-                      <StepLabel sx={{ '.MuiStepLabel-label': { color: 'white', '&.Mui-active': { color: 'white' }, '&.Mui-completed': { color: 'white' } }, '.MuiStepIcon-root': { '&.Mui-completed': { color: '#8DECB4' }, '&.Mui-active': { color: '#41B06E' } } }}>
-                        {label}           
-                      </StepLabel>
-                    </Step>
-                  );
-                })}
-              </Stepper>
-              {activeStep === steps.length ? (
-                <React.Fragment>
-                  <Typography sx={{ mt: 2, mb: 1, color:'#FFFFFF', fontSize:'30px'}}>
-                    Factura Creada Correctamente
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                    <Box sx={{ flex: '1 1 auto' }} />
-                    <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={closeModal}>
-                        Salir 
-                    </Button>
-                  </Box>
-                </React.Fragment>
-              ) : (
-              <React.Fragment>
-                {activeStep === 0 && (
-                  <FormBox onSubmit={handleSubmit} > 
-                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                        <TextField select label='Tipo-Pago' type='text' name='TipoPago' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoPago} onChange={handleChange}>
-                          <MenuItem value="E">Efectivo</MenuItem>
-                          <MenuItem value="P">Pago Móvil</MenuItem>
-                          <MenuItem value="T">Tarjeta</MenuItem>
-                        </TextField>        
-                      </Box>
-                      {formData.TipoPago === "E" && (
-                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                          <TextField select label="Tipo-Efectivo" name='TipoEfectivo'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoEfectivo} onChange={handleChange}>
-                            <MenuItem value="D">Divisa</MenuItem>
-                            <MenuItem value="B">Bolivares</MenuItem>
-                          </TextField>
-                        </Box>
-                      )}
-                      {formData.TipoPago === "P" && (
-                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                          <InputField label="Nro_Telefono" type='text' name='NroTelf'valor={formData.NroTelf} cambio={handleChange} />
-                          <InputField label="Nro-Reference" type='number' name='Referencia' valor={formData.Referencia} cambio={handleChange}/>
-                        </Box>
-                      )}
-                      {formData.TipoPago === "T" && (
-                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                          <TextField select label="Tipo_Tarjeta" type='text' name='TipoTarjeta' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoTarjeta} onChange={handleChange}>
-                            <MenuItem value="Debito">Debito</MenuItem>
-                            <MenuItem value="Credito">Credito</MenuItem>
-                          </TextField>
-                          <InputField label="Numero_Tarjeta" type='text' name='NumTarjeta'valor={formData.NumTarjeta} cambio={handleChange} />
-                          <InputField label="Banco" type='text' name='Banco'valor={formData.Banco} cambio={handleChange} />
-                        </Box>
-                      )}
-                      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = total} onChange={handleChange} disabled ></TextField>
-                        <TextField select label="Cédula Cliente" name='CIResponsable' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataFactura.CIResponsable} onChange={handleChange2}>
-                        </TextField>
-                      </Box>
-                      <Button type='submit' variant="contained" sx={{margin: '5px 0', color: '#000000', bgcolor: '#FFFFFF', '&:hover': {bgcolor: '#41B06E',color: '#FFFFFF'}}}>
-                      Registrar Pago
-                      </Button>
-                    </Box>
-                  </FormBox>
-                )}
-                {activeStep === 1 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                    <TableContainer component={Paper}>
-                      <h1 style={{color:'black'}}>M&M</h1>
-                      <p className='p_factura'>RIF: {user.RIFSuc}</p>
-                      <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
-                      <Table aria-label="simple table">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Descripción</TableCell>
-                            <TableCell align="right">Cantidad</TableCell>
-                            <TableCell align="right">Precio</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {selectedProducts.map((product, index) => (  
-                            <TableRow key={index}>
-                              <TableCell component="th" scope="row">
-                                {product.Descripcion}
-                              </TableCell>
-                              <TableCell align="right">{product.quantity}</TableCell>
-                              <TableCell align="right">{product.Precio}</TableCell>
-                            </TableRow>
-                          ))}
-                          <TableRow>
-                            <TableCell rowSpan={3} />
-                            <TableCell colSpan={2}>Total</TableCell>
-                            <TableCell align="right">${total }</TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Box>
-                )}
-                <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                  <Button disabled={activeStep === 0} onClick={handleBack} variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E'  } }}>
-                    Regresar
-                  </Button>
-                  {activeStep === steps.length - 1 ? (
-                    facturaEmitida ? (
-                      <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF',  } }}>
-                        Finalizar
-                      </Button>
-                    ) : (
-                      <Button type="submit" onClick={handleSubmitFactura} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E',  } }}>
-                        Emitir Factura
-                      </Button>
-                    )
-                  ) : (
-                  <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF',  } }}>
-                    Siguiente
-                  </Button>
-                )}
-              </Box>
-            </React.Fragment>
-          )}
-        </Box>
-      </Modal>
-    </Box>
-  </Box>
-);
-}
-
-    function Facturas({ data = null}) {
-
-      const initialValues = {
-        CodF: data?.CodF || '',
-        CodOrd: data?.CodOrd || '',
-        Fecha: data?.Fecha || '',
-        Monto: data?.Monto || '',
-        Descuento: data?.Descuento || '',
-      }
-      const [formData, handleChange] = useForm(initialValues);
-
-      const [facturas, setFacturas] = useState([]);
-      const [selectedFactura, setSelectedFactura] = useState(null);
 
       useEffect(() => {
         const fetchFacturas = async () => {
@@ -1426,7 +1328,7 @@ if (Descuento) {
 
 // Función para renderizar los detalles de la factura seleccionada
 const renderFacturaDetails = () => {
-  const factura = facturas.find(f => f.CodF === selectedFactura);
+  const factura= Array.isArray(facturas) ? facturas.find(f => f.CodF === selectedFactura) : null;
   if (!factura) return <p>No se encontró la factura</p>;
 
   return (
@@ -1475,12 +1377,198 @@ const renderFacturaDetails = () => {
       </Button>
                   </Box>
   );
-};
-
+  };
   return (
-
-
     <Box sx={{ position: 'absolute', width: '80%', marginLeft: '15rem', marginTop: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+       <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2()}>
+            Emitir Factura
+          </Button>
+          <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+            <Box sx={{ width: '100%', alignItems: 'center', display: 'flex', flexDirection: 'column', }} mt={5}>
+              <Stepper activeStep={activeStep} sx={{'.MuiStepLabel-label': { color: 'white' }, marginBottom:'10px'}}>
+                {steps.map((label) => {
+                  return (
+                    <Step key={label} >
+                      <StepLabel sx={{ '.MuiStepLabel-label': { color: 'white', '&.Mui-active': { color: 'white' }, '&.Mui-completed': { color: 'white' } }, '.MuiStepIcon-root': { '&.Mui-completed': { color: '#8DECB4' }, '&.Mui-active': { color: '#41B06E' } } }}>
+                        {label}           
+                      </StepLabel>
+                    </Step>
+                  );
+                })}
+              </Stepper>
+              {activeStep === steps.length ? (
+                <React.Fragment>
+                  <Typography sx={{ mt: 2, mb: 1, color:'#FFFFFF', fontSize:'30px'}}>
+                    Factura Creada Correctamente
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                    <Box sx={{ flex: '1 1 auto' }} />
+                    <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={closeModal}>
+                        Salir 
+                    </Button>
+                  </Box>
+                </React.Fragment>
+              ) : (
+              <React.Fragment>
+                {activeStep === 0 && (
+                  <FormBox > 
+                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                        <TextField type='number' label="NRO-ORD-SERV" name='CodOrd' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataFactura.CodOrd} onChange={handleChange2}/>
+                      </Box>     
+                    </Box>
+                  </FormBox>
+                )}
+                {activeStep === 2 && (
+                     <FormBox onSubmit={handleSubmit} > 
+                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                        <TextField select label='Tipo-Pago' type='text' name='TipoPago' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoPago} onChange={handleChange}>
+                          <MenuItem value="E">Efectivo</MenuItem>
+                          <MenuItem value="P">Pago Móvil</MenuItem>
+                          <MenuItem value="T">Tarjeta</MenuItem>
+                        </TextField>        
+                      </Box>
+                      {formData.TipoPago === "E" && (
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                          <TextField select label="Tipo-Efectivo" name='TipoEfectivo'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoEfectivo} onChange={handleChange}>
+                            <MenuItem value="D">Divisa</MenuItem>
+                            <MenuItem value="B">Bolivares</MenuItem>
+                          </TextField>
+                        </Box>
+                      )}
+                      {formData.TipoPago === "P" && (
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                          <InputField label="Nro_Telefono" type='text' name='NroTelf'valor={formData.NroTelf} cambio={handleChange} />
+                          <InputField label="Nro-Reference" type='number' name='Referencia' valor={formData.Referencia} cambio={handleChange}/>
+                        </Box>
+                      )}
+                      {formData.TipoPago === "T" && (
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                          <TextField select label="Tipo_Tarjeta" type='text' name='TipoTarjeta' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoTarjeta} onChange={handleChange}>
+                            <MenuItem value="Debito">Debito</MenuItem>
+                            <MenuItem value="Credito">Credito</MenuItem>
+                          </TextField>
+                          <InputField label="Numero_Tarjeta" type='text' name='NumTarjeta'valor={formData.NumTarjeta} cambio={handleChange} />
+                          <InputField label="Banco" type='text' name='Banco'valor={formData.Banco} cambio={handleChange} />
+                        </Box>
+                      )}
+                      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = total} onChange={handleChange} disabled ></TextField>
+                        <TextField select label="Cédula Cliente" name='CIResponsable' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataFactura.CIResponsable} onChange={handleChange2}>
+                          {Clientes.map((cliente, index) => (
+                            <MenuItem key={index} value={cliente.CIResponsable}>
+                              {cliente.CIResponsable}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </Box>
+                      <Button type='submit' variant="contained" sx={{margin: '5px 0', color: '#000000', bgcolor: '#FFFFFF', '&:hover': {bgcolor: '#41B06E',color: '#FFFFFF'}}}>
+                      Registrar Pago
+                      </Button>
+                    </Box>
+                  </FormBox>
+                )}
+                {activeStep === 1 && (
+                  <Box sx={{maxHeight:500, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', overflow:'auto' }}>
+                    <TableContainer component={Paper}>
+                      <h1 style={{ color: 'black' }}>M&M</h1>
+                      <p className='p_factura'>RIF: {user.RIFSuc}</p>
+                      <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
+                      <Table aria-label="simple table">
+                        <TableBody>
+                          <TableRow>
+                            <TableCell>Orden de Servicio:</TableCell>
+                            <TableCell align="right">{formDataFactura.CodOrd}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Codigo de Vehiculo</TableCell>
+                            <TableCell align="right">{datosOrdenServicio.CodVehiculo}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Nombre de Cliente</TableCell>
+                            <TableCell align="right">{datosOrdenServicio.NombreResponsable}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Cedula Responsable</TableCell>
+                            <TableCell align="right">{datosOrdenServicio.CIResponsable}</TableCell>
+                          </TableRow>
+                          <TableRow>
+      <TableCell>Cod Serv</TableCell>
+      <TableCell align="right">Descr</TableCell>
+      <TableCell align="right">Descr</TableCell>
+      <TableCell align="right">Monto</TableCell>
+    </TableRow>
+
+  {Array.isArray(Servicios) && Servicios.map((servicio, index) => (
+    <TableRow key={index}>
+      <TableCell >{servicio.CodServicio}</TableCell>
+      <TableCell align="right">{servicio.Descripcion}</TableCell>
+      {/* Agrega más celdas según los datos de tu objeto servicio */}
+    </TableRow>
+  ))}
+    <TableRow>
+      <TableCell>Cod Serv</TableCell>
+      <TableCell align="right">Nro Act</TableCell>
+      <TableCell align="right">Descr</TableCell>
+      <TableCell align="right">Monto</TableCell>
+    </TableRow>
+                         {Array.isArray(Actividades) && Actividades.map((actividad, index) => (
+    <TableRow key={index}>
+      <TableCell>{actividad.CodServicio}</TableCell>
+      <TableCell align="right">{actividad.NroActividad}</TableCell>
+      <TableCell align="right">{actividad.NroActividad}</TableCell>
+      <TableCell align="right">{actividad.Monto}</TableCell>
+    </TableRow>
+  ))
+                          }
+                           <TableRow>
+      <TableCell>Producto</TableCell>
+    </TableRow>
+                                             {Array.isArray(Productos) && Productos.map((producto, index) => (
+    <TableRow key={index}>
+      <TableCell>{producto.NombreP}</TableCell>
+    </TableRow>
+  ))
+                          }
+                                                     <TableRow>
+                            <TableCell>Descuento</TableCell>
+                            <TableCell>{Descuento.Descuento}</TableCell>
+    </TableRow>
+                          <TableRow>
+                            <TableCell rowSpan={3} />
+                            <TableCell colSpan={2}>Total</TableCell>
+                            <TableCell align="right">${total}</TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Box>
+                )}
+                <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                  <Button disabled={activeStep === 0} onClick={handleBack} variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E'  } }}>
+                    Regresar
+                  </Button>
+                  {activeStep === steps.length - 2 ? (
+                    facturaEmitida ? (
+                      <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF',  } }}>
+                        Finalizar
+                      </Button>
+                    ) : (
+                      <Button type="submit" onClick={handleSubmitFactura} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E',  } }}>
+                        Emitir Factura
+                      </Button>
+                    )
+                  ) : (
+                  <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF',  } }}>
+                    Siguiente
+                  </Button>
+                )}
+              </Box>
+            </React.Fragment>
+          )}
+        </Box>
+      </Modal>
        <h1 className='h1Factura'>Lista de Facturas</h1>
       {selectedFactura && (
        <Button variant="contained"  onClick={handleOpenModal}  sx={{ backgroundColor: '#8DECB4', marginBottom:3, '&:hover': { backgroundColor: '#41B06E' } }}>
@@ -1509,47 +1597,50 @@ const renderFacturaDetails = () => {
       </TableRow>
     </TableHead>
     <TableBody>
-      {facturas.map((factura) => {
-        const isSelected = selectedFactura === factura.CodF;
-        return (
-          <TableRow
-            key={factura.nroFactura}
-            hover
-            onClick={() => handleSelectFactura(factura.CodF)}
-            role="checkbox"
-            aria-checked={isSelected}
-            selected={isSelected}
-            sx={{
-              '&:hover': {
-                backgroundColor: '#8DECB4 !important' // Cambia el color de fondo al pasar el mouse
+    {
+  Array.isArray(facturas) && // Corrected this line
+    facturas.map(factura => {
+      const isSelected = selectedFactura === factura.CodF;
+      return (
+        <TableRow
+          key={factura.nroFactura}
+          hover
+          onClick={() => handleSelectFactura(factura.CodF)}
+          role="checkbox"
+          aria-checked={isSelected}
+          selected={isSelected}
+          sx={{
+            '&:hover': {
+              backgroundColor: '#8DECB4 !important' // Changes background color on hover
+            },
+            ...(isSelected && {
+              backgroundColor: '#41B06E !important', // Darker green color when selected
+            }),
+          }}
+        >
+          <TableCell padding="checkbox">
+            <Checkbox checked={isSelected} sx={{
+              color: '#41B06E', // Color when the checkbox is not selected
+              '&.Mui-checked': {
+                color: '#8DECB4', // Color when the checkbox is selected
               },
-              ...(isSelected && {
-                backgroundColor: '#41B06E !important', // Color verde más oscuro al seleccionar
-              }),
-            }}
-          >
-            <TableCell padding="checkbox">
-              <Checkbox checked={isSelected} sx={{
-    color: '#41B06E', // Color cuando el checkbox no está seleccionado
-    '&.Mui-checked': {
-      color: '#8DECB4', // Color cuando el checkbox está seleccionado
-    },
-  }}/>
-            </TableCell>
-            <TableCell component="th" scope="row">
-              {factura.CodF}
-            </TableCell>
-            <TableCell align="right">{factura.Fecha}</TableCell>
-            <TableCell align="right">{factura.Monto}</TableCell>
-          </TableRow>
-        );
-      })}
+            }}/>
+          </TableCell>
+          <TableCell component="th" scope="row">
+            {factura.CodF}
+          </TableCell>
+          <TableCell align="right">{factura.Fecha}</TableCell>
+          <TableCell align="right">{factura.Monto}</TableCell>
+        </TableRow>
+      );
+    })
+}
     </TableBody>
   </Table>
 </TableContainer>
     </Box>
   );
-  }
+}
   
 // Define una función para renderizar una lista de elementos
 function renderList(items, textKey, secondaryKey, onSeleccionado) {
@@ -1810,7 +1901,7 @@ function Teteo({ opcion }) {
   const renderfunction = (funcion) => {
 
     if (funcion == 'Facturas') {
-      return <Ventas/>
+      return <Facturas/>
     } else {
       return <ListServicios opcion={opcion}/>
     }
