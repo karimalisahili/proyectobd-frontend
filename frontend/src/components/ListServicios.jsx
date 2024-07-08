@@ -1,3 +1,4 @@
+
 import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, MenuItem ,Typography, TableContainer, TableHead, TableCell, TableRow, Table, TableBody, Paper, Checkbox } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
@@ -1019,6 +1020,371 @@ return(
       );
 
     }
+    
+const steps = ['Seleccion de Orden de Servicio', 'Seccion de Pago', 'Factura Preliminar'];
+    
+function useForm2(initialState) {
+  // Inicializa el estado del formulario con el estado inicial proporcionado
+  const [formData, setFormData] = useState(initialState);
+
+  // Función para manejar los cambios en los campos del formulario
+  const handleChange2 = (e) => {
+    // Extrae el nombre y el valor del campo que disparó el evento
+    const { name, value } = e.target;
+    // Actualiza el estado del formulario con el nuevo valor para el campo especificado
+    setFormData(prevState => ({
+      ...prevState, // Copia el estado anterior del formulario
+      [name]: value // Actualiza el valor del campo especificado
+    }));
+  };
+
+  // Devuelve el estado actual del formulario y la función handleChange
+  const resetForm = () => setFormData(initialState);
+
+  return [formData, handleChange2, resetForm];
+}
+
+    function Ventas() {
+  const initialValues = {
+    Fecha: new Date().toISOString().split('T')[0],
+    Monto: 0,
+    TipoPago: '',
+    TipoEfectivo: null,
+    Referencia: null,
+    NroTelf: null,
+    TipoTarjeta: null,
+    Banco: null,
+    NumTarjeta: null,
+    NumFacturaServicio: null,
+    NumR: null
+  };
+
+  
+
+  const initialValuesFacturas = {
+    CodOrd: 0,
+    Fecha: null,
+    Monto: 0,
+    Descuento: 0,
+  };
+
+  const [formData, handleChange, resetForm] = useForm(initialValues);
+
+  const [formDataFactura, handleChange2, resetForm2] = useForm2(initialValuesFacturas);
+      
+  const [facturaEmitida, setFacturaEmitida] = useState(false);
+
+  const handleSubmitFactura = async (e) => {
+    e.preventDefault();
+    const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
+    }
+    
+    formDataFactura.Fecha = new Date().toISOString().split('T')[0];
+    formDataFactura.Monto = total;
+    formDataFactura.Descuento = Descuento.Descuento;
+
+    const endpoint = `${SERVERNAME}/facturas_servicios`;
+    const method = 'POST';
+
+    try {
+      await sendData(endpoint, formDataFactura, method);
+      alert('Operación realizada correctamente');
+      setFacturaEmitida(true);
+    } catch (error) {
+      console.error('Error en la operación', error);
+      // Assuming error is an object with a message property
+      if (error.message.includes('500')) {
+        alert('Error interno del servidor. Por favor, intente nuevamente más tarde.');
+      } else if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
+      }
+    }
+
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const isConfirmed = window.confirm('¿Está seguro de que desea realizar esta acción?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
+    }
+  
+    const endpoint = `${SERVERNAME}/pagos`;
+    const method = 'POST';
+
+    try {
+      await sendData(endpoint, formData, method);
+      alert('Operación realizada correctamente');
+    } catch (error) {
+      console.error('Error en la operación', error);
+      // Assuming error is an object with a message property
+      if (error.message.includes('500')) {
+        alert('Error interno del servidor. Por favor, intente nuevamente más tarde.');
+      } else if (error.message.includes('404')) {
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
+      } else {
+        alert('Error en la operación. Por favor, intente nuevamente.');
+      }
+    }
+  };
+
+  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
+  // Estado para controlar la visibilidad del modal
+  const [open2, setOpen2] = useState(false);
+  const [Descuento, setDescuento] = useState([]);
+  const [Pagos, setPagos] = useState([]);
+  const [Productos, setProductos] = useState([]);
+  const [ordenServicio, setOrdenServicio] = useState([]);
+  const [Servicios, setServicios] = useState([]);
+  const [Actividades, setActividades] = useState([]);
+
+  // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
+  useEffect(() => {
+    // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
+    const obtenerDatos = async (endpoint, setter) => {
+      try {
+        // Realiza la petición fetch al servidor y espera la respuesta
+        const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
+        // Convierte la respuesta a formato JSON
+        const datos = await respuesta.json();
+        // Actualiza el estado correspondiente con los datos obtenidos
+        setter(datos);
+      } catch (error) {
+        // Captura y registra errores en la consola
+        console.error(`Error al obtener datos de ${endpoint}:`, error);
+      }
+    };
+
+    // Llama a obtenerDatos para cada tipo de dato necesario
+    obtenerDatos(`pagos`, setPagos);
+    obtenerDatos(`datosDescuento/:nroOrden`, setDescuento);
+    obtenerDatos(`datosProductos/:nroOrden`, setProductos);
+    obtenerDatos(`datosOrdenServicio/:nroOrden`, setOrdenServicio);
+    obtenerDatos(`datosServicios/:nroOrden`, setServicios);
+    obtenerDatos(`datosActividades/:nroOrden`, setActividades);
+
+  }, []);
+
+  const handleOpen2 = () => {
+    setOpen2(true);
+    resetForm();
+    setActiveStep(0)
+  };
+
+  const closeModal = () => {
+    setOpen2(false);
+    window.location.reload();
+  };
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState({});
+  const [quantity, setQuantity] = useState('');
+
+  const handleSelectProduct = (product) => {
+    setOpenDialog(true);
+    setCurrentProduct(product);
+     
+  };
+    
+  // Estado inicial para la lista de productos seleccionados
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  // Función para manejar el clic en un producto
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setQuantity('');
+  };
+
+  const handleConfirmQuantity = () => {
+    const total = currentProduct.Precio * quantity; // Calcula el total
+    setSelectedProducts(prevSelectedProducts => [
+      ...prevSelectedProducts,
+      { ...currentProduct, quantity: quantity, total: total } // Guarda el total junto con el producto y la cantidad
+    ]);
+    handleCloseDialog();
+      };
+      
+      const isStepSkipped = (step) => {
+    return skipped.has(step);
+  };
+
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [skipped, setSkipped] = React.useState(new Set());
+    
+  const handleNext = () => {
+    let newSkipped = skipped;
+    if (isStepSkipped(activeStep)) {
+      newSkipped = new Set(newSkipped.values());
+      newSkipped.delete(activeStep);
+    }
+
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setSkipped(newSkipped);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const subtotal = selectedProducts.reduce((acc, product) => acc + product.total, 0);
+
+// Paso 2 y 3: Verificar si `descuento` tiene datos y calcular el total con descuento
+let total = 0;
+if (Descuento) {
+  // Asegurarse de que Descuento no es undefined y tiene al menos un elemento
+  const montoDescuento = (subtotal * Descuento.Descuento) / 100;
+  total = subtotal - montoDescuento;
+
+} else {
+  // Si no hay descuento, el total es el subtotal
+  total = subtotal;
+  }
+  formDataFactura.Monto = total;
+  return (
+    <Box>
+
+      <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2()}>
+            Emitir Factura
+          </Button>
+          <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+            <Box sx={{ width: '100%', alignItems: 'center', display: 'flex', flexDirection: 'column', }} mt={5}>
+              <Stepper activeStep={activeStep} sx={{'.MuiStepLabel-label': { color: 'white' }, marginBottom:'10px'}}>
+                {steps.map((label) => {
+                  return (
+                    <Step key={label} >
+                      <StepLabel sx={{ '.MuiStepLabel-label': { color: 'white', '&.Mui-active': { color: 'white' }, '&.Mui-completed': { color: 'white' } }, '.MuiStepIcon-root': { '&.Mui-completed': { color: '#8DECB4' }, '&.Mui-active': { color: '#41B06E' } } }}>
+                        {label}           
+                      </StepLabel>
+                    </Step>
+                  );
+                })}
+              </Stepper>
+              {activeStep === steps.length ? (
+                <React.Fragment>
+                  <Typography sx={{ mt: 2, mb: 1, color:'#FFFFFF', fontSize:'30px'}}>
+                    Factura Creada Correctamente
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                    <Box sx={{ flex: '1 1 auto' }} />
+                    <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={closeModal}>
+                        Salir 
+                    </Button>
+                  </Box>
+                </React.Fragment>
+              ) : (
+              <React.Fragment>
+                {activeStep === 0 && (
+                  <FormBox onSubmit={handleSubmit} > 
+                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                        <TextField select label='Tipo-Pago' type='text' name='TipoPago' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoPago} onChange={handleChange}>
+                          <MenuItem value="E">Efectivo</MenuItem>
+                          <MenuItem value="P">Pago Móvil</MenuItem>
+                          <MenuItem value="T">Tarjeta</MenuItem>
+                        </TextField>        
+                      </Box>
+                      {formData.TipoPago === "E" && (
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                          <TextField select label="Tipo-Efectivo" name='TipoEfectivo'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoEfectivo} onChange={handleChange}>
+                            <MenuItem value="D">Divisa</MenuItem>
+                            <MenuItem value="B">Bolivares</MenuItem>
+                          </TextField>
+                        </Box>
+                      )}
+                      {formData.TipoPago === "P" && (
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                          <InputField label="Nro_Telefono" type='text' name='NroTelf'valor={formData.NroTelf} cambio={handleChange} />
+                          <InputField label="Nro-Reference" type='number' name='Referencia' valor={formData.Referencia} cambio={handleChange}/>
+                        </Box>
+                      )}
+                      {formData.TipoPago === "T" && (
+                        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                          <TextField select label="Tipo_Tarjeta" type='text' name='TipoTarjeta' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoTarjeta} onChange={handleChange}>
+                            <MenuItem value="Debito">Debito</MenuItem>
+                            <MenuItem value="Credito">Credito</MenuItem>
+                          </TextField>
+                          <InputField label="Numero_Tarjeta" type='text' name='NumTarjeta'valor={formData.NumTarjeta} cambio={handleChange} />
+                          <InputField label="Banco" type='text' name='Banco'valor={formData.Banco} cambio={handleChange} />
+                        </Box>
+                      )}
+                      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = total} onChange={handleChange} disabled ></TextField>
+                        <TextField select label="Cédula Cliente" name='CIResponsable' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataFactura.CIResponsable} onChange={handleChange2}>
+                        </TextField>
+                      </Box>
+                      <Button type='submit' variant="contained" sx={{margin: '5px 0', color: '#000000', bgcolor: '#FFFFFF', '&:hover': {bgcolor: '#41B06E',color: '#FFFFFF'}}}>
+                      Registrar Pago
+                      </Button>
+                    </Box>
+                  </FormBox>
+                )}
+                {activeStep === 1 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                    <TableContainer component={Paper}>
+                      <h1 style={{color:'black'}}>M&M</h1>
+                      <p className='p_factura'>RIF: {user.RIFSuc}</p>
+                      <p className='p_factura'>Fecha:  {new Date().toISOString().split('T')[0]}</p>
+                      <Table aria-label="simple table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Descripción</TableCell>
+                            <TableCell align="right">Cantidad</TableCell>
+                            <TableCell align="right">Precio</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {selectedProducts.map((product, index) => (  
+                            <TableRow key={index}>
+                              <TableCell component="th" scope="row">
+                                {product.Descripcion}
+                              </TableCell>
+                              <TableCell align="right">{product.quantity}</TableCell>
+                              <TableCell align="right">{product.Precio}</TableCell>
+                            </TableRow>
+                          ))}
+                          <TableRow>
+                            <TableCell rowSpan={3} />
+                            <TableCell colSpan={2}>Total</TableCell>
+                            <TableCell align="right">${total }</TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Box>
+                )}
+                <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                  <Button disabled={activeStep === 0} onClick={handleBack} variant="contained" sx={{ backgroundColor: '#8DECB4',my:3, mx:3, '&:hover': { backgroundColor: '#41B06E'  } }}>
+                    Regresar
+                  </Button>
+                  {activeStep === steps.length - 1 ? (
+                    facturaEmitida ? (
+                      <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF',  } }}>
+                        Finalizar
+                      </Button>
+                    ) : (
+                      <Button type="submit" onClick={handleSubmitFactura} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E',  } }}>
+                        Emitir Factura
+                      </Button>
+                    )
+                  ) : (
+                  <Button type="button" onClick={handleNext} variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#76C2AF',  } }}>
+                    Siguiente
+                  </Button>
+                )}
+              </Box>
+            </React.Fragment>
+          )}
+        </Box>
+      </Modal>
+    </Box>
+  </Box>
+);
+}
 
     function Facturas({ data = null}) {
 
@@ -1195,6 +1561,12 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
     onSeleccionado(seleccion);
 };
   // Retorna un componente List de Material-UI con un estilo personalizado
+
+  if (!Array.isArray(items)) {
+    console.error('renderList was called with items that are not an array:', items);
+    return null; // Or return a placeholder component indicating the error or empty state
+  }
+
   return (
     <List sx={listStyle}>
       {/* Mapea cada elemento del array 'items' a un componente ListItem */}
@@ -1248,7 +1620,7 @@ function mostrarLista(opcion, listaServiciosSeleccionados, reservasSeleccionados
 
 
 
-function ListServicios({opcion}){
+function ListServicios({ opcion }) {
     
   const [open, setOpen] = useState(false);
   // Estado para determinar el tipo de formulario a mostrar en el modal
@@ -1325,7 +1697,7 @@ const renderForm = (info, editar) => {
     case 'Pagos':
       return <Pagos data={info} isEditing={editar}/>;
     case 'Facturas':
-      return <Facturas data ={info} isEditing={editar}/>;
+      return <Ventas data ={info} isEditing={editar}/>;
     default:
       return <div> fallo </div>;
   }
@@ -1432,9 +1804,31 @@ const renderContenido = () => {
   );
 }
 
+function Teteo({ opcion }) {
+  
+  console.log(opcion);
+  const renderfunction = (funcion) => {
+
+    if (funcion == 'Facturas') {
+      return <Ventas/>
+    } else {
+      return <ListServicios opcion={opcion}/>
+    }
+    }
+return (
+  <Box>
+    {renderfunction(opcion)}
+  </Box>
+
+  )
+}
+
+Teteo.propTypes = {
+  opcion: PropTypes.string
+};
+
 ListServicios.propTypes = {
-    opcion: PropTypes.string.isRequired,
-    raiz: PropTypes.string.isRequired,
+    opcion: PropTypes.string
 };
 
 // Define las propiedades esperadas para el componente FormBox
@@ -1494,5 +1888,5 @@ Facturas.propTypes={
 }
 
 
-export default ListServicios;
+export default Teteo;
 
