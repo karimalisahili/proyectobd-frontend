@@ -49,6 +49,10 @@ const FormularioProductoTienda = ({ onSubmit }) => {
     imagen: ''
   });
 
+  console.log(formData);
+
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
