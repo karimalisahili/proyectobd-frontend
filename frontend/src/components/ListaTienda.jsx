@@ -185,6 +185,22 @@ function Ventas() {
       await sendData(endpoint, formDataFactura, method);
       alert('Operación realizada correctamente');
       setFacturaEmitida(true);
+
+
+      //aaa
+      for (const producto of productosSeleccionados) { // Asumiendo que productosSeleccionados es tu array de productos
+        const endpointProducto = `${SERVERNAME}/registranfactprod`;
+        const dataProducto = {
+          NumFactTienda: formDataFactura.NumFact, // Asumiendo que NumFact es parte de formDataFactura después de crear la factura
+          CodProducto: producto.CodProducto,
+          RIFSuc: user.RIFSuc,
+          CantComprada: producto.CantComprada
+        };
+
+        await sendData(endpointProducto, dataProducto, method);
+        //aaa
+      }
+
     } catch (error) {
       console.error('Error en la operación', error);
       // Assuming error is an object with a message property
