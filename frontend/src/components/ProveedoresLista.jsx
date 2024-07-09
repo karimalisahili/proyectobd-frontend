@@ -11,7 +11,7 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
 const userJson = localStorage.getItem('user');
-const user = userJson;
+const user = userJson ? JSON.parse(userJson) : {};
 
 // Estilos para el componente Box. Se configura el padding vertical, ancho, color de borde,
 // color de fondo y color de texto. Estos estilos se aplican a un componente Box de Material UI.
