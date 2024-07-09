@@ -1,17 +1,19 @@
 // Importación de componentes de Material UI, PropTypes y hooks de React.
-import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography, MenuItem, Snackbar } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
-import PersonIcon from '@mui/icons-material/Person';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import { useNavigate } from 'react-router-dom';
+
 
 // Definición de la variable SERVERNAME que obtiene el valor de la variable de entorno VITE_SERVERNAME.
-// Este valor se utiliza para configurar el NombreP del servidor en la aplicación.
+// Este valor se utiliza para configurar el Nombre del servidor en la aplicación.
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
 const userJson = localStorage.getItem('user');
-const user = userJson;
+const user = userJson ? JSON.parse(userJson) : {};
 
 // Estilos para el componente Box. Se configura el padding vertical, ancho, color de borde,
 // color de fondo y color de texto. Estos estilos se aplican a un componente Box de Material UI.
@@ -47,8 +49,6 @@ const commonStyles = {
 // Define un estilo base para la lista y lo extiende con propiedades específicas para controlar su altura máxima y el desbordamiento vertical
 const listStyle = { ...style, maxHeight: '320px', overflowY: 'auto' };
 
-
-
 // Hook personalizado para manejar formularios
 function useForm(initialState) {
   // Inicializa el estado del formulario con el estado inicial proporcionado
@@ -56,7 +56,7 @@ function useForm(initialState) {
 
   // Función para manejar los cambios en los campos del formulario
   const handleChange = (e) => {
-    // Extrae el NombreP y el valor del campo que disparó el evento
+    // Extrae el Nombre y el valor del campo que disparó el evento
     const { name, value } = e.target;
     // Actualiza el estado del formulario con el nuevo valor para el campo especificado
     setFormData(prevState => ({
@@ -71,6 +71,7 @@ function useForm(initialState) {
 
 // Define una función asíncrona llamada sendData
 async function sendData(endpoint, formData, method) {
+  console.log(formData, method, endpoint)
   const response = await fetch(endpoint, {
     method: method,
     headers: {
@@ -82,50 +83,10 @@ async function sendData(endpoint, formData, method) {
 
   // Check if the response is OK and the content type is JSON
   if (response.status == 200) {
-
-    const estoyenproductos = SERVERNAME+'/productos'
-
-    if(endpoint === estoyenproductos){
-      const {CodProd, TipoPro} = formData;
-
-      if (TipoPro === 'Tienda') {
-        // Endpoint for 'Tienda' products
-        const tiendaEndpoint = `${SERVERNAME}/productos_tienda`;
-        // Perform the POST request
-        const tiendaResponse = await fetch(tiendaEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ CodProd }),
-        });
-
-        if (tiendaResponse.status === 500) {
-          throw new Error('Error al crear producto de tienda');
-        }
-        console.log('Producto de tienda creado con éxito');
-      } else if (TipoPro === 'Servicio') {
-        // Endpoint for 'Servicio' products
-        const servicioEndpoint = `${SERVERNAME}/productos_servicios`;
-        // Perform the POST request
-        const servicioResponse = await fetch(servicioEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ CodProd }),
-        });
-
-        if (servicioResponse.status === 500) {
-          throw new Error('Error al crear producto de servicio');
-        }
-        console.log('Producto de servicio creado con éxito');
-      }
-    }
-    //window.location.reload();
+    window.location.reload();
     return response.json();
   } else {
-    // Handle non-JSON responses or errors
+    // Handle non-JSON responses or errorsF
     const text = await response.text(); // Read response as text to avoid JSON parse error
     throw new Error(`Failed to fetch JSON. Status: ${response.status}, Body: ${text}`);
   }
@@ -148,7 +109,7 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
   <TextField
     label={label} // Establece la etiqueta del campo
     type={type} // Establece el tipo de input (ej. text, number)
-    name={name} // Establece el NombreP del campo, importante para identificarlo al enviar el formulario
+    name={name} // Establece el Nombre del campo, importante para identificarlo al enviar el formulario
     sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} // Estilos personalizados
     InputProps={min ? { inputProps: { min } } : {}} // Propiedad condicional para establecer el valor mínimo si se proporciona
     value={valor} // Vincula el valor del campo a la variable 'valor'
@@ -157,19 +118,16 @@ const InputField = ({ label, type, name, min, valor, cambio }) => (
 );
 
 // Define un componente funcional llamado Personal
-function Productos({ data = null, isEditing = false }) {
+// Define un componente funcional llamado Personal
+function Proveedores({ data = null, isEditing = false }) {
 
   const initialValues = {
-    CodProd: data?.CodProd || '',
-    NombreP: data?.NombreP || '',
-    Descripcion: data?.Descripcion || '',
-    Precio: data?.Precio || '',
-    Ecologico: data?.Ecologico || '',
-    Fabricante: data?.Fabricante || '',
-    Maximo: data?.Maximo || '',
-    Minimo: data?.Minimo || '',
-    TipoPro: data?.TipoPro || '',
-    CodLinea: data?.CodLinea || '',
+    Rif: data?.Rif || '',
+    RazonSocial: data?.RazonSocial || '',
+    Direccion: data?.Direccion || '',
+    TelefonoL: data?.TelefonoL || '',
+    TelefonoC: data?.TelefonoC || '',
+    PersonaCont: data?.PersonaCont || '',
   };
 
   const [formData, handleChange] = useForm(initialValues);
@@ -180,7 +138,7 @@ function Productos({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/productos`;
+    const endpoint = `${SERVERNAME}/proveedores`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
@@ -201,7 +159,7 @@ function Productos({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/productos`; // Asumiendo que CodProd es el identificador único
+    const endpoint = `${SERVERNAME}/proveedores`; // Asumiendo que Rif es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -212,84 +170,43 @@ function Productos({ data = null, isEditing = false }) {
     }
   };
 
-  const [lineasSeleccionados, setlineasSeleccionados] = useState([]);
-
-  // useEffect para cargar datos de empleados, lineas y vehículos al montar el componente
-  useEffect(() => {
-    // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
-    const obtenerDatos = async (endpoint, setter) => {
-      try {
-        console.log(`${SERVERNAME}/${endpoint}`)
-        // Realiza la petición fetch al servidor y espera la respuesta
-        const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
-        // Convierte la respuesta a formato JSON
-        const datos = await respuesta.json();
-        // Actualiza el estado correspondiente con los datos obtenidos
-        setter(datos);
-      } catch (error) {
-        // Captura y registra errores en la consola
-        console.error(`Error al obtener datos de ${endpoint}:`, error);
-      }
-    };
-
-
-    // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos('lineas', setlineasSeleccionados);
-  }, []);
-
-
-  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
     <FormBox onSubmit={handleSubmit}>
       {/* Box para agrupar los campos de entrada con estilo de flexbox */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         {/* Box para agrupar dos campos de entrada horizontalmente */}
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para el NombreP del empleado */}
-          <InputField label="Nombre-Producto" type='text' name='NombreP'
-            valor={formData.NombreP} cambio={handleChange} />
-          {/* InputField para el Precio del empleado */}
-          <InputField label="Precio" type='number' name='Precio' min={1} valor={formData.Precio} cambio={handleChange} />
-          <InputField label="Codigo-Producto" type='text' name='CodProd'
-            valor={formData.CodProd} cambio={handleChange} />
-        </Box>
-      </Box>
-      {/* Repite la estructura anterior para otros campos del formulario */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}> 
-          <TextField select label="¿Es Ecologico?" type='text' name="Ecologico" sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Ecologico} onChange={handleChange}>
-              <MenuItem value="S">Si</MenuItem>
-              <MenuItem value="N">No</MenuItem>
-          </TextField>
-          <TextField select label="Tipo Producto" type='text' name="TipoPro" sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoPro} onChange={handleChange}>
-              <MenuItem value="Tienda">Tienda</MenuItem>
-              <MenuItem value="Servicio">Servicio</MenuItem>
-          </TextField>
-           <TextField select label="Linea" type='number' name='CodLinea' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodLinea} onChange={handleChange}>
-                {lineasSeleccionados.map((linea, index) => (
-                  <MenuItem key={index} value={linea.CodLineas}>
-                    {linea.Descripcion}
-                  </MenuItem>
-                ))}
-              </TextField>  
+
+          <InputField disable label="Rif" type='text' name='Rif'
+            valor={formData.Rif} cambio={handleChange} />
+
+          <InputField label="Razon Social" type='text' name='RazonSocial'
+            valor={formData.RazonSocial} cambio={handleChange} />
+
+
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Descripcion" type='text' name='Descripcion'
-            valor={formData.Descripcion} cambio={handleChange} />
-          <InputField label="Fabricante" type='text' name='Fabricante'
-            valor={formData.Fabricante} cambio={handleChange} />      
+          <InputField label="Direccion" type='text' name='Direccion'
+            valor={formData.Direccion} cambio={handleChange} />
+          <InputField label="Telefono Local" type='text' name='TelefonoL' valor={formData.TelefonoL} cambio={handleChange} />
+
+
+
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>    
-            <InputField label="Minimo" type='number' name='Minimo'
-            valor={formData.Minimo} cambio={handleChange} />
-          <InputField label="Maximo" type='number' name='Maximo'
-            valor={formData.Maximo} cambio={handleChange} />      
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+
+
+          <InputField label="Telefono Contacto" type='text' name='TelefonoC' valor={formData.TelefonoC} cambio={handleChange} />
+
+          <InputField label="Persona Contacto" type='text' name='PersonaCont' valor={formData.PersonaCont} cambio={handleChange} />
+
         </Box>
       </Box>
+
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         <Button type='submit' variant="contained" sx={{
           margin: '5px 20px',
@@ -301,7 +218,7 @@ function Productos({ data = null, isEditing = false }) {
           }
         }}
         >
-          {isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
+          {isEditing ? 'Actualizar Proveedor' : 'Agregar Proveedor'}
         </Button>
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
@@ -313,23 +230,19 @@ function Productos({ data = null, isEditing = false }) {
   );
 }
 
+
 // Define un componente funcional llamado linea
-function Lineas({ data = null, isEditing = false }) {
+function REQUISICIONCOMPRA({ data = null, isEditing = false }) {
+
+
   // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para CodLineas y Descripcion
   const initialValues = {
-    CodLineas: data?.CodLineas || '',
-    Descripcion: data?.Descripcion || '',
+    RIFSuc: user.RIFSuc || '',
+    IdReq: data?.IdReq || '',
+    CodProd: data?.CodProd || '',
+    CantProd: data?.CantProd || '',
+    Fecha: data?.Fecha || '',
   };
-
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-const [snackbarMessage, setSnackbarMessage] = useState('');
-const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Puedes usar 'error', 'warning', 'info', 'success'
-const handleCloseSnackbar = (event, reason) => {
-  if (reason === 'clickaway') {
-    return;
-  }
-  setOpenSnackbar(false);
-};
 
   const [formData, handleChange] = useForm(initialValues);
 
@@ -337,24 +250,18 @@ const handleCloseSnackbar = (event, reason) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = `${SERVERNAME}/lineas`;
+    const endpoint = `${SERVERNAME}/requisiciones_compra`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
       await sendData(endpoint, formData, method);
-       setSnackbarMessage('Línea Creada Exitosamente');
-    setSnackbarSeverity('success');
-    setOpenSnackbar(true);
+      alert('Operación realizada correctamente');
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
-        setSnackbarMessage('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-    setSnackbarSeverity('error');
-    setOpenSnackbar(true);
+        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
       } else {
-        setSnackbarMessage('Error en la operación. Por favor, intente nuevamente.');
-    setSnackbarSeverity('error');
-    setOpenSnackbar(true);
+        alert('Error en la operación. Por favor, intente nuevamente.');
       }
     }
   };
@@ -366,7 +273,7 @@ const handleCloseSnackbar = (event, reason) => {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/lineas`; // Asumiendo que CodProd es el identificador único
+    const endpoint = `${SERVERNAME}/requisiciones_compra`; // Asumiendo que IdReqeh es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -377,21 +284,14 @@ const handleCloseSnackbar = (event, reason) => {
     }
   };
 
+
+
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
-    <>
     <FormBox onSubmit={handleSubmit}>
       {/* Box para agrupar los campos de entrada con estilo de flexbox */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        {/* Box para agrupar dos campos de entrada horizontalmente */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para la cédula del linea */}
-          {/* InputField para el NombreP del linea */}
-          <InputField label="Descripcion-linea" type='text' name='Descripcion' valor={formData.Descripcion} cambio={handleChange} />
-        </Box>
-      </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Button type='submit' variant="contained" sx={{
+        {!isEditing && (<Button type='submit' variant="contained" sx={{
           margin: '5px 0',
           color: '#000000',
           bgcolor: '#FFFFFF',
@@ -400,58 +300,109 @@ const handleCloseSnackbar = (event, reason) => {
             color: '#FFFFFF'
           }
         }}>
-          {isEditing ? 'Actualizar linea' : 'Agregar linea'}
-        </Button>
+          {isEditing ? 'Actualizar Requisicion Compra' : 'Generar Requisicion Compra'}
+        </Button>)}
+
+
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
             Eliminar
           </Button>
         )}
       </Box>
-      </FormBox>
-      <Snackbar
-  open={openSnackbar}
-  autoHideDuration={6000}
-  onClose={handleCloseSnackbar}
-        message={snackbarMessage}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-  sx={{ bgcolor: '#41B06E',}}
-  action={
-    <React.Fragment>
-      <Button color="secondary" size="medium" onClick={handleCloseSnackbar}>
-        CERRAR
-      </Button>
-    </React.Fragment>
-  }
-/>
-      </>
+    </FormBox>
   );
 }
 
 // Define un componente funcional llamado Vehiculo
-function Inventario({ data = null, isEditing = false }) {
-  //RIFSuc,p.CodProd, p.NombreP, i.Existencia
-  // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
-  const initialValues = {
-    CodProd: data?.CodProd || '',
-    NombreP: data?.NombreP || '',
-    Existencia: data?.Existencia || '',
+function ORDENCOMPRA({ data = null, isEditing = false }) {
 
+  // Ajusta initialValues para usar useState
+  const [ordenCompra, setOrdenCompra] = useState({
+    RIFSuc: user.RIFSuc,
+    RIFProv: data?.RIFProv || '',
+    items: [
+      {
+        CodRequiCom: '',
+        CodProd: '',
+        Precio: 0,
+      },
+    ],
+  });
+
+
+
+  // Función para manejar cambios en el formulario
+  const handleChangeOrden = (e, index = null, field = null) => {
+    if (index !== null && field) {
+      // Maneja cambios en los campos de los ítems
+      const updatedItems = ordenCompra.items.map((item, i) => {
+        if (i === index) {
+          return { ...item, [field]: e.target.value };
+        }
+        return item;
+      });
+      setOrdenCompra({ ...ordenCompra, items: updatedItems });
+    } else {
+      // Maneja cambios en los campos normales del formulario
+      setOrdenCompra({ ...ordenCompra, [e.target.name]: e.target.value });
+    }
   };
 
-  const [formData, handleChange] = useForm(initialValues);
+  // Función para agregar un nuevo ítem
+  const handleAddItem = () => {
+    setOrdenCompra({
+      ...ordenCompra,
+      items: [...ordenCompra.items, { CodRequiCom: '', CodProd: '', Precio: 0 }],
+    });
+  };
+
+  // Función para quitar un ítem
+  const handleRemoveItem = (index) => {
+    const newItems = ordenCompra.items.filter((_, i) => i !== index);
+    setOrdenCompra({ ...ordenCompra, items: newItems });
+  };
+
+  const handleSubmitOrden = async (e) => {
+    e.preventDefault();
+
+    try {
+      const postRequests = ordenCompra.items.map(item => {
+        const requestData = {
+          RIFProv: ordenCompra.RIFProv,
+          CodRequiCom: item.CodRequiCom,
+          CodProd: item.CodProd,
+          Precio: item.Precio,
+          RIFSuc: ordenCompra.RIFSuc,
+        };
+        const endpoint = `${SERVERNAME}/ordenescompras`;
+        return sendData(endpoint, requestData, 'POST');
+      });
+
+
+      await Promise.all(postRequests);
+
+      alert('Órdenes de compra creadas con éxito');
+    } catch (error) {
+      console.error('Error en la operación', error);
+      alert('Error en la operación. Por favor, intente nuevamente.');
+    }
+  };
+
+
+  const [formData, handleChange] = useForm(ordenCompra);
 
   // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData)
-    const endpoint = `${SERVERNAME}/vehiculos`;
+    const endpoint = `${SERVERNAME}/tiposvehiculos`;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
       await sendData(endpoint, formData, method);
-      
+      alert('Operación realizada correctamente');
     } catch (error) {
       console.error('Error en la operación', error);
       if (error.message.includes('404')) {
@@ -467,9 +418,9 @@ function Inventario({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/vehiculos`; // Asumiendo que CodProd es el identificador único
+    const endpoint = `${SERVERNAME}/ordenescompras`; // Asumiendo que CodTipoV es el identificador único
     try {
-      await sendData(endpoint, formData, 'DELETE');
+      await sendData(endpoint, ordenCompra, 'DELETE');
       alert('Empleado eliminado correctamente');
       // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
     } catch (error) {
@@ -480,37 +431,50 @@ function Inventario({ data = null, isEditing = false }) {
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
-    <FormBox onSubmit={handleSubmit}>
-      {/* Box para agrupar los campos de entrada con estilo de flexbox */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        {/* Box para agrupar dos campos de entrada horizontalmente */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          {/* InputField para la cédula del responsable */}
-          <InputField label="CodProd-linea" type='text' name='Existencia'
-            valor={formData.Existencia} cambio={handleChange} />
-        </Box>
-      </Box>
-      {/* Repite la estructura anterior para otros campos del formulario */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="CodProd-Inventario" type='text' name='CodProd'
-            valor={formData.CodProd} cambio={handleChange} />
-          <InputField label="TIPO-ACEITE" type='text' name='NombreP'
-            valor={formData.NombreP} cambio={handleChange} />
-        </Box>
-      </Box>
+    <FormBox onSubmit={handleSubmitOrden}>
+      {!isEditing && (
+        <div>
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+              <TextField label="RIFProv" type='text' name='RIFProv'
+                value={ordenCompra.RIFProv} onChange={handleChangeOrden}
+                style={{ backgroundColor: 'white' }}
+              />
+
+            </Box>
+            {ordenCompra.items.map((item, index) => (
+              <Box key={index} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <TextField
+                  label="CodRequiCom"
+                  type="text"
+                  value={item.CodRequiCom}
+                  onChange={(e) => handleChangeOrden(e, index, 'CodRequiCom')}
+                  style={{ backgroundColor: 'white' }}
+                />
+                <TextField
+                  label="CodProd"
+                  type="text"
+                  value={item.CodProd}
+                  onChange={(e) => handleChangeOrden(e, index, 'CodProd')}
+                  style={{ backgroundColor: 'white' }}
+                />
+                <TextField
+                  label="Precio"
+                  type="number"
+                  value={item.Precio}
+                  onChange={(e) => handleChangeOrden(e, index, 'Precio')}
+                  style={{ backgroundColor: 'white' }}
+                />
+                <Button onClick={() => handleRemoveItem(index)}>Quitar</Button>
+              </Box>
+            ))}
+            <Button onClick={handleAddItem}>Agregar ítem</Button>
+          </Box>
+          <Button type="submit">Enviar</Button>
+        </div>
+      )}
+
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Button type='submit' variant="contained" sx={{
-          margin: '5px 0',
-          color: '#000000',
-          bgcolor: '#FFFFFF',
-          '&:hover': {
-            bgcolor: '#41B06E',
-            color: '#FFFFFF'
-          }
-        }}>
-          {isEditing ? 'Actualizar Inventario' : 'Agregar Inventario'}
-        </Button>
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
             Eliminar
@@ -521,7 +485,138 @@ function Inventario({ data = null, isEditing = false }) {
   );
 }
 
+function Facturas({ data = null, isEditing = false }) {
 
+  // Ajusta initialValues para usar useState
+  const [factura, setFactura] = useState({
+    RIFSuc: user.RIFSuc || '',
+    NumFact: data?.NumFact || '',
+    Fecha: data?.Fecha || '',
+    items: data?.items || [
+      {
+        CodOrden: 0,
+        CodRequiCom: 0,
+        CodProd: 0,
+      },
+    ],
+  });
+
+  // Función para manejar cambios en el formulario
+  const handleChangeFactura = (e, index = null, field = null) => {
+    if (index !== null && field) {
+      // Maneja cambios en los campos de los ítems
+      const updatedItems = factura.items.map((item, i) => {
+        if (i === index) {
+          return { ...item, [field]: e.target.value };
+        }
+        return item;
+      });
+      setFactura({ ...factura, items: updatedItems });
+    } else {
+      // Maneja cambios en los campos normales del formulario
+      setFactura({ ...factura, [e.target.name]: e.target.value });
+    }
+  };
+
+  // Función para agregar un nuevo ítem
+  const handleAddItem = () => {
+    setFactura({
+      ...factura,
+      items: [...factura.items, { CodOrden: 0, CodRequiCom: 0, CodProd: 0 }],
+    });
+  };
+
+  // Función para quitar un ítem
+  const handleRemoveItem = (index) => {
+    const newItems = factura.items.filter((_, i) => i !== index);
+    setFactura({ ...factura, items: newItems });
+  };
+
+  const handleSubmitFactura = async (e) => {
+    e.preventDefault();
+ 
+    try {
+
+      const endpoint = `${SERVERNAME}/facturasproveedores`;
+      return sendData(endpoint, factura, 'POST');
+
+    } catch (error) {
+      console.error('Error en la operación', error);
+      alert('Error en la operación. Por favor, intente nuevamente.');
+    }
+  };
+
+  const handleDelete = async () => {
+    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar esta factura?');
+    if (!isConfirmed) {
+      return; // Si el usuario no confirma, detiene la función aquí
+    }
+    const endpoint = `${SERVERNAME}/facturas/${factura.NumFact}`; // Asumiendo que NumFact es el identificador único
+    try {
+      await sendData(endpoint, {}, 'DELETE');
+      alert('Factura eliminada correctamente');
+    } catch (error) {
+      console.error('Error al eliminar la factura', error);
+      alert('Error al eliminar la factura. Por favor, intente nuevamente.');
+    }
+  };
+
+  return (
+    <FormBox onSubmit={handleSubmitFactura}>
+      <div>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+            <TextField label="NumFact" type='text' name='NumFact'
+              value={factura.NumFact} onChange={handleChangeFactura}
+              style={{ backgroundColor: 'white' }}
+            />
+
+            <TextField label="Fecha" type='date' name='Fecha'
+              value={factura.Fecha} onChange={handleChangeFactura}
+              style={{ backgroundColor: 'white' }}
+            />
+          </Box>
+          {factura.items.map((item, index) => (
+            <Box key={index} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <TextField
+                label="CodOrden"
+                type="text"
+                value={item.CodOrden}
+                onChange={(e) => handleChangeFactura(e, index, 'CodOrden')}
+                style={{ backgroundColor: 'white' }}
+              />
+              <TextField
+                label="CodRequiCom"
+                type="text"
+                value={item.CodRequiCom}
+                onChange={(e) => handleChangeFactura(e, index, 'CodRequiCom')}
+                style={{ backgroundColor: 'white' }}
+              />
+              <TextField
+                label="CodProd"
+                type="text"
+                value={item.CodProd}
+                onChange={(e) => handleChangeFactura(e, index, 'CodProd')}
+                style={{ backgroundColor: 'white' }}
+              />
+              <Button onClick={() => handleRemoveItem(index)}>Quitar</Button>
+            </Box>
+          ))}
+          <Button onClick={handleAddItem}>Agregar ítem</Button>
+        </Box>
+        <Button type="submit">Enviar</Button>
+      </div>
+
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+        {isEditing && (
+          <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
+            Eliminar
+          </Button>
+        )}
+      </Box>
+    </FormBox>
+  );
+}
 
 // Define una función para renderizar una lista de elementos
 function renderList(items, textKey, secondaryKey, onSeleccionado) {
@@ -543,6 +638,7 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
           <ListItemText primary={item[textKey]} />
           {/* Muestra el valor secundario directamente sin un componente específico */}
           {item[secondaryKey]}
+
         </ListItem>
       ))}
     </List>
@@ -550,29 +646,35 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
 }
 
 // Define una función para mostrar una lista basada en la opción seleccionada
-function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, onSeleccionado) {
+function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados,facturasSeleccionadas, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
-    case 'Productos':
+    case 'Proveedores':
       // Renderiza y retorna una lista de empleados seleccionados
-      return renderList(empleadosSeleccionados, 'NombreP', 'CodProd', onSeleccionado);
-    case 'Lineas':
+      return renderList(empleadosSeleccionados, 'Rif', 'RazonSocial', onSeleccionado);
+    case 'REQUISICIONES DE COMPRAS':
       // Renderiza y retorna una lista de lineas seleccionados
-      return renderList(lineasSeleccionados, 'Descripcion', 'CodLineas', onSeleccionado);
-    case 'Inventario':
+      return renderList(lineasSeleccionados, 'IdReq', 'CodProd', onSeleccionado);
+    case 'ORDENES DE COMPRA':
       // Renderiza y retorna una lista de vehículos seleccionados
-      return renderList(vehiculosSeleccionados, 'CodProd', 'NombreP', onSeleccionado);
+      return renderList(vehiculosSeleccionados, 'CodOrden', 'CodProd', onSeleccionado);
+
+    case 'Facturas':
+
+      return renderList(facturasSeleccionadas, 'NumFact', 'Fecha', onSeleccionado);
     default:
       // Retorna un párrafo indicando que se debe seleccionar una opción si ninguna coincide
       return <p>Seleccione una opción</p>;
   }
 }
 
-
-
 // Define el componente Lists que recibe una prop 'opcion'
-function InventarioLista({ opcion }) {
+function ProveedoresLista({ opcion }) {
+  const navigate = useNavigate();
 
+  const handleVerDetallesClick = () => {
+    navigate(`/detallefactura/${seleccionEnLists.NumFact}`);
+  };
   // Estado para controlar la visibilidad del modal
   const [open, setOpen] = useState(false);
   // Estado para determinar el tipo de formulario a mostrar en el modal
@@ -583,6 +685,9 @@ function InventarioLista({ opcion }) {
   const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
   const [lineasSeleccionados, setlineasSeleccionados] = useState([]);
   const [vehiculosSeleccionados, setVehiculosSeleccionados] = useState([]);
+  const [facturasSeleccionadas, setFacturasSeleccionadas] = useState([]);
+
+
 
   // useEffect para cargar datos de empleados, lineas y vehículos al montar el componente
   useEffect(() => {
@@ -594,6 +699,7 @@ function InventarioLista({ opcion }) {
         const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
         // Convierte la respuesta a formato JSON
         const datos = await respuesta.json();
+        console.log(datos);
         // Actualiza el estado correspondiente con los datos obtenidos
         setter(datos);
       } catch (error) {
@@ -604,9 +710,10 @@ function InventarioLista({ opcion }) {
 
 
     // Llama a obtenerDatos para cada tipo de dato necesario
-    obtenerDatos(`productos`, setEmpleadosSeleccionados);
-    obtenerDatos('lineas', setlineasSeleccionados);
-    obtenerDatos(`inventario_view/${user.RIFSuc}`, setVehiculosSeleccionados);
+    obtenerDatos(`proveedores`, setEmpleadosSeleccionados);
+    obtenerDatos(`requisiciones_compra/${user.RIFSuc}`, setlineasSeleccionados);
+    obtenerDatos(`ordenescompras/${user.RIFSuc}`, setVehiculosSeleccionados);
+    obtenerDatos(`facturasproveedores/${user.RIFSuc}`, setFacturasSeleccionadas)
   }, []);
 
   // Función para manejar la apertura del modal y establecer el tipo de formulario
@@ -627,12 +734,14 @@ function InventarioLista({ opcion }) {
   // Función para renderizar el formulario correspondiente en el modal
   const renderForm = (info, editar) => {
     switch (formType) {
-      case 'Productos':
-        return <Productos data={info} isEditing={editar} />;
-      case 'Lineas':
-        return <Lineas data={info} isEditing={editar} />;
-      case 'Inventario':
-        return <Inventario data={info} isEditing={editar} />;
+      case 'Proveedores':
+        return <Proveedores data={info} isEditing={editar} />;
+      case 'REQUISICIONES DE COMPRAS':
+        return <REQUISICIONCOMPRA data={info} isEditing={editar} />;
+      case 'ORDENES DE COMPRA':
+        return <ORDENCOMPRA data={info} isEditing={editar} />;
+      case 'Facturas':
+        return <Facturas data={info} isEditing={editar} />;
       default:
         return <div> fallo </div>;
     }
@@ -640,29 +749,29 @@ function InventarioLista({ opcion }) {
 
   const [seleccionEnLists, setSeleccionEnLists] = useState(null);
 
+
   // Función para manejar la selección desde renderList
   const manejarSeleccionEnLists = (seleccion) => {
     setSeleccionEnLists(seleccion);
     // Aquí puedes hacer algo más con la selección en el componente Lists
   };
 
+  console.log(seleccionEnLists)
 
   // Renderiza el componente
   return (
     <Box>
-
       <div className="vertical_line"></div>
-      <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
+      <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <h1 className='h1Libreta'>Lista de {opcion}</h1>
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
-          {mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
+          {mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados,facturasSeleccionadas, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
-          {opcion !== 'Inventario' && (
-            <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
-              Agregar {opcion}
-            </Button>
-          )}
+
+          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
+            Agregar {opcion}
+          </Button>
+
           {/* Modal que se muestra u oculta basado en el estado 'open' */}
           <Modal open={open} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
@@ -674,20 +783,29 @@ function InventarioLista({ opcion }) {
         {seleccionEnLists ? (
           <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <div className="circle">
-              <PersonIcon sx={{ fontSize: 150 }} />
+              <DirectionsCarIcon sx={{ fontSize: 150 }} />
             </div>
-            <h2 className='h2Libreta'>{seleccionEnLists.NombreP || ''}</h2>
-            <h2 className='h2Libreta'>{seleccionEnLists.CodProd || ''}</h2>
-            <h2 className='h2Libreta'>{seleccionEnLists.Descripcion || ''}</h2>
-            <h2 className='h2Libreta'>{seleccionEnLists.CodLineas || ''}</h2>
+            <h2>{seleccionEnLists.Nombre || ''}</h2>
+            <h2>{seleccionEnLists.CodProd || ''}</h2>
+            <h2>{seleccionEnLists.Descripcion || ''}</h2>
+            <h2>{seleccionEnLists.CodLineas || ''}</h2>
+            {opcion === 'Facturas' && (
+        <Button
+          variant="contained"
+          sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }}
+          onClick={handleVerDetallesClick}
+        >
+          Ver Detalles
+        </Button>
+      )}
           </Box>
         ) : (
-          <Typography textAlign={'center'}>No se ha seleccionado ningún {opcion}</Typography>
+          <Typography>No se ha seleccionado ningún elemento</Typography>
         )}
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
           <List sx={style}>
-            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Descripcion' || entry[0] === 'Descripcion')).map(([key, value]) => (
+            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Rif' || entry[0] === 'IdReq' || entry[0] === 'CodOrden' || entry[0] == 'NumFact')).map(([key, value]) => (
               <React.Fragment key={key}>
                 <ListItem>
                   <ListItemText primary={`${key}: `} />
@@ -695,15 +813,24 @@ function InventarioLista({ opcion }) {
                 </ListItem>
                 <Divider component="li" />
               </React.Fragment>
+              
             ))}
+            
           </List>
           {/* Botón para modificar, aún no implementado completamente */}
-          {opcion !== 'Inventario' && (
+
+          {opcion === 'ORDENES DE COMPRAS' && (
             <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
               Modificar
             </Button>
-          )
-          }
+
+          )}
+
+      
+
+
+
+
 
           <Modal open={open2} onClose={closeModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             {/* Renderiza el formulario correspondiente dentro del modal */}
@@ -716,7 +843,7 @@ function InventarioLista({ opcion }) {
 }
 
 // Define las propiedades esperadas para el componente Lists
-InventarioLista.propTypes = {
+ProveedoresLista.propTypes = {
   opcion: PropTypes.string.isRequired, // 'opcion' debe ser una cadena de texto y es requerida
   raiz: PropTypes.string.isRequired, // 'raiz' debe ser una cadena de texto y es requerida
 };
@@ -737,19 +864,24 @@ InputField.propTypes = {
   valor: PropTypes.string, // 'valor' debe ser una cadena de texto, pero no es requerida
 };
 
-Productos.propTypes = {
+Proveedores.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
 
-Lineas.propTypes = {
+REQUISICIONCOMPRA.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
 
-Inventario.propTypes = {
+ORDENCOMPRA.propTypes = {
   data: PropTypes.object,
   isEditing: PropTypes.bool,
 }
 
-export default InventarioLista;
+Facturas.propTypes = {
+  data: PropTypes.object,
+  isEditing: PropTypes.bool,
+}
+
+export default ProveedoresLista;
