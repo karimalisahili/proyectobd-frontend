@@ -1020,6 +1020,7 @@ return(
               name='NroOrenServ'
               valor = {formData.NroOrenServ}
               cambio = {handleChange}/>
+        
                 <TextField select label="CODIGO-PRODUCTO"
               type='number'
               name='CodProductoServ'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodProductoServ} onChange={handleChange}>
@@ -1133,10 +1134,10 @@ function Facturas({ data = null }) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
     
-    
+    console.log(formDataFactura);
     formDataFactura.Fecha = new Date().toISOString().split('T')[0];
     formDataFactura.Monto = montoFinal
-    formDataFactura.Descuento = Descuento[0].Descuento;
+    formDataFactura.Descuento = Descuento ? Descuento[0].Descuento : 0;
 
     console.log(formDataFactura);
 
@@ -1326,10 +1327,7 @@ if (Descuento.length >= 0) {
   montoFinal = sub;
 }
 
-  formDataFactura.Monto = montoFinal;
-  formData
-
-  
+  formDataFactura.Monto = montoFinal;  
       useEffect(() => {
         const fetchFacturas = async () => {
           try {
@@ -1570,7 +1568,7 @@ if (Descuento.length >= 0) {
                           }
                           
                                              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <h2>Productos</h2>
+                            <h2>---------------------------------</h2>
                           </div>       
                           <TableRow sx={{display:'flex', justifyContent:'center'}}>
                             <TableCell align='center'>Subtotal</TableCell>
@@ -1583,7 +1581,7 @@ if (Descuento.length >= 0) {
                               <TableCell sx={{ mx:2}} align='center'>${subtotal[0].TotalPagar}</TableCell>
   )}
   {Descuento && (
-    <TableCell sx={{ mx:2}}   align='center'>%{Descuento[0].Descuento}</TableCell>
+    <TableCell sx={{ mx:2}}   align='center'>%{Descuento?.[0]?.Descuento ?? 0}</TableCell>
   )}
                             <TableCell sx={{ mx:2}}  align='center'>${montoFinal}</TableCell>
                             
