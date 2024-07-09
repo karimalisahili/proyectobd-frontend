@@ -315,14 +315,80 @@ function REQUISICIONCOMPRA({ data = null, isEditing = false }) {
 // Define un componente funcional llamado Vehiculo
 function ORDENCOMPRA({ data = null, isEditing = false }) {
 
-  // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
-  const initialValues = {
-    CodTipoV: data?.CodTipoV || '',
-    Descripcion: data?.Descripcion || '',
+  // Ajusta initialValues para usar useState
+  const [ordenCompra, setOrdenCompra] = useState({
+    RIFSuc: user.RIFSuc,
+    RIFProv: data?.RIFProv || '',
+    items: [
+      {
+        CodRequiCom: '',
+        CodProd: '',
+        Precio: 0,
+      },
+    ],
+  });
 
+
+
+  // Función para manejar cambios en el formulario
+  const handleChangeOrden = (e, index = null, field = null) => {
+    if (index !== null && field) {
+      // Maneja cambios en los campos de los ítems
+      const updatedItems = ordenCompra.items.map((item, i) => {
+        if (i === index) {
+          return { ...item, [field]: e.target.value };
+        }
+        return item;
+      });
+      setOrdenCompra({ ...ordenCompra, items: updatedItems });
+    } else {
+      // Maneja cambios en los campos normales del formulario
+      setOrdenCompra({ ...ordenCompra, [e.target.name]: e.target.value });
+    }
   };
 
-  const [formData, handleChange] = useForm(initialValues);
+  // Función para agregar un nuevo ítem
+  const handleAddItem = () => {
+    setOrdenCompra({
+      ...ordenCompra,
+      items: [...ordenCompra.items, { CodRequiCom: '', CodProd: '', Precio: 0 }],
+    });
+  };
+
+  // Función para quitar un ítem
+  const handleRemoveItem = (index) => {
+    const newItems = ordenCompra.items.filter((_, i) => i !== index);
+    setOrdenCompra({ ...ordenCompra, items: newItems });
+  };
+
+  const handleSubmitOrden = async (e) => {
+    e.preventDefault();
+
+    try {
+      const postRequests = ordenCompra.items.map(item => {
+        const requestData = {
+          RIFProv: ordenCompra.RIFProv,
+          CodRequiCom: item.CodRequiCom,
+          CodProd: item.CodProd,
+          Precio: item.Precio,
+          RIFSuc: ordenCompra.RIFSuc,
+        };
+        const endpoint = `${SERVERNAME}/ordenescompras`;
+        return sendData(endpoint, requestData, 'POST');
+      });
+
+
+      await Promise.all(postRequests);
+
+      alert('Órdenes de compra creadas con éxito');
+    } catch (error) {
+      console.error('Error en la operación', error);
+      alert('Error en la operación. Por favor, intente nuevamente.');
+    }
+  };
+
+
+  const [formData, handleChange] = useForm(ordenCompra);
 
   // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
 
@@ -350,9 +416,9 @@ function ORDENCOMPRA({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/tiposvehiculos`; // Asumiendo que CodTipoV es el identificador único
+    const endpoint = `${SERVERNAME}/ordenescompras`; // Asumiendo que CodTipoV es el identificador único
     try {
-      await sendData(endpoint, formData, 'DELETE');
+      await sendData(endpoint, ordenCompra, 'DELETE');
       alert('Empleado eliminado correctamente');
       // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
     } catch (error) {
@@ -363,29 +429,50 @@ function ORDENCOMPRA({ data = null, isEditing = false }) {
 
   // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
-    <FormBox onSubmit={handleSubmit}>
-      {/* Box para agrupar los campos de entrada con estilo de flexbox */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-      </Box>
-      {/* Repite la estructura anterior para otros campos del formulario */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Descripcion" type='text' name='Descripcion'
-            valor={formData.Descripcion} cambio={handleChange} />
-        </Box>
-      </Box>
+    <FormBox onSubmit={handleSubmitOrden}>
+      {!isEditing && (
+        <div>
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+              <TextField label="RIFProv" type='text' name='RIFProv'
+                value={ordenCompra.RIFProv} onChange={handleChangeOrden}
+                style={{ backgroundColor: 'white' }}
+              />
+
+            </Box>
+            {ordenCompra.items.map((item, index) => (
+              <Box key={index} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <TextField
+                  label="CodRequiCom"
+                  type="text"
+                  value={item.CodRequiCom}
+                  onChange={(e) => handleChangeOrden(e, index, 'CodRequiCom')}
+                  style={{ backgroundColor: 'white' }}
+                />
+                <TextField
+                  label="CodProd"
+                  type="text"
+                  value={item.CodProd}
+                  onChange={(e) => handleChangeOrden(e, index, 'CodProd')}
+                  style={{ backgroundColor: 'white' }}
+                />
+                <TextField
+                  label="Precio"
+                  type="number"
+                  value={item.Precio}
+                  onChange={(e) => handleChangeOrden(e, index, 'Precio')}
+                  style={{ backgroundColor: 'white' }}
+                />
+                <Button onClick={() => handleRemoveItem(index)}>Quitar</Button>
+              </Box>
+            ))}
+            <Button onClick={handleAddItem}>Agregar ítem</Button>
+          </Box>
+          <Button type="submit">Enviar</Button>
+        </div>
+      )}
+
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Button type='submit' variant="contained" sx={{
-          margin: '5px 0',
-          color: '#000000',
-          bgcolor: '#FFFFFF',
-          '&:hover': {
-            bgcolor: '#41B06E',
-            color: '#FFFFFF'
-          }
-        }}>
-          {isEditing ? 'Actualizar Tipo Vehiculo' : 'Agregar Tipo Vehiculo'}
-        </Button>
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
             Eliminar
@@ -434,7 +521,7 @@ function Facturas({ data = null, isEditing = false }) {
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/tiposvehiculos`; // Asumiendo que CodTipoV es el identificador único
+    const endpoint = `${SERVERNAME}/ordenescompras`; // Asumiendo que CodTipoV es el identificador único
     try {
       await sendData(endpoint, formData, 'DELETE');
       alert('Empleado eliminado correctamente');
@@ -508,7 +595,7 @@ function renderList(items, textKey, secondaryKey, onSeleccionado) {
 }
 
 // Define una función para mostrar una lista basada en la opción seleccionada
-function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, onSeleccionado) {
+function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados,facturasSeleccionadas, onSeleccionado) {
   // Utiliza una estructura switch para manejar las diferentes opciones
   switch (opcion) {
     case 'Proveedores':
@@ -519,7 +606,11 @@ function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehic
       return renderList(lineasSeleccionados, 'IdReq', 'CodProd', onSeleccionado);
     case 'ORDENES DE COMPRA':
       // Renderiza y retorna una lista de vehículos seleccionados
-      return renderList(vehiculosSeleccionados, 'CodOrden', 'CodRequiCom', onSeleccionado);
+      return renderList(vehiculosSeleccionados, 'CodOrden', 'CodProd', onSeleccionado);
+
+    case 'Facturas':
+
+      return renderList(facturasSeleccionadas, 'NumFact', 'Fecha', onSeleccionado);
     default:
       // Retorna un párrafo indicando que se debe seleccionar una opción si ninguna coincide
       return <p>Seleccione una opción</p>;
@@ -539,6 +630,7 @@ function ProveedoresLista({ opcion }) {
   const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
   const [lineasSeleccionados, setlineasSeleccionados] = useState([]);
   const [vehiculosSeleccionados, setVehiculosSeleccionados] = useState([]);
+  const [facturasSeleccionadas, setFacturasSeleccionadas] = useState([]);
 
 
 
@@ -564,7 +656,8 @@ function ProveedoresLista({ opcion }) {
     // Llama a obtenerDatos para cada tipo de dato necesario
     obtenerDatos(`proveedores`, setEmpleadosSeleccionados);
     obtenerDatos(`requisiciones_compra/${user.RIFSuc}`, setlineasSeleccionados);
-    obtenerDatos(`ordenescompras`, setVehiculosSeleccionados);
+    obtenerDatos(`ordenescompras/${user.RIFSuc}`, setVehiculosSeleccionados);
+    obtenerDatos(`facturas_proveedores/${user.RIFSuc}`)
   }, []);
 
   // Función para manejar la apertura del modal y establecer el tipo de formulario
@@ -591,8 +684,8 @@ function ProveedoresLista({ opcion }) {
         return <REQUISICIONCOMPRA data={info} isEditing={editar} />;
       case 'ORDENES DE COMPRA':
         return <ORDENCOMPRA data={info} isEditing={editar} />;
-        case 'Facturas':
-          return <Facturas data={info} isEditing={editar} />;
+      case 'Facturas':
+        return <Facturas data={info} isEditing={editar} />;
       default:
         return <div> fallo </div>;
     }
@@ -616,7 +709,7 @@ function ProveedoresLista({ opcion }) {
       <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '50%', height: 'auto' }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Llama a mostrarLista para renderizar la lista de elementos seleccionados basada en la opción */}
-          {mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados, manejarSeleccionEnLists)}
+          {mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehiculosSeleccionados,facturasSeleccionadas, manejarSeleccionEnLists)}
           {/* Botón para abrir el modal y agregar un nuevo elemento basado en la opción seleccionada */}
 
           <Button variant="contained" sx={{ backgroundColor: '#8DECB4', '&:hover': { backgroundColor: '#41B06E' }, my: 3 }} onClick={() => handleOpen(opcion)}>
@@ -647,7 +740,7 @@ function ProveedoresLista({ opcion }) {
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
           <List sx={style}>
-            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Rif' || entry[0] === 'IdReq')).map(([key, value]) => (
+            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Rif' || entry[0] === 'IdReq' || entry[0] === 'CodOrden')).map(([key, value]) => (
               <React.Fragment key={key}>
                 <ListItem>
                   <ListItemText primary={`${key}: `} />
@@ -659,9 +752,12 @@ function ProveedoresLista({ opcion }) {
           </List>
           {/* Botón para modificar, aún no implementado completamente */}
 
-          <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
-            Modificar
-          </Button>
+          {opcion === 'ORDENES DE COMPRAS' && (
+            <Button variant="contained" sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }} onClick={() => handleOpen2(opcion)}>
+              Modificar
+            </Button>
+
+          )}
 
 
 
