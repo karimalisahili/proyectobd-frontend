@@ -197,6 +197,8 @@ function Ventas() {
       }
     }
 
+    
+
   };
 
   const handleSubmit = async (e) => {
@@ -232,6 +234,8 @@ function Ventas() {
   const [Descuento, setDescuento] = useState([]);
   const [Pagos, setPagos] = useState([]);
   const [Clientes, setClientes] = useState([]);
+
+
 
   // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
   useEffect(() => {
