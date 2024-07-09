@@ -29,6 +29,8 @@ export default function AppRouter() {
             <Route path="/Marcas" element={<ProtectedRoute><Marcas /></ProtectedRoute>} />
             <Route path="/Marcas_servicio" element={<ProtectedRoute><Marcas_servicio/></ProtectedRoute>} />
             <Route path="/Personal_servicio" element={<ProtectedRoute><Personal_servicio/></ProtectedRoute>} />
+            <Route path="/detallefactura/:NumFact" element={<ProtectedRoute><Personal_servicio/></ProtectedRoute>} />
+
         </Routes>
     )
 }
