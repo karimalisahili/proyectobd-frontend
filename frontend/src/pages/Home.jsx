@@ -1,5 +1,7 @@
 import '../css/Home.css';
 import Navbar from '../components/Navbar';
+import Marcas_servicio from './Marcas_servicio';
+import Personal_servicio from './Personal_servicio';
 
 
 function Home() {
@@ -7,7 +9,8 @@ function Home() {
   return (
     <div>
       <Navbar />
-      <h1>Home</h1>
+      <Marcas_servicio />
+      <Personal_servicio />
     </div>
   );
 }

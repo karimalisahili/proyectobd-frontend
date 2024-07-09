@@ -35,9 +35,8 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
-const userJson = localStorage.getItem('user');
-const user = JSON.parse(userJson);
-
+ const userJson = localStorage.getItem('user');
+    const user = userJson ? JSON.parse(userJson) : {};
 
 // Hook personalizado para manejar formularios
 function useForm(initialState) {
@@ -916,12 +915,12 @@ function Reservas({ data = null, isEditing = false }){
     function Contrataciones({data = null, isEditing = false}){
 
       const initialValues = {
-        CodServicio: data?.CodServicio || '',
-        NroActividad: data?.NroActividad || '',
-        NroOrenServ: data?.NroOrenServ || '',
-        CodProductoServ: data?.CodProductoServ || '',
-        CantProd: data?.CantProd || '',
-        Precio: data?.Precio || '',
+        CodServicio: data?.CodServicio || 0,
+        NroActividad: data?.NroActividad || 0,
+        NroOrenServ: data?.NroOrenServ || 0,
+        CodProductoServ: data?.CodProductoServ || 0,
+        CantProd: data?.CantProd || 0,
+        Precio: data?.Precio || 0,
       }
 
       const [formData, handleChange] = useForm(initialValues);
@@ -961,22 +960,59 @@ function Reservas({ data = null, isEditing = false }){
     console.error('Error al eliminar el empleado', error);
     alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
   }
-};
+      };
+
+      const [Servicios, setServicios] = useState([]);
+      const [Actividades, setActividades] = useState([]);
+      const [OrdenServicio, setOrdenServicio] = useState([]);
+      const [ProductosServicios, setProductosServicios] = useState([]);
+
+      
+      useEffect(() => {
+    // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
+    const obtenerDatos = async (endpoint, setter) => {
+      try {
+        console.log(`${SERVERNAME}/${endpoint}`)
+        // Realiza la petición fetch al servidor y espera la respuesta
+        const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
+        // Convierte la respuesta a formato JSON
+        const datos = await respuesta.json();
+        // Actualiza el estado correspondiente con los datos obtenidos
+        setter(datos);
+      } catch (error) {
+        // Captura y registra errores en la consola
+        console.error(`Error al obtener datos de ${endpoint}:`, error);
+      }
+    };
+        // Llama a obtenerDatos para cada tipo de dato necesario
+        obtenerDatos(`servicios`, setServicios);
+        obtenerDatos(`actividades`, setActividades);
+        obtenerDatos(`ordenes_servicios`, setOrdenServicio);
+        obtenerDatos(`productos_servicios`, setProductosServicios);
+  }, []);
 
 return(
         <FormBox onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-              <InputField label="CODIGO-SERVICIO"
+        <TextField select label="SERVICIO"
               type='number'
-              name='CodServicio'
-              valor = {formData.CodServicio}
-              cambio = {handleChange}/>
-              <InputField label="CODIGO-ACTIVIDAD"
+              name='CodServicio'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodServicio}onChange={handleChange}>
+            {Servicios.map((servicio, index) => (
+              <MenuItem key={index} value={servicio.CodigoServ}>
+                {servicio.Descripcion}
+              </MenuItem>
+            ))}
+        </TextField>
+        <TextField select label="CODIGO-ACTIVIDAD"
               type='number'
-              name='NroActividad'
-              valor = {formData.NroActividad}
-              cambio = {handleChange}/>
+              name='NroActividad'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.NroActividad} onChange={handleChange}>
+            {Actividades.map((actividad, index) => (
+              <MenuItem key={index} value={actividad.NroActividad}>
+                {actividad.Descripcion}
+              </MenuItem>
+            ))}
+          </TextField>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
               <InputField label="NRO-ORDEN-SERVICIO"
@@ -984,11 +1020,16 @@ return(
               name='NroOrenServ'
               valor = {formData.NroOrenServ}
               cambio = {handleChange}/>
-              <InputField label="CODIGO-PRODUCTO"
+                <TextField select label="CODIGO-PRODUCTO"
               type='number'
-              name='CodProductoServ'
-              valor = {formData.CodProductoServ}
-              cambio = {handleChange}/>
+              name='CodProductoServ'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodProductoServ} onChange={handleChange}>
+            {ProductosServicios.map((producto, index) => (
+              <MenuItem key={index} value={producto.CodProd}>
+                {producto.CodProd}
+              </MenuItem>
+            ))}
+          </TextField>
+        
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}> 
               <InputField label="CANTIDAD-PRODUCTO"
@@ -1043,27 +1084,6 @@ function useForm2(initialState) {
   return [formData, handleChange2, resetForm];
 }
 
-    function Ventas() {
-  
-
-  
-
-
-
-  
-
-  
-
-
-  
-  return (
-    <Box>
-      <Box sx={{ position: 'absolute', ml: '15%', width: '35%', top: '30%', height: 'auto' }}>
-         
-    </Box>
-  </Box>
-);
-}
 
 function Facturas({ data = null }) {
       
@@ -1153,7 +1173,7 @@ function Facturas({ data = null }) {
     const method = 'POST';
 
     try {
-      await sendData(endpoint, formData, method);
+      await sendData(endpoint, formDataPagos, method);
       alert('Operación realizada correctamente');
     } catch (error) {
       console.error('Error en la operación', error);
@@ -1307,6 +1327,7 @@ if (Descuento.length >= 0) {
 }
 
   formDataFactura.Monto = montoFinal;
+  formData
 
   
       useEffect(() => {
@@ -1322,8 +1343,6 @@ if (Descuento.length >= 0) {
 
     fetchFacturas();
       }, []);
-  
-  console.log(facturas);
 
     const handleSelectFactura = (nroFactura) => {
       setSelectedFactura(nroFactura);
@@ -1431,38 +1450,38 @@ if (Descuento.length >= 0) {
                      <FormBox onSubmit={handleSubmit} > 
                     <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                       <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                        <TextField select label='Tipo-Pago' type='text' name='TipoPago' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoPago} onChange={handleChange}>
+                        <TextField select label='Tipo-Pago' type='text' name='TipoPago' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataPagos.TipoPago} onChange={handleChangePagos}>
                           <MenuItem value="E">Efectivo</MenuItem>
                           <MenuItem value="P">Pago Móvil</MenuItem>
                           <MenuItem value="T">Tarjeta</MenuItem>
                         </TextField>        
                       </Box>
-                      {formData.TipoPago === "E" && (
+                      {formDataPagos.TipoPago === "E" && (
                         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                          <TextField select label="Tipo-Efectivo" name='TipoEfectivo'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoEfectivo} onChange={handleChange}>
+                          <TextField select label="Tipo-Efectivo" name='TipoEfectivo'sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataPagos.TipoEfectivo} onChange={handleChangePagos}>
                             <MenuItem value="D">Divisa</MenuItem>
                             <MenuItem value="B">Bolivares</MenuItem>
                           </TextField>
                         </Box>
                       )}
-                      {formData.TipoPago === "P" && (
+                      {formDataPagos.TipoPago === "P" && (
                         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                          <InputField label="Nro_Telefono" type='text' name='NroTelf'valor={formData.NroTelf} cambio={handleChange} />
-                          <InputField label="Nro-Reference" type='number' name='Referencia' valor={formData.Referencia} cambio={handleChange}/>
+                          <InputField label="Nro_Telefono" type='text' name='NroTelf'valor={formDataPagos.NroTelf} cambio={handleChangePagos} />
+                          <InputField label="Nro-Reference" type='number' name='Referencia' valor={formDataPagos.Referencia} cambio={handleChangePagos}/>
                         </Box>
                       )}
-                      {formData.TipoPago === "T" && (
+                      {formDataPagos.TipoPago === "T" && (
                         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                          <TextField select label="Tipo_Tarjeta" type='text' name='TipoTarjeta' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoTarjeta} onChange={handleChange}>
+                          <TextField select label="Tipo_Tarjeta" type='text' name='TipoTarjeta' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataPagos.TipoTarjeta} onChange={handleChangePagos}>
                             <MenuItem value="Debito">Debito</MenuItem>
                             <MenuItem value="Credito">Credito</MenuItem>
                           </TextField>
-                          <InputField label="Numero_Tarjeta" type='text' name='NumTarjeta'valor={formData.NumTarjeta} cambio={handleChange} />
-                          <InputField label="Banco" type='text' name='Banco'valor={formData.Banco} cambio={handleChange} />
+                          <InputField label="Numero_Tarjeta" type='text' name='NumTarjeta'valor={formDataPagos.NumTarjeta} cambio={handleChangePagos} />
+                          <InputField label="Banco" type='text' name='Banco'valor={formDataPagos.Banco} cambio={handleChangePagos} />
                         </Box>
                       )}
                       <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Monto = montoFinal} onChange={handleChange} disabled ></TextField>
+                        <TextField label="Monto" type='number' name='Monto' min={0} sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataPagos.Monto = montoFinal} onChange={handleChangePagos} disabled ></TextField>
                         <TextField select label="Cédula Cliente" name='CIResponsable' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formDataFactura.CIResponsable} onChange={handleChange2}>
                           {Clientes.map((cliente, index) => (
                             <MenuItem key={index} value={cliente.CIResponsable}>

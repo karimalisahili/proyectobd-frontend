@@ -108,10 +108,11 @@ const handleCloseSnackbar = (event, reason) => {
       return;
     }
     const method = isEditing ? 'PUT' : 'POST';
+    const message= isEditing ? 'Elemento actualizado correctamente' : 'Elemento agregado correctamente';
     try {
       await sendData(endpointUrl, formData, method);
        setOpenSnackbar(true);
-            setSnackbarMessage('Inicio de sesión exitoso');
+      setSnackbarMessage(message);
       setSnackbarSeverity('success');
       setTimeout(() => {
                 window.location.reload();
@@ -131,8 +132,11 @@ const handleCloseSnackbar = (event, reason) => {
     }
     try {
       await sendData(endpointUrl, formData, 'DELETE');
-      alert('Elemento eliminado correctamente');
-      window.location.reload();
+      setSnackbarMessage('Elemento eliminado correctamente');
+      setSnackbarSeverity('success');
+      setTimeout(() => {
+                window.location.reload();
+        }, 3000);
     } catch (error) {
       console.error('Error al eliminar el elemento', error);
       alert('Error al eliminar el elemento. Por favor, intente nuevamente.');
