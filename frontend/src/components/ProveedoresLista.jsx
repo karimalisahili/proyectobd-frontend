@@ -3,6 +3,8 @@ import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, T
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import { useNavigate } from 'react-router-dom';
+
 
 // Definición de la variable SERVERNAME que obtiene el valor de la variable de entorno VITE_SERVERNAME.
 // Este valor se utiliza para configurar el Nombre del servidor en la aplicación.
@@ -668,7 +670,11 @@ function mostrarLista(opcion, empleadosSeleccionados, lineasSeleccionados, vehic
 
 // Define el componente Lists que recibe una prop 'opcion'
 function ProveedoresLista({ opcion }) {
+  const navigate = useNavigate();
 
+  const handleVerDetallesClick = () => {
+    navigate(`/detallefactura/${seleccionEnLists.NumFact}`);
+  };
   // Estado para controlar la visibilidad del modal
   const [open, setOpen] = useState(false);
   // Estado para determinar el tipo de formulario a mostrar en el modal
@@ -783,6 +789,15 @@ function ProveedoresLista({ opcion }) {
             <h2>{seleccionEnLists.CodProd || ''}</h2>
             <h2>{seleccionEnLists.Descripcion || ''}</h2>
             <h2>{seleccionEnLists.CodLineas || ''}</h2>
+            {opcion === 'Facturas' && (
+        <Button
+          variant="contained"
+          sx={{ backgroundColor: '#8DECB4', my: 3, mx: 3, '&:hover': { backgroundColor: '#41B06E' } }}
+          onClick={handleVerDetallesClick}
+        >
+          Ver Detalles
+        </Button>
+      )}
           </Box>
         ) : (
           <Typography>No se ha seleccionado ningún elemento</Typography>
@@ -798,7 +813,9 @@ function ProveedoresLista({ opcion }) {
                 </ListItem>
                 <Divider component="li" />
               </React.Fragment>
+              
             ))}
+            
           </List>
           {/* Botón para modificar, aún no implementado completamente */}
 
@@ -808,6 +825,9 @@ function ProveedoresLista({ opcion }) {
             </Button>
 
           )}
+
+      
+
 
 
 
