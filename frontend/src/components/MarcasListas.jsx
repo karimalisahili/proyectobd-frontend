@@ -1,5 +1,5 @@
 // Importación de componentes de Material UI, PropTypes y hooks de React.
-import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText, Divider, Modal, TextField, Typography, MenuItem } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -10,8 +10,6 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
-const userJson = localStorage.getItem('user');
-const user = JSON.parse(userJson);
 
 // Estilos para el componente Box. Se configura el padding vertical, ancho, color de borde,
 // color de fondo y color de texto. Estos estilos se aplican a un componente Box de Material UI.
@@ -262,66 +260,96 @@ function Modelos({ data = null, isEditing = false }) {
         }
     };
 
-    /*
-  CREATE TABLE MODELOS_VEHICULOS (
-      CodMarcaV INT NOT NULL,
-      CodConsec INT NOT NULL IDENTITY(1,1),
-      Descripcion VARCHAR(50) NOT NULL,
-      CantPuestos INT NOT NULL,
-      Peso DECIMAL(10, 2) NOT NULL,
-      TipoAceite VARCHAR(25) NOT NULL,
-      AceiteCaja VARCHAR(25) NOT NULL,
-      TipoRefri VARCHAR(25) NOT NULL,
-      Octanaje INT NOT NULL CHECK (Octanaje IN (91, 95)),
-      TipoMant VARCHAR(30) NOT NULL,
-      TiempoUsoMant INT NOT NULL,
-      KilometrajeMant DECIMAL(10, 2) NOT NULL,
-      CodTipoV INT NOT NULL,
-      PRIMARY KEY (CodMarcaV, CodConsec),
-      FOREIGN KEY (CodTipoV) REFERENCES TIPOS_VEHICULOS(CodTipoV) ON UPDATE CASCADE ON DELETE NO ACTION,
-      FOREIGN KEY (CodMarcaV) REFERENCES MARCAS_VEHICULOS(CodMarcaVeh) ON UPDATE CASCADE ON DELETE NO ACTION
-  );
-    */
+
+     const [Marcas, setMarcas] = useState([]);
+    const [Modelos, setModelos] = useState([]);
+    const [Vehiculos, setVehiculos] = useState([]);
+
+    // useEffect para cargar datos de empleados, lineas y vehículos al montar el componente
+    useEffect(() => {
+        // Función asíncrona para obtener datos de un endpoint y actualizar el estado correspondiente
+        const obtenerDatos = async (endpoint, setter) => {
+            try {
+                console.log(`${SERVERNAME}/${endpoint}`)
+                // Realiza la petición fetch al servidor y espera la respuesta
+                const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
+                // Convierte la respuesta a formato JSON
+                const datos = await respuesta.json();
+                // Actualiza el estado correspondiente con los datos obtenidos
+                setter(datos);
+            } catch (error) {
+                // Captura y registra errores en la consola
+                console.error(`Error al obtener datos de ${endpoint}:`, error);
+            }
+        };
+
+
+        // Llama a obtenerDatos para cada tipo de dato necesario
+        obtenerDatos(`marcas_vehiculos`, setMarcas);
+        obtenerDatos('modelosvehiculos', setModelos);
+        obtenerDatos(`tiposvehiculos`, setVehiculos);
+    }, []);
+    
     // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
     return (
         <FormBox onSubmit={handleSubmit}>
             {/* Box para agrupar los campos de entrada con estilo de flexbox */}
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                 {/* Box para agrupar dos campos de entrada horizontalmente */}
-                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                    <InputField label="CodMarcaV" type='number' name='CodMarcaV' valor={formData.CodMarcaV} cambio={handleChange} />
+                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>      
+                    <TextField select label="Marca" type='text' name='CodMarcaV' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodMarcaV} onChange={handleChange}>
+            {Marcas.map((marca, index) => (
+              <MenuItem key={index} value={marca.CodMarcaVeh}>
+                {marca.Nombre}
+              </MenuItem>
+            ))}
+                    </TextField>
+            <TextField select label="TIPO-VEHICULO" type='text' name='CodTipoV' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.CodTipoV} onChange={handleChange}>
+            {Vehiculos.map((vehiculo, index) => (
+              <MenuItem key={index} value={vehiculo.CodTipoV}>
+                {vehiculo.Descripcion}
+              </MenuItem>
+            ))}
+          </TextField>
                     <InputField label="Descripcion-Modelo" type='text' name='Descripcion' valor={formData.Descripcion} cambio={handleChange} />
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                    <TextField select label="TIPO-ACEITE" type='text' name='TipoAceite' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoAceite} onChange={handleChange}>
+                <MenuItem value="Minerales">Minerales</MenuItem>
+                          <MenuItem value="Semisintéticos">Semisintéticos</MenuItem>
+                          <MenuItem value=" 100% sintéticos"> 100% sintéticos</MenuItem>
+
+          </TextField>
+                     <TextField select label="ACEITE-CAJA" type='text' name='AceiteCaja' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.AceiteCaja} onChange={handleChange}>
+                <MenuItem value="SAE 80W">SAE 80W</MenuItem>
+                          <MenuItem value="SAE 90">SAE 90</MenuItem>
+                        <MenuItem value="75W-90">75W-90</MenuItem>
+                        <MenuItem value="80W-90">80W-90</MenuItem>
+                    </TextField>
+                    <TextField select label="REFRIGERANTE" type='text' name='TipoRefri' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoRefri} onChange={handleChange}>
+                <MenuItem value="refrigerante rosa">refrigerante rosa</MenuItem>
+                          <MenuItem value="refrigerante verde">refrigerante verde</MenuItem>
+                        <MenuItem value="refrigerante azul">refrigerante azul</MenuItem>
+                        <MenuItem value="refrigerante amarillo">refrigerante amarillo</MenuItem>
+          </TextField>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                    <TextField select label="OCTANAJE" type='text' name="Octanaje" sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.Octanaje} onChange={handleChange}>
+                          <MenuItem value="91">91</MenuItem>
+                        <MenuItem value="95">95</MenuItem>
+                    </TextField>
+                    <TextField select label="TIPO-MANTENIMIENTO" type='text' name='TipoMant' sx={{ bgcolor: '#FFFFFF', width: '30%', margin: '10px', borderRadius: '10px' }} value={formData.TipoMant} onChange={handleChange}>
+                          <MenuItem value="Mant. Carro Aut">Mant. Carro Aut</MenuItem>
+                        <MenuItem value="Mant. Carro Man">Mant. Carro Man</MenuItem>
+                    </TextField>
+                    <InputField label="TiempoUsoMant" type='number' name='TiempoUsoMant' valor={formData.TiempoUsoMant} cambio={handleChange} />
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+                    <InputField label="KilometrajeMant" type='text' name='KilometrajeMant' valor={formData.KilometrajeMant} cambio={handleChange} />
                     <InputField label="CantPuestos" type='number' name='CantPuestos' valor={formData.CantPuestos} cambio={handleChange} />
                     <InputField label="Peso" type='number' name='Peso' valor={formData.Peso} cambio={handleChange} />
                 </Box>
-
-                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                <InputField label="TipoAceite" type='text' name='TipoAceite' valor={formData.TipoAceite} cambio={handleChange} />
-                    <InputField label="AceiteCaja" type='text' name='AceiteCaja' valor={formData.AceiteCaja} cambio={handleChange} />
-                </Box>
-
-                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                <InputField label="TipoRefri" type='text' name='TipoRefri' valor={formData.TipoRefri} cambio={handleChange} />
-                    <select name="Octanaje" value={formData.Octanaje} onChange={handleChange} style={{ backgroundColor: 'white', color: 'black', borderRadius: '8px' }}>
-                        <option value="91">Seleccione Octanaje</option>
-                        <option value="91">91</option>
-                        <option value="95">95</option>
-                    </select>
-                </Box>
-
-                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                <InputField label="TipoMant" type='text' name='TipoMant' valor={formData.TipoMant} cambio={handleChange} />
-                    <InputField label="TiempoUsoMant" type='number' name='TiempoUsoMant' valor={formData.TiempoUsoMant} cambio={handleChange} />
-                </Box>
-
-                <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-                <InputField label="KilometrajeMant" type='text' name='KilometrajeMant' valor={formData.KilometrajeMant} cambio={handleChange} />
-                    <InputField label="CodTipoV" type='text' name='CodTipoV' valor={formData.CodTipoV} cambio={handleChange} />
-                </Box>
-
-
+                
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                 <Button type='submit' variant="contained" sx={{

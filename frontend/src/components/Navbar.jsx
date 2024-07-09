@@ -9,14 +9,16 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 const SERVERNAME = import.meta.env.VITE_SERVERNAME;
-const userJson = localStorage.getItem('user');
-const user = JSON.parse(userJson);
 
 function Navbar() {
+    const userJson = localStorage.getItem('user');
+    const user = userJson ? JSON.parse(userJson) : {};
     const navigate = useNavigate();
     const location = useLocation();
     const { encargado } = useAuth();
-      const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
+    const [empleadosSeleccionados, setEmpleadosSeleccionados] = useState([]);
+    
+    const {logout} = useAuth();
 
     const [opcionActiva, setOpcionActiva] = useState('');
    // useEffect para cargar datos de empleados, clientes y vehículos al montar el componente
@@ -62,8 +64,10 @@ function Navbar() {
         const confirmLogout = window.confirm("¿Está seguro de que quiere salir?");
         if (confirmLogout) {
             // Aquí puedes agregar lógica adicional para manejar el cierre de sesión, como limpiar el estado global o localStorage
+            logout();
             navigate('/'); // Redirige al usuario al login
             window.location.reload();
+
         }
     };
 
