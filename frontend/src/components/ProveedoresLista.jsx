@@ -11,7 +11,7 @@ const SERVERNAME = import.meta.env.VITE_SERVERNAME;
 // Obtención de la información del usuario almacenada en localStorage y conversión de esta de JSON a objeto.
 // Esto permite manejar la información del usuario de manera más sencilla en la aplicación.
 const userJson = localStorage.getItem('user');
-const user = userJson;
+const user = userJson ? JSON.parse(userJson) : {};
 
 // Estilos para el componente Box. Se configura el padding vertical, ancho, color de borde,
 // color de fondo y color de texto. Estos estilos se aplican a un componente Box de Material UI.
@@ -84,7 +84,7 @@ async function sendData(endpoint, formData, method) {
     window.location.reload();
     return response.json();
   } else {
-    // Handle non-JSON responses or errors
+    // Handle non-JSON responses or errorsF
     const text = await response.text(); // Read response as text to avoid JSON parse error
     throw new Error(`Failed to fetch JSON. Status: ${response.status}, Body: ${text}`);
   }
@@ -483,80 +483,129 @@ function ORDENCOMPRA({ data = null, isEditing = false }) {
   );
 }
 
-// Define un componente funcional llamado Vehiculo
 function Facturas({ data = null, isEditing = false }) {
 
-  // Utiliza un hook personalizado useForm para manejar el estado del formulario, inicializando con valores predeterminados para los campos del formulario
-  const initialValues = {
-    CodTipoV: data?.CodTipoV || '',
-    Descripcion: data?.Descripcion || '',
+  // Ajusta initialValues para usar useState
+  const [factura, setFactura] = useState({
+    RIFSuc: user.RIFSuc || '',
+    NumFact: data?.NumFact || '',
+    Fecha: data?.Fecha || '',
+    items: data?.items || [
+      {
+        CodOrden: 0,
+        CodRequiCom: 0,
+        CodProd: 0,
+      },
+    ],
+  });
 
+  // Función para manejar cambios en el formulario
+  const handleChangeFactura = (e, index = null, field = null) => {
+    if (index !== null && field) {
+      // Maneja cambios en los campos de los ítems
+      const updatedItems = factura.items.map((item, i) => {
+        if (i === index) {
+          return { ...item, [field]: e.target.value };
+        }
+        return item;
+      });
+      setFactura({ ...factura, items: updatedItems });
+    } else {
+      // Maneja cambios en los campos normales del formulario
+      setFactura({ ...factura, [e.target.name]: e.target.value });
+    }
   };
 
-  const [formData, handleChange] = useForm(initialValues);
+  // Función para agregar un nuevo ítem
+  const handleAddItem = () => {
+    setFactura({
+      ...factura,
+      items: [...factura.items, { CodOrden: 0, CodRequiCom: 0, CodProd: 0 }],
+    });
+  };
 
-  // Define una función asíncrona handleSubmit para manejar el evento de envío del formulario
+  // Función para quitar un ítem
+  const handleRemoveItem = (index) => {
+    const newItems = factura.items.filter((_, i) => i !== index);
+    setFactura({ ...factura, items: newItems });
+  };
 
-  const handleSubmit = async (e) => {
+  const handleSubmitFactura = async (e) => {
     e.preventDefault();
-    console.log(formData)
-    const endpoint = `${SERVERNAME}/tiposvehiculos`;
-    const method = isEditing ? 'PUT' : 'POST';
-
+ 
     try {
-      await sendData(endpoint, formData, method);
-      alert('Operación realizada correctamente');
+
+      const endpoint = `${SERVERNAME}/facturasproveedores`;
+      return sendData(endpoint, factura, 'POST');
+
     } catch (error) {
       console.error('Error en la operación', error);
-      if (error.message.includes('404')) {
-        alert('Recurso no encontrado. Por favor, verifique los datos e intente nuevamente.');
-      } else {
-        alert('Error en la operación. Por favor, intente nuevamente.');
-      }
+      alert('Error en la operación. Por favor, intente nuevamente.');
     }
   };
 
   const handleDelete = async () => {
-    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar este empleado?');
+    const isConfirmed = window.confirm('¿Está seguro de que desea eliminar esta factura?');
     if (!isConfirmed) {
       return; // Si el usuario no confirma, detiene la función aquí
     }
-    const endpoint = `${SERVERNAME}/ordenescompras`; // Asumiendo que CodTipoV es el identificador único
+    const endpoint = `${SERVERNAME}/facturas/${factura.NumFact}`; // Asumiendo que NumFact es el identificador único
     try {
-      await sendData(endpoint, formData, 'DELETE');
-      alert('Empleado eliminado correctamente');
-      // Aquí podrías redirigir al usuario o actualizar el estado para reflejar que el empleado fue eliminado
+      await sendData(endpoint, {}, 'DELETE');
+      alert('Factura eliminada correctamente');
     } catch (error) {
-      console.error('Error al eliminar el empleado', error);
-      alert('Error al eliminar el empleado. Por favor, intente nuevamente.');
+      console.error('Error al eliminar la factura', error);
+      alert('Error al eliminar la factura. Por favor, intente nuevamente.');
     }
   };
 
-  // Renderiza el componente FormBox pasando handleSubmit como prop para manejar el envío del formulario
   return (
-    <FormBox onSubmit={handleSubmit}>
-      {/* Box para agrupar los campos de entrada con estilo de flexbox */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-      </Box>
-      {/* Repite la estructura anterior para otros campos del formulario */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
-          <InputField label="Descripcion" type='text' name='Descripcion'
-            valor={formData.Descripcion} cambio={handleChange} />
+    <FormBox onSubmit={handleSubmitFactura}>
+      <div>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'center' }}>
+            <TextField label="NumFact" type='text' name='NumFact'
+              value={factura.NumFact} onChange={handleChangeFactura}
+              style={{ backgroundColor: 'white' }}
+            />
+
+            <TextField label="Fecha" type='date' name='Fecha'
+              value={factura.Fecha} onChange={handleChangeFactura}
+              style={{ backgroundColor: 'white' }}
+            />
+          </Box>
+          {factura.items.map((item, index) => (
+            <Box key={index} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <TextField
+                label="CodOrden"
+                type="text"
+                value={item.CodOrden}
+                onChange={(e) => handleChangeFactura(e, index, 'CodOrden')}
+                style={{ backgroundColor: 'white' }}
+              />
+              <TextField
+                label="CodRequiCom"
+                type="text"
+                value={item.CodRequiCom}
+                onChange={(e) => handleChangeFactura(e, index, 'CodRequiCom')}
+                style={{ backgroundColor: 'white' }}
+              />
+              <TextField
+                label="CodProd"
+                type="text"
+                value={item.CodProd}
+                onChange={(e) => handleChangeFactura(e, index, 'CodProd')}
+                style={{ backgroundColor: 'white' }}
+              />
+              <Button onClick={() => handleRemoveItem(index)}>Quitar</Button>
+            </Box>
+          ))}
+          <Button onClick={handleAddItem}>Agregar ítem</Button>
         </Box>
-      </Box>
+        <Button type="submit">Enviar</Button>
+      </div>
+
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Button type='submit' variant="contained" sx={{
-          margin: '5px 0',
-          color: '#000000',
-          bgcolor: '#FFFFFF',
-          '&:hover': {
-            bgcolor: '#41B06E',
-            color: '#FFFFFF'
-          }
-        }}>
-          {isEditing ? 'Actualizar Tipo Vehiculo' : 'Agregar Tipo Vehiculo'}
-        </Button>
         {isEditing && (
           <Button variant="contained" color='error' onClick={handleDelete} sx={{ '&:hover': { backgroundColor: '#8b0000 ' } }}>
             Eliminar
@@ -644,6 +693,7 @@ function ProveedoresLista({ opcion }) {
         const respuesta = await fetch(`${SERVERNAME}/${endpoint}`);
         // Convierte la respuesta a formato JSON
         const datos = await respuesta.json();
+        console.log(datos);
         // Actualiza el estado correspondiente con los datos obtenidos
         setter(datos);
       } catch (error) {
@@ -657,7 +707,7 @@ function ProveedoresLista({ opcion }) {
     obtenerDatos(`proveedores`, setEmpleadosSeleccionados);
     obtenerDatos(`requisiciones_compra/${user.RIFSuc}`, setlineasSeleccionados);
     obtenerDatos(`ordenescompras/${user.RIFSuc}`, setVehiculosSeleccionados);
-    obtenerDatos(`facturas_proveedores/${user.RIFSuc}`)
+    obtenerDatos(`facturasproveedores/${user.RIFSuc}`, setFacturasSeleccionadas)
   }, []);
 
   // Función para manejar la apertura del modal y establecer el tipo de formulario
@@ -740,7 +790,7 @@ function ProveedoresLista({ opcion }) {
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* Lista estática, posiblemente para mostrar detalles o información adicional */}
           <List sx={style}>
-            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Rif' || entry[0] === 'IdReq' || entry[0] === 'CodOrden')).map(([key, value]) => (
+            {seleccionEnLists && Object.entries(seleccionEnLists).slice(Object.entries(seleccionEnLists).findIndex(entry => entry[0] === 'Rif' || entry[0] === 'IdReq' || entry[0] === 'CodOrden' || entry[0] == 'NumFact')).map(([key, value]) => (
               <React.Fragment key={key}>
                 <ListItem>
                   <ListItemText primary={`${key}: `} />
