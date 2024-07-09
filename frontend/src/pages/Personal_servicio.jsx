@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
 import axios from 'axios';
 import '../css/estadisticas.css';  // Importa el archivo CSS
 import Button from '@mui/material/Button';
@@ -26,8 +25,8 @@ function Personal_servicio() {
         }
 
         try {
-            const responseMas = await axios.get(`http://localhost:3002/estadisticas_empleados_mas_servicios/${anio}/${mes}`);
-            const responseMenos = await axios.get(`http://localhost:3002/estadisticas_empleados_menos_servicios/${anio}/${mes}`);
+            const responseMas = await axios.get(`http://localhost:5173/estadisticas_empleados_mas_servicios/${anio}/${mes}`);
+            const responseMenos = await axios.get(`http://localhost:5173/estadisticas_empleados_menos_servicios/${anio}/${mes}`);
 
             if (responseMas.data.length === 0 && responseMenos.data.length === 0) {
                 setNoResultados(true);
@@ -43,7 +42,6 @@ function Personal_servicio() {
 
     return (
         <div>
-            <Navbar />
             <h1 className="header">Personal que realiza más/menos servicios por mes.</h1>
             <div className="container-empleado-g">
                 <form onSubmit={handleSubmit}>

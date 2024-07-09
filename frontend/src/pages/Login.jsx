@@ -50,7 +50,7 @@ const handleCloseSnackbar = (event, reason) => {
             setSnackbarSeverity('success');
             setTimeout(() => {
                 navigate('/Home');
-        }, 2000);
+        }, 1000);
         } else {
             setSnackbarMessage('Inicio de sesión fallido');
             setSnackbarSeverity('error');
